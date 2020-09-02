@@ -39,16 +39,16 @@ struct bigint {
 
     bigint() : sign(1) {}
 
-    bigint(long long v) { *this = v; }
+    explicit bigint(int64_t v) { *this = v; }
 
-    bigint(const string& s) { read(s); }
+    explicit bigint(const string& s) { read(s); }
 
     void operator=(const bigint& v) {
         sign = v.sign;
         a = v.a;
     }
 
-    void operator=(long long v) {
+    void operator=(int64_t v) {
         sign = 1;
         a.clear();
         if (v < 0) sign = -1, v = -v;
@@ -93,7 +93,7 @@ struct bigint {
         if (v < 0) sign = -sign, v = -v;
         for (int32_t i = 0, carry = 0; i < (int32_t)a.size() || carry; ++i) {
             if (i == (int32_t)a.size()) a.push_back(0);
-            long long cur = a[i] * (long long)v + carry;
+            int64_t cur = a[i] * (int64_t)v + carry;
             carry = (int32_t)(cur / base);
             a[i] = (int32_t)(cur % base);
             // asm("divl %%ecx" : "=a"(carry), "=d"(a[i]) : "A"(cur),
@@ -108,11 +108,11 @@ struct bigint {
         return res;
     }
 
-    void operator*=(long long v) {
+    void operator*=(int64_t v) {
         if (v < 0) sign = -sign, v = -v;
         for (int32_t i = 0, carry = 0; i < (int32_t)a.size() || carry; ++i) {
             if (i == (int32_t)a.size()) a.push_back(0);
-            long long cur = a[i] * (long long)v + carry;
+            int64_t cur = a[i] * (int64_t)v + carry;
             carry = (int32_t)(cur / base);
             a[i] = (int32_t)(cur % base);
             // asm("divl %%ecx" : "=a"(carry), "=d"(a[i]) : "A"(cur),
@@ -121,7 +121,7 @@ struct bigint {
         trim();
     }
 
-    bigint operator*(long long v) const {
+    bigint operator*(int64_t v) const {
         bigint res = *this;
         res *= v;
         return res;
@@ -139,7 +139,7 @@ struct bigint {
             r += a.a[i];
             int32_t s1 = r.a.size() <= b.a.size() ? 0 : r.a[b.a.size()];
             int32_t s2 = r.a.size() <= b.a.size() - 1 ? 0 : r.a[b.a.size() - 1];
-            int32_t d = ((long long)base * s1 + s2) / b.a.back();
+            int32_t d = ((int64_t)base * s1 + s2) / b.a.back();
             r -= b * d;
             while (r < 0) r += b, --d;
             q.a[i] = d;
@@ -159,7 +159,7 @@ struct bigint {
     void operator/=(int32_t v) {
         if (v < 0) sign = -sign, v = -v;
         for (int32_t i = (int32_t)a.size() - 1, rem = 0; i >= 0; --i) {
-            long long cur = a[i] + rem * (long long)base;
+            int64_t cur = a[i] + rem * (int64_t)base;
             a[i] = (int32_t)(cur / v);
             rem = (int32_t)(cur % v);
         }
@@ -176,7 +176,7 @@ struct bigint {
         if (v < 0) v = -v;
         int32_t m = 0;
         for (int32_t i = a.size() - 1; i >= 0; --i)
-            m = (a[i] + m * (long long)base) % v;
+            m = (a[i] + m * (int64_t)base) % v;
         return m * sign;
     }
 
@@ -221,8 +221,8 @@ struct bigint {
         return res;
     }
 
-    long long longValue() const {
-        long long res = 0;
+    int64_t longValue() const {
+        int64_t res = 0;
         for (int32_t i = a.size() - 1; i >= 0; i--) res = res * base + a[i];
         return res * sign;
     }
@@ -269,11 +269,11 @@ struct bigint {
     static vector<int32_t> convert_base(const vector<int32_t>& a,
             int32_t old_digits,
             int32_t new_digits) {
-        vector<long long> p(max(old_digits, new_digits) + 1);
+        vector<int64_t> p(max(old_digits, new_digits) + 1);
         p[0] = 1;
         for (int32_t i = 1; i < (int32_t)p.size(); i++) p[i] = p[i - 1] * 10;
         vector<int32_t> res;
-        long long cur = 0;
+        int64_t cur = 0;
         int32_t cur_digits = 0;
         for (int32_t i = 0; i < (int32_t)a.size(); i++) {
             cur += a[i] * p[cur_digits];
@@ -289,7 +289,7 @@ struct bigint {
         return res;
     }
 
-    typedef vector<long long> vll;
+    typedef vector<int64_t> vll;
 
     static vll karatsubaMultiply(const vll& a, const vll& b) {
         int32_t n = a.size();
@@ -335,7 +335,7 @@ struct bigint {
         bigint res;
         res.sign = sign * v.sign;
         for (int32_t i = 0, carry = 0; i < (int32_t)c.size(); i++) {
-            long long cur = c[i] + carry;
+            int64_t cur = c[i] + carry;
             res.a.push_back((int32_t)(cur % 1000000));
             carry = (int32_t)(cur / 1000000);
         }

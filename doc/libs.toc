@@ -1,0 +1,18 @@
+\contentsline {section}{\numberline {1}Binary Trie}{1}%
+\contentsline {section}{\numberline {2}DSU}{2}%
+\contentsline {section}{\numberline {3}Fenwick}{2}%
+\contentsline {section}{\numberline {4}FFT}{3}%
+\contentsline {section}{\numberline {5}GCD}{4}%
+\contentsline {section}{\numberline {6}Grid}{5}%
+\contentsline {section}{\numberline {7}Hash}{5}%
+\contentsline {section}{\numberline {8}O(1) square root}{6}%
+\contentsline {section}{\numberline {9}Matrix}{6}%
+\contentsline {section}{\numberline {10}Mint}{7}%
+\contentsline {section}{\numberline {11}NT}{7}%
+\contentsline {section}{\numberline {12}NTT}{12}%
+\contentsline {section}{\numberline {13}Polynomial}{15}%
+\contentsline {section}{\numberline {14}Removable priority queue}{23}%
+\contentsline {section}{\numberline {15}Segment Tree}{23}%
+\contentsline {section}{\numberline {16}Sparse Table}{25}%
+\contentsline {section}{\numberline {17}Suffix Array}{25}%
+\contentsline {section}{\numberline {18}Template}{26}%
