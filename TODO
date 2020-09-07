@@ -1,11 +1,14 @@
 Implement data structures by hand
-1. vector
-2. stack
-3. queue
+
+1. vector - DONE
+2. stack - DONE due to vector
+3. queue - DONE using deque
+7. priority queue - DONE
+10. pair - DONE
+
 4. set
 5. linked list
 6. binary tree
-7. priority queue
 8. doubly linked list
 9. hash map
-10. pair
+11. graph algos like dijkstras and all on codeground

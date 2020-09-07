@@ -11,6 +11,3 @@ inline long long isqrt(long long n) {
     if ((sq * sq) == n) return sq;
     return sq - 1;
 }
-
-// segment tree
-

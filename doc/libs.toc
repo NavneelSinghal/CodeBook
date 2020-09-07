@@ -1,18 +1,23 @@
-\contentsline {section}{\numberline {1}Binary Trie}{1}%
-\contentsline {section}{\numberline {2}DSU}{2}%
-\contentsline {section}{\numberline {3}Fenwick}{2}%
-\contentsline {section}{\numberline {4}FFT}{3}%
-\contentsline {section}{\numberline {5}GCD}{4}%
-\contentsline {section}{\numberline {6}Grid}{5}%
-\contentsline {section}{\numberline {7}Hash}{5}%
-\contentsline {section}{\numberline {8}O(1) square root}{6}%
-\contentsline {section}{\numberline {9}Matrix}{6}%
-\contentsline {section}{\numberline {10}Mint}{7}%
-\contentsline {section}{\numberline {11}NT}{7}%
-\contentsline {section}{\numberline {12}NTT}{12}%
-\contentsline {section}{\numberline {13}Polynomial}{15}%
-\contentsline {section}{\numberline {14}Removable priority queue}{23}%
-\contentsline {section}{\numberline {15}Segment Tree}{23}%
-\contentsline {section}{\numberline {16}Sparse Table}{25}%
-\contentsline {section}{\numberline {17}Suffix Array}{25}%
-\contentsline {section}{\numberline {18}Template}{26}%
+\contentsline {section}{\numberline {1}Data Structures}{2}%
+\contentsline {subsection}{\numberline {1.1}Vector}{2}%
+\contentsline {subsection}{\numberline {1.2}Deque}{3}%
+\contentsline {subsection}{\numberline {1.3}Priority Queue}{4}%
+\contentsline {subsection}{\numberline {1.4}Pair}{6}%
+\contentsline {subsection}{\numberline {1.5}Fenwick}{7}%
+\contentsline {subsection}{\numberline {1.6}Segment Tree}{8}%
+\contentsline {subsection}{\numberline {1.7}Sparse Table}{10}%
+\contentsline {subsection}{\numberline {1.8}Binary Trie}{11}%
+\contentsline {subsection}{\numberline {1.9}DSU}{12}%
+\contentsline {subsection}{\numberline {1.10}AVL Tree}{13}%
+\contentsline {section}{\numberline {2}FFT}{16}%
+\contentsline {section}{\numberline {3}Dijkstra}{18}%
+\contentsline {section}{\numberline {4}GCD}{21}%
+\contentsline {section}{\numberline {5}Grid}{22}%
+\contentsline {section}{\numberline {6}Hash}{23}%
+\contentsline {section}{\numberline {7}O(1) square root}{24}%
+\contentsline {section}{\numberline {8}Matrix}{25}%
+\contentsline {section}{\numberline {9}Mint}{26}%
+\contentsline {section}{\numberline {10}NT}{27}%
+\contentsline {section}{\numberline {11}NTT}{32}%
+\contentsline {section}{\numberline {12}Suffix Array}{36}%
+\contentsline {section}{\numberline {13}Template}{38}%
