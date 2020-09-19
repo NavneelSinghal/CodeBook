@@ -10,8 +10,7 @@ int main() {
     cout << v.size() << '\n';
     for (int i = 0; i < v.size(); ++i) {
         v[i].push_back(i);
-        for (int j = 0; j < v[i].size(); ++j)
-            cout << v[i][j] << ' ';
+        for (int j = 0; j < v[i].size(); ++j) cout << v[i][j] << ' ';
         cout << '\n';
     }
     while (v.size()) {

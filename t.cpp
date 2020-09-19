@@ -24,8 +24,8 @@ using namespace std;
 #define isodd(n) (n & 1)
 #define iseven(n) (!(n & 1))
 
-#define del_rep(v) \
-    sort(v.begin(), v.end());  \
+#define del_rep(v)            \
+    sort(v.begin(), v.end()); \
     v.erase(unique(v.begin(), v.end()), v.end());
 #define checkbit(n, b) ((n >> b) & 1)
 

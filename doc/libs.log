@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2020.8.12)  7 SEP 2020 21:09
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2020.8.12)  8 SEP 2020 20:39
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -6,10 +6,19 @@ entering extended mode
 (./libs.tex
 LaTeX2e <2020-02-02> patch level 2
 L3 programming layer <2020-02-14>
-(/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
-Document Class: article 2019/12/20 v1.4l Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/extsizes/extarticle.cls
+Document Class: extarticle 1996/10/08 v1.0 Non Standard LaTeX document class
 (/usr/share/texlive/texmf-dist/tex/latex/base/size10.clo
 File: size10.clo 2019/12/20 v1.4l Standard LaTeX file (size option)
+)
+(/usr/share/texlive/texmf-dist/tex/latex/base/exscale.sty
+Package: exscale 2018/09/24 v2.1i Standard LaTeX package exscale
+LaTeX Font Info:    Redeclaring symbol font `largesymbols' on input line 57.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `normal'
+(Font)                  OMX/cmex/m/n --> OMX/cmex/m/n on input line 57.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `bold'
+(Font)                  OMX/cmex/m/n --> OMX/cmex/m/n on input line 57.
+\big@size=\dimen134
 )
 \c@part=\count167
 \c@section=\count168
@@ -21,7 +30,7 @@ File: size10.clo 2019/12/20 v1.4l Standard LaTeX file (size option)
 \c@table=\count174
 \abovecaptionskip=\skip47
 \belowcaptionskip=\skip48
-\bibindent=\dimen134
+\bibindent=\dimen135
 )
 (/usr/share/texlive/texmf-dist/tex/latex/base/fontenc.sty
 Package: fontenc 2020/02/11 v2.0o Standard LaTeX package
@@ -35,14 +44,14 @@ Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
 \lst@gtempboxa=\box45
 \lst@token=\toks15
 \lst@length=\count176
-\lst@currlwidth=\dimen135
+\lst@currlwidth=\dimen136
 \lst@column=\count177
 \lst@pos=\count178
-\lst@lostspace=\dimen136
-\lst@width=\dimen137
+\lst@lostspace=\dimen137
+\lst@width=\dimen138
 \lst@newlines=\count179
 \lst@lineno=\count180
-\lst@maxwidth=\dimen138
+\lst@maxwidth=\dimen139
 
 (/usr/share/texlive/texmf-dist/tex/latex/listings/lstmisc.sty
 File: lstmisc.sty 2019/09/10 1.8c (Carsten Heinz)
@@ -76,6 +85,76 @@ Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1369.
 Package xcolor Info: Model `Gray' substituted by `gray' on input line 1370.
 Package xcolor Info: Model `wave' substituted by `hsb' on input line 1371.
 )
+(/usr/share/texlive/texmf-dist/tex/latex/tools/multicol.sty
+Package: multicol 2019/12/09 v1.8y multicolumn formatting (FMi)
+\c@tracingmulticols=\count183
+\mult@box=\box47
+\multicol@leftmargin=\dimen140
+\c@unbalance=\count184
+\c@collectmore=\count185
+\doublecol@number=\count186
+\multicoltolerance=\count187
+\multicolpretolerance=\count188
+\full@width=\dimen141
+\page@free=\dimen142
+\premulticols=\dimen143
+\postmulticols=\dimen144
+\multicolsep=\skip49
+\multicolbaselineskip=\skip50
+\partial@page=\box48
+\last@line=\box49
+\maxbalancingoverflow=\dimen145
+\mult@rightbox=\box50
+\mult@grightbox=\box51
+\mult@gfirstbox=\box52
+\mult@firstbox=\box53
+\@tempa=\box54
+\@tempa=\box55
+\@tempa=\box56
+\@tempa=\box57
+\@tempa=\box58
+\@tempa=\box59
+\@tempa=\box60
+\@tempa=\box61
+\@tempa=\box62
+\@tempa=\box63
+\@tempa=\box64
+\@tempa=\box65
+\@tempa=\box66
+\@tempa=\box67
+\@tempa=\box68
+\@tempa=\box69
+\@tempa=\box70
+\@tempa=\box71
+\@tempa=\box72
+\@tempa=\box73
+\@tempa=\box74
+\@tempa=\box75
+\@tempa=\box76
+\@tempa=\box77
+\@tempa=\box78
+\@tempa=\box79
+\@tempa=\box80
+\@tempa=\box81
+\@tempa=\box82
+\@tempa=\box83
+\@tempa=\box84
+\@tempa=\box85
+\@tempa=\box86
+\@tempa=\box87
+\@tempa=\box88
+\@tempa=\box89
+\@tempa=\box90
+\c@minrows=\count189
+\c@columnbadness=\count190
+\c@finalcolumnbadness=\count191
+\last@try=\dimen146
+\multicolovershoot=\dimen147
+\multicolundershoot=\dimen148
+\mult@nat@firstbox=\box91
+\colbreak@box=\box92
+\mc@col@check@num=\count192
+)
 (/usr/share/texlive/texmf-dist/tex/latex/geometry/geometry.sty
 Package: geometry 2020/01/02 v5.9 Page Geometry
 
@@ -85,17 +164,17 @@ Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 (/usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty
 Package: iftex 2019/11/07 v1.0c TeX engine tests
 ))
-\Gm@cnth=\count183
-\Gm@cntv=\count184
-\c@Gm@tempcnt=\count185
-\Gm@bindingoffset=\dimen139
-\Gm@wd@mp=\dimen140
-\Gm@odd@mp=\dimen141
-\Gm@even@mp=\dimen142
-\Gm@layoutwidth=\dimen143
-\Gm@layoutheight=\dimen144
-\Gm@layouthoffset=\dimen145
-\Gm@layoutvoffset=\dimen146
+\Gm@cnth=\count193
+\Gm@cntv=\count194
+\c@Gm@tempcnt=\count195
+\Gm@bindingoffset=\dimen149
+\Gm@wd@mp=\dimen150
+\Gm@odd@mp=\dimen151
+\Gm@even@mp=\dimen152
+\Gm@layoutwidth=\dimen153
+\Gm@layoutheight=\dimen154
+\Gm@layouthoffset=\dimen155
+\Gm@layoutvoffset=\dimen156
 \Gm@dimlist=\toks16
 )
 (/usr/share/texlive/texmf-dist/tex/latex/bera/beramono.sty
@@ -112,58 +191,58 @@ File: lstmisc.sty 2019/09/10 1.8c (Carsten Heinz)
 )
 (/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdfmode.def
 File: l3backend-pdfmode.def 2020-02-03 L3 backend support: PDF mode
-\l__kernel_color_stack_int=\count186
-\l__pdf_internal_box=\box47
+\l__kernel_color_stack_int=\count196
+\l__pdf_internal_box=\box93
 )
 (./libs.aux)
 \openout1 = `libs.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 16.
-LaTeX Font Info:    ... okay on input line 16.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 16.
-LaTeX Font Info:    ... okay on input line 16.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 16.
-LaTeX Font Info:    ... okay on input line 16.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 16.
-LaTeX Font Info:    ... okay on input line 16.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 16.
-LaTeX Font Info:    ... okay on input line 16.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 16.
-LaTeX Font Info:    ... okay on input line 16.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 16.
-LaTeX Font Info:    ... okay on input line 16.
-\c@lstlisting=\count187
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+\c@lstlisting=\count197
  (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count188
-\scratchdimen=\dimen147
-\scratchbox=\box48
-\nofMPsegments=\count189
-\nofMParguments=\count190
+\scratchcounter=\count198
+\scratchdimen=\dimen157
+\scratchbox=\box94
+\nofMPsegments=\count199
+\nofMParguments=\count266
 \everyMPshowfont=\toks17
-\MPscratchCnt=\count191
-\MPscratchDim=\dimen148
-\MPnumerator=\count192
-\makeMPintoPDFobject=\count193
+\MPscratchCnt=\count267
+\MPscratchDim=\dimen158
+\MPnumerator=\count268
+\makeMPintoPDFobject=\count269
 \everyMPtoPDFconversion=\toks18
 )
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
 *geometry* verbose mode - [ preamble ] result:
 * driver: pdftex
-* paper: <default>
+* paper: legalpaper
 * layout: <same size as paper>
 * layoutoffset:(h,v)=(0.0pt,0.0pt)
-* modes: 
-* h-part:(L,W,R)=(56.9055pt, 500.484pt, 56.9055pt)
-* v-part:(T,H,B)=(56.9055pt, 681.15898pt, 56.9055pt)
-* \paperwidth=614.295pt
-* \paperheight=794.96999pt
-* \textwidth=500.484pt
-* \textheight=681.15898pt
-* \oddsidemargin=-15.36449pt
-* \evensidemargin=-15.36449pt
-* \topmargin=-52.36449pt
+* modes: landscape 
+* h-part:(L,W,R)=(28.45274pt, 954.87451pt, 28.45274pt)
+* v-part:(T,H,B)=(28.45274pt, 557.38951pt, 28.45274pt)
+* \paperwidth=1011.78pt
+* \paperheight=614.295pt
+* \textwidth=954.87451pt
+* \textheight=557.38951pt
+* \oddsidemargin=-43.81725pt
+* \evensidemargin=-43.81725pt
+* \topmargin=-80.81725pt
 * \headheight=12.0pt
 * \headsep=25.0pt
 * \topskip=10.0pt
@@ -182,60 +261,62 @@ LaTeX Font Info:    ... okay on input line 16.
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 (./libs.toc
-LaTeX Font Info:    External font `cmex10' loaded for size
+LaTeX Font Info:    External font `cmex7' loaded for size
 (Font)              <7> on input line 2.
-LaTeX Font Info:    External font `cmex10' loaded for size
+LaTeX Font Info:    External font `cmex7' loaded for size
 (Font)              <5> on input line 2.
 )
 \tf@toc=\write3
 \openout3 = `libs.toc'.
 
- [1
-
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
-LaTeX Font Info:    Trying to load font information for T1+fvm on input line 27
+LaTeX Font Info:    Trying to load font information for T1+fvm on input line 30
 .
-
-(/usr/share/texlive/texmf-dist/tex/latex/bera/t1fvm.fd
+ (/usr/share/texlive/texmf-dist/tex/latex/bera/t1fvm.fd
 File: t1fvm.fd 2004/09/07 scalable font definitions for T1/fvm.
 )
 LaTeX Font Info:    Font shape `T1/fvm/m/n' will be
-(Font)              scaled to size 6.80005pt on input line 27.
- (../vector.cpp
+(Font)              scaled to size 6.40002pt on input line 30.
+
+(../vector.cpp
 LaTeX Font Info:    Font shape `T1/fvm/b/n' will be
-(Font)              scaled to size 6.80005pt on input line 1.
+(Font)              scaled to size 6.40002pt on input line 1.
+) (../deque.cpp [1
+
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]) (../pq.cpp
 LaTeX Font Info:    Font shape `T1/fvm/m/it' in size <8> not available
-(Font)              Font shape `T1/fvm/m/sl' tried instead on input line 34.
+(Font)              Font shape `T1/fvm/m/sl' tried instead on input line 44.
 LaTeX Font Info:    Font shape `T1/fvm/m/sl' will be
-(Font)              scaled to size 6.80005pt on input line 34.
-)
-[2] (../deque.cpp) [3] (../pq.cpp [4]) [5] (../pair.cpp) [6] (../fenwick.cpp)
-[7] (../segtree.cpp [8]) [9] (../sparsetable.cpp) [10] (../binarytrie.cpp)
-[11] (../dsu.cpp) [12] (../avl.cpp [13] [14]) [15] (../fft.cpp [16]) [17]
-(../dijkstra.cpp [18] [19]) [20] (../gcd.cpp) [21] (../grid.cpp) [22]
-(../hash.cpp) [23] (../lib.cpp) [24] (../matrix.cpp) [25] (../mint.cpp)
-[26] (../nt.cpp [27] [28] [29] [30]) [31] (../ntt.cpp [32] [33] [34]) [35]
-(../suffixarray.cpp [36]) [37] (../t.cpp) [38] (./libs.aux) ) 
+(Font)              scaled to size 6.40002pt on input line 44.
+) (../pair.cpp) (../fenwick.cpp) (../segtree.cpp [2])
+(../sparsetable.cpp) (../binarytrie.cpp) (../dsu.cpp) (../avl.cpp [3])
+(../matrix.cpp) (../bridges.cpp [4]) (../undirected_cycle.cpp) (../toposort.cpp
+) (../scc.cpp) (../prim.cpp) (../mincostflow.cpp [5]) (../lca.cpp)
+(../floyd_warshall.cpp) (../dinic.cpp) (../directed_cycle.cpp [6])
+(../dijkstra.cpp) (../dfs.cpp [7]) (../bellman_ford.cpp)
+(../articulation_points.cpp) (../2sat.cpp) (../01bfs.cpp) (../suffixarray.cpp
+[8]) (../kmp.cpp) (../z.cpp) (../gcd.cpp) (../grid.cpp) (../hash.cpp)
+(../lib.cpp) (../mint.cpp [9]) (../nt.cpp [10]) (../ntt.cpp [11]) (../fft.cpp
+[12]) (../t.cpp) [13] (./libs.aux) ) 
 Here is how much of TeX's memory you used:
- 4771 strings out of 481239
- 60441 string characters out of 5920377
- 525674 words of memory out of 5000000
- 19978 multiletter control sequences out of 15000+600000
- 539619 words of font info for 37 fonts, out of 8000000 for 9000
+ 5151 strings out of 481239
+ 67140 string characters out of 5920377
+ 607720 words of memory out of 5000000
+ 20298 multiletter control sequences out of 15000+600000
+ 539846 words of font info for 38 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 34i,6n,60p,180b,1598s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/share/texliv
-e/texmf-dist/fonts/enc/dvips/base/8r.enc}{/usr/share/texmf/fonts/enc/dvips/cm-s
-uper/cm-super-t1.enc}</usr/share/texlive/texmf-dist/fonts/type1/public/bera/fvm
-b8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/bera/fvmr8a.pfb></usr
-/share/texlive/texmf-dist/fonts/type1/public/bera/fvmro8a.pfb></usr/share/texmf
-/fonts/type1/public/cm-super/sfbx1000.pfb></usr/share/texmf/fonts/type1/public/
-cm-super/sfbx1200.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfbx1440.pf
-b></usr/share/texmf/fonts/type1/public/cm-super/sfrm1000.pfb>
-Output written on libs.pdf (38 pages, 166938 bytes).
+ 34i,6n,60p,207b,1730s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/share/texlive/texmf-dist/fonts/enc/dv
+ips/base/8r.enc}{/usr/share/texmf/fonts/enc/dvips/cm-super/cm-super-t1.enc}</us
+r/share/texlive/texmf-dist/fonts/type1/public/bera/fvmb8a.pfb></usr/share/texli
+ve/texmf-dist/fonts/type1/public/bera/fvmr8a.pfb></usr/share/texlive/texmf-dist
+/fonts/type1/public/bera/fvmro8a.pfb></usr/share/texmf/fonts/type1/public/cm-su
+per/sfbx1000.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfbx1200.pfb></u
+sr/share/texmf/fonts/type1/public/cm-super/sfbx1440.pfb></usr/share/texmf/fonts
+/type1/public/cm-super/sfrm1000.pfb>
+Output written on libs.pdf (13 pages, 174655 bytes).
 PDF statistics:
- 159 PDF objects out of 1000 (max. 8388607)
- 110 compressed objects within 2 object streams
+ 77 PDF objects out of 1000 (max. 8388607)
+ 54 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

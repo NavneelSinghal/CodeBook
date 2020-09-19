@@ -1,10 +1,11 @@
-\documentclass{article}
+\documentclass[10pt]{extarticle}
 \usepackage[T1]{fontenc}
 \usepackage{listings}
 \usepackage{xcolor}
-\usepackage[margin=2cm]{geometry}
-\usepackage[scaled=.85]{beramono}
-
+\usepackage{multicol}
+\usepackage[landscape,margin=1cm,legalpaper]{geometry}
+\usepackage[scaled=.8]{beramono}
+\renewcommand{\baselinestretch}{0.7} 
 \lstset{
   language=C++,
   backgroundcolor=\color{black!7}, % set backgroundcolor
@@ -15,9 +16,11 @@
 
 \begin{document}
 
+\begin{multicols*}{3}
+
 \tableofcontents
 
-\pagebreak
+
 
 %\section{Bigint}
 %\lstinputlisting{../bigint.cpp}
@@ -25,94 +28,117 @@
 \section{Data Structures}
 \subsection{Vector}
 \lstinputlisting{../vector.cpp}
-\pagebreak
+
 \subsection{Deque}
 \lstinputlisting{../deque.cpp}
-\pagebreak
+
 \subsection{Priority Queue}
 \lstinputlisting{../pq.cpp}
-\pagebreak
+
 \subsection{Pair}
 \lstinputlisting{../pair.cpp}
-\pagebreak
+
 \subsection{Fenwick}
 \lstinputlisting{../fenwick.cpp}
-\pagebreak
+
 \subsection{Segment Tree}
 \lstinputlisting{../segtree.cpp}
-\pagebreak
+
 \subsection{Sparse Table}
 \lstinputlisting{../sparsetable.cpp}
-\pagebreak
+
 \subsection{Binary Trie}
 \lstinputlisting{../binarytrie.cpp}
-\pagebreak
+
 \subsection{DSU}
 \lstinputlisting{../dsu.cpp}
-\pagebreak
+
 \subsection{AVL Tree}
 \lstinputlisting{../avl.cpp}
-\pagebreak
+
+\subsection{Matrix}
+\lstinputlisting{../matrix.cpp}
+
+\section{Graphs}
+
+    \subsection{Bridges}
+    \lstinputlisting{../bridges.cpp}
+    \subsection{Undirected cycle}
+    \lstinputlisting{../undirected_cycle.cpp}
+    \subsection{Topological sort}
+    \lstinputlisting{../toposort.cpp}
+    \subsection{Strongly connected components}
+    \lstinputlisting{../scc.cpp}
+    \subsection{Prim's MST}
+    \lstinputlisting{../prim.cpp}
+    \subsection{Minimum cost flow}
+    \lstinputlisting{../mincostflow.cpp}
+    \subsection{LCA}
+    \lstinputlisting{../lca.cpp}
+    \subsection{Floyd Warshall}
+    \lstinputlisting{../floyd_warshall.cpp}
+    \subsection{Dinic}
+    \lstinputlisting{../dinic.cpp}
+    \subsection{Directed cycle}
+    \lstinputlisting{../directed_cycle.cpp}
+    \subsection{Dijkstra}
+    \lstinputlisting{../dijkstra.cpp}
+    \subsection{DFS}
+    \lstinputlisting{../dfs.cpp}
+    \subsection{Bellman Ford}
+    \lstinputlisting{../bellman_ford.cpp}
+    \subsection{Articulation Points}
+    \lstinputlisting{../articulation_points.cpp}
+    \subsection{2-SAT}
+    \lstinputlisting{../2sat.cpp}
+    \subsection{0-1 BFS}
+    \lstinputlisting{../01bfs.cpp}
+
+\section{Strings}
+
+\subsection{Suffix Array}
+\lstinputlisting{../suffixarray.cpp}
+\subsection{KMP}
+\lstinputlisting{../kmp.cpp}
+\subsection{Z-function}
+\lstinputlisting{../z.cpp}
+
+\section{GCD}
+\lstinputlisting{../gcd.cpp}
+
+\section{Grid}
+\lstinputlisting{../grid.cpp}
+
+\section{Hash}
+\lstinputlisting{../hash.cpp}
+
+\section{O(1) square root}
+\lstinputlisting{../lib.cpp}
+
+\section{Mint}
+\lstinputlisting{../mint.cpp}
+
+\section{NT}
+\lstinputlisting{../nt.cpp}
+
+\section{NTT}
+\lstinputlisting{../ntt.cpp}
+
+\section{FFT}
+\lstinputlisting{../fft.cpp}
 
 %\section{Factorial}
 %\lstinputlisting{../fact.cpp}
 
-\section{FFT}
-\lstinputlisting{../fft.cpp}
-\pagebreak
-
-\section{Dijkstra}
-\lstinputlisting{../dijkstra.cpp}
-\pagebreak
-
-\section{GCD}
-\lstinputlisting{../gcd.cpp}
-\pagebreak
-
-\section{Grid}
-\lstinputlisting{../grid.cpp}
-\pagebreak
-
-\section{Hash}
-\lstinputlisting{../hash.cpp}
-\pagebreak
-
-\section{O(1) square root}
-\lstinputlisting{../lib.cpp}
-\pagebreak
-
-\section{Matrix}
-\lstinputlisting{../matrix.cpp}
-\pagebreak
-
-\section{Mint}
-\lstinputlisting{../mint.cpp}
-\pagebreak
-
-\section{NT}
-\lstinputlisting{../nt.cpp}
-\pagebreak
-
-\section{NTT}
-\lstinputlisting{../ntt.cpp}
-\pagebreak
-
 %\section{Polynomial}
 %\lstinputlisting{../polynomial.cpp}
-%\pagebreak
-
 
 %\section{Removable priority queue}
 %\lstinputlisting{../removable_pq.cpp}
-%\pagebreak
-
-\section{Suffix Array}
-\lstinputlisting{../suffixarray.cpp}
-\pagebreak
 
 \section{Template}
 \lstinputlisting{../t.cpp}
-\pagebreak
 
+\end{multicols*}
 
 \end{document}

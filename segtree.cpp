@@ -96,18 +96,15 @@ node query(int v, int tl, int tr, int l, int r) {
     }
     int tm = (tl + tr) >> 1;
     return combine(query(v << 1, tl, tm, l, min(r, tm)),
-            query((v << 1) | 1, tm + 1, tr, max(l, tm + 1), r));
+                   query((v << 1) | 1, tm + 1, tr, max(l, tm + 1), r));
 }
 
 // slightly more efficient range query
 node query2(int v, int tl, int tr, int l, int r) {
-    if (l == tl && r == tr)
-        return t[v];
+    if (l == tl && r == tr) return t[v];
     int tm = (tl + tr) >> 1;
-    if (l > tm)
-        return query((v << 1) | 1, tm + 1, tr, l, r);
-    if (tm + 1 > r)
-        return query(v << 1, tl, tm, l, r);
+    if (l > tm) return query((v << 1) | 1, tm + 1, tr, l, r);
+    if (tm + 1 > r) return query(v << 1, tl, tm, l, r);
     return combine(query(v << 1, tl, tm, l, tm),
-            query((v << 1) | 1, tm + 1, tr, tm + 1, r));
+                   query((v << 1) | 1, tm + 1, tr, tm + 1, r));
 }

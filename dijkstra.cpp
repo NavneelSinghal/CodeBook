@@ -1,96 +1,97 @@
-#include <iostream>
 #include <cassert>
+#include <iostream>
 
 using namespace std;
 
 template <typename T>
 class vector {
-    private:
-        T* a;
-        int capacity;
-        int length;
-    public:
-        vector() : capacity(4), length(0), a(new T[4]) {}
-        vector(int n) : capacity(n), length(n), a(new T[n]) {}
-        vector(int n, T v) : capacity(n), length(n), a(new T[n]) {
-            for (int i = 0; i < length; ++i) a[i] = v;
-        }
-        ~vector() { delete[] a; }
-        void push_back(T v) {
-            if (length == capacity) {
-                T* old = a;
-                capacity <<= 1;
-                a = new T[capacity];
-                for (int i = 0; i < length; ++i) {
-                    a[i] = old[i];
-                }
-                delete[] old;
-            }
-            a[length++] = v;
-        }
-        void pop_back() { --length; }
-        T& back() { return a[length - 1]; }
-        int size() { return length; }
-        T& operator[](int index) { return a[index]; }
-};
+   private:
+    T* a;
+    int capacity;
+    int length;
 
+   public:
+    vector() : capacity(4), length(0), a(new T[4]) {}
+    vector(int n) : capacity(n), length(n), a(new T[n]) {}
+    vector(int n, T v) : capacity(n), length(n), a(new T[n]) {
+        for (int i = 0; i < length; ++i) a[i] = v;
+    }
+    ~vector() { delete[] a; }
+    void push_back(T v) {
+        if (length == capacity) {
+            T* old = a;
+            capacity <<= 1;
+            a = new T[capacity];
+            for (int i = 0; i < length; ++i) {
+                a[i] = old[i];
+            }
+            delete[] old;
+        }
+        a[length++] = v;
+    }
+    void pop_back() { --length; }
+    T& back() { return a[length - 1]; }
+    int size() { return length; }
+    T& operator[](int index) { return a[index]; }
+};
 
 // min heap
 template <typename T>
 class priority_queue {
-    private:
-        vector<T> a;
-        void heapify_down (int i) {
-            int left = (i << 1) + 1;
-            int right = left + 1;
-            int mn = i;
-            if (left < a.size() && a[left] < a[i]) mn = left;
-            if (right < a.size() && a[right] < a[mn]) mn = right;
-            if (mn != i) {
-                swap(a[i], a[mn]);
-                heapify_down(mn);
-            }
+   private:
+    vector<T> a;
+    void heapify_down(int i) {
+        int left = (i << 1) + 1;
+        int right = left + 1;
+        int mn = i;
+        if (left < a.size() && a[left] < a[i]) mn = left;
+        if (right < a.size() && a[right] < a[mn]) mn = right;
+        if (mn != i) {
+            swap(a[i], a[mn]);
+            heapify_down(mn);
         }
-        void heapify_up (int i) {
-            if (i && a[(i - 1) >> 1] > a[i]) {
-                swap(a[i], a[(i - 1) >> 1]);
-                heapify_up((i - 1) >> 1);
-            }
+    }
+    void heapify_up(int i) {
+        if (i && a[(i - 1) >> 1] > a[i]) {
+            swap(a[i], a[(i - 1) >> 1]);
+            heapify_up((i - 1) >> 1);
         }
-    public:
-        priority_queue() : a() {}
-        void push(T val) {
-            a.push_back(val);
-            int cur = a.size() - 1;
-            heapify_up(cur);
-        }
-        T top() { return a[0]; }
-        void pop() {
-            a[0] = a.back();
-            a.pop_back();
-            heapify_down(0);
-        }
+    }
 
-        int size() { return a.size(); }
+   public:
+    priority_queue() : a() {}
+    void push(T val) {
+        a.push_back(val);
+        int cur = a.size() - 1;
+        heapify_up(cur);
+    }
+    T top() { return a[0]; }
+    void pop() {
+        a[0] = a.back();
+        a.pop_back();
+        heapify_down(0);
+    }
+
+    int size() { return a.size(); }
 };
 
 using ll = long long;
 
 template <typename T, typename V>
 class Pair {
-    public:
-        T F;
-        V S;
-        Pair() : F(), S() {}
-        Pair(T f, V s) : F(f), S(s) {}
-        bool operator < (const Pair<T, V> p) {
-            if (F == p.F) return S < p.S;
-            return F < p.F;
-        }
-        bool operator > (const Pair<T, V> p) {
-            if (F == p.F) return S > p.S;
-            return F > p.F;
-        }
+   public:
+    T F;
+    V S;
+    Pair() : F(), S() {}
+    Pair(T f, V s) : F(f), S(s) {}
+    bool operator<(const Pair<T, V> p) {
+        if (F == p.F) return S < p.S;
+        return F < p.F;
+    }
+    bool operator>(const Pair<T, V> p) {
+        if (F == p.F) return S > p.S;
+        return F > p.F;
+    }
 };
 
 const ll INF = 1e18;
@@ -117,7 +118,7 @@ void dijkstra(int s) {
         ll dv = q.top().F;
         q.pop();
         if (dv != d[v]) continue;
-        auto &gv = g[v];
+        auto& gv = g[v];
         int sz = gv.size();
         for (int i = 0; i < sz; ++i) {
             int to = gv[i].F;
@@ -141,9 +142,10 @@ int main() {
         g[u].push_back(Pair<int, ll>(v, w));
     }
     dijkstra(s);
-    if (d[t] == INF) cout << -1 << '\n';
+    if (d[t] == INF)
+        cout << -1 << '\n';
     else {
-        cout << d[t]; 
+        cout << d[t];
         while (t != s) {
             path.push_back(Pair<int, int>(p[t], t));
             t = p[t];
@@ -161,4 +163,3 @@ int main() {
     }
     return 0;
 }
-

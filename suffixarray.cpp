@@ -31,7 +31,7 @@ vector<int32_t> sort_cyclic_shifts(string const& s) {
         for (int32_t i = 1; i < n; i++) {
             pair<int32_t, int32_t> cur = {c[p[i]], c[(p[i] + (1 << h)) % n]};
             pair<int32_t, int32_t> prev = {c[p[i - 1]],
-                c[(p[i - 1] + (1 << h)) % n]};
+                                           c[(p[i - 1] + (1 << h)) % n]};
             if (cur != prev) ++classes;
             c_new[p[i]] = classes - 1;
         }
@@ -48,38 +48,35 @@ vector<int32_t> suffix_array_construct(string s) {
     return sorted_shifts;
 }
 
-// burrow wheeler transform - find the string consisting of the last elements of the sorted rotated arrays
+// burrow wheeler transform - find the string consisting of the last elements of
+// the sorted rotated arrays
 
 // inverse burrow wheeler transform
 
-    string s;
-    read_str(s);
-    int n = s.size();
-    vector<int> nextPosition;
-    vector<vector<int>> positions(27);
-    
-    for (int i = 0; i < n; ++i)
-        positions[max(0, s[i] - 'a' + 1)].push_back(i);
+string s;
+read_str(s);
+int n = s.size();
+vector<int> nextPosition;
+vector<vector<int>> positions(27);
 
-    for (int i = 0; i < 27; ++i)
-        for (auto position : positions[i])
-            nextPosition.push_back(position);
+for (int i = 0; i < n; ++i) positions[max(0, s[i] - 'a' + 1)].push_back(i);
 
-    int position = -1;
-    for (int i = 0; i < n; ++i) {
-        if (s[i] == '#') {
-            position = i;
-            break;
-        }
+for (int i = 0; i < 27; ++i)
+    for (auto position : positions[i]) nextPosition.push_back(position);
+
+int position = -1;
+for (int i = 0; i < n; ++i) {
+    if (s[i] == '#') {
+        position = i;
+        break;
     }
+}
 
-    assert(~position);
+assert(~position);
 
-    for (int i = 1; i < n; ++i) {
-        position = nextPosition[position];
-        write_char(s[position]);
-    }
+for (int i = 1; i < n; ++i) {
+    position = nextPosition[position];
+    write_char(s[position]);
+}
 
-    write_char('\n');
-
-
+write_char('\n');

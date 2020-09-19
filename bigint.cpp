@@ -60,7 +60,7 @@ struct bigint {
             bigint res = v;
 
             for (int32_t i = 0, carry = 0;
-                    i < (int32_t)max(a.size(), v.a.size()) || carry; ++i) {
+                 i < (int32_t)max(a.size(), v.a.size()) || carry; ++i) {
                 if (i == (int32_t)res.a.size()) res.a.push_back(0);
                 res.a[i] += carry + (i < (int32_t)a.size() ? a[i] : 0);
                 carry = res.a[i] >= base;
@@ -76,7 +76,7 @@ struct bigint {
             if (abs() >= v.abs()) {
                 bigint res = *this;
                 for (int32_t i = 0, carry = 0; i < (int32_t)v.a.size() || carry;
-                        ++i) {
+                     ++i) {
                     res.a[i] -= carry + (i < (int32_t)v.a.size() ? v.a[i] : 0);
                     carry = res.a[i] < 0;
                     if (carry) res.a[i] += base;
@@ -267,8 +267,8 @@ struct bigint {
     }
 
     static vector<int32_t> convert_base(const vector<int32_t>& a,
-            int32_t old_digits,
-            int32_t new_digits) {
+                                        int32_t old_digits,
+                                        int32_t new_digits) {
         vector<int64_t> p(max(old_digits, new_digits) + 1);
         p[0] = 1;
         for (int32_t i = 1; i < (int32_t)p.size(); i++) p[i] = p[i - 1] * 10;

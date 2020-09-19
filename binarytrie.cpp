@@ -3,14 +3,14 @@ struct trie {
     trie* child[2];
 };
 
-trie* create () {
+trie* create() {
     trie* t = new trie();
     t->isleaf = false;
     memset(t->child, 0, sizeof t->child);
     return t;
 }
 
-void add (trie* root, int n) {
+void add(trie* root, int n) {
     int p = 0;
     for (int i = 31; ~i; --i) {
         p = (n >> i) & 1;
@@ -21,7 +21,7 @@ void add (trie* root, int n) {
     }
 }
 
-void clean (trie* root) {
+void clean(trie* root) {
 #ifdef CLEAN
     if (root == NULL) return;
     clean(root->child[0]);
@@ -30,7 +30,7 @@ void clean (trie* root) {
 #endif
 }
 
-int maxxor (trie* root, int n) {
+int maxxor(trie* root, int n) {
     int ans = 0;
     for (int i = 31; ~i; --i) {
         int p = (n >> i) & 1;
@@ -43,4 +43,3 @@ int maxxor (trie* root, int n) {
     }
     return ans;
 }
-
