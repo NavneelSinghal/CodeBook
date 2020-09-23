@@ -132,6 +132,31 @@ void dijkstra(int s) {
     }
 }
 
+void dijkstra2(int s) {
+    for (int i = 0; i < n; ++i) {
+        d[i] = INF;
+    }
+    // (distance, vertex)
+    set<pair<long long, int>> s;
+    d[s] = 0;
+    s.insert({0LL, s});
+    while (s.size() > 0) {
+        pair<long long, int> p = *s.begin();
+        s.erase(s.begin());
+        int u = p.second;
+        long long len = p.first;
+        for (pair<int, long long> edge : g[u]) {
+            int v = edge.first;
+            long long weight = edge.second;
+            if (d[v] > len + weight) {
+                s.erase({d[v], v});
+                d[v] = len + weight;
+                s.insert({d[v], v});
+            }
+        }
+    }
+}
+
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(0);
