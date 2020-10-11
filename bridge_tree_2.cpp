@@ -42,7 +42,7 @@ int main() {
         };
 
         // bridge detection - fails for multiple edges if index in dfs_bridge is replaced by parent
-        vector<char> is_bridge(m), visited_bridge(n);
+        vector<char> is_bridge(m);
         vector<int> tin(n), low(n);
         int timer = 0;
 
@@ -59,13 +59,12 @@ int main() {
 
         function<void(int, int)> dfs_bridge = [&] (int u, int index) {
 
-            visited_bridge[u] = true;
-            tin[u] = low[u] = timer++;
+            tin[u] = low[u] = ++timer;
 
             for (auto i : g[u]) {
                 int v = adjacent(u, i);
                 if (index == i) continue;
-                if (visited_bridge[v]) {
+                if (tin[v]) {
                     low[u] = min(low[u], tin[v]);
                 } else {
                     dfs_bridge(v, i);
