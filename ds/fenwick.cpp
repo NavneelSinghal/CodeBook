@@ -1,3 +1,4 @@
+// 1-based indexing - check
 struct Fenwick {
     int n;
     vector<int> t;
