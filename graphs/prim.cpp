@@ -11,7 +11,8 @@ int n;
 vector<vector<Edge>> adj;
 
 void prim() {
-    int total_weight = 0;
+
+    long long total_weight = 0;
     vector<Edge> min_e(n);
     min_e[0].w = 0;
     set<Edge> q;
