@@ -17,6 +17,8 @@ void setIO(string name = "") {
     cout << setprecision(10) << fixed;
 }
 
+// 1-indexed vertex and edge numbering
+
 const int N = (int)1e5 + 7;
 const int M = N;
 
