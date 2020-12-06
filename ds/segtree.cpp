@@ -1,3 +1,5 @@
+// some issue with iterative segtree - see https://codeforces.com/contest/1420 C2
+
 // implementation with optimal space
 // to allow for O(1) query for [0..n) by t[1], see the segtree below this one
 
