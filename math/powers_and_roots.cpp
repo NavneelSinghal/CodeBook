@@ -1,19 +1,58 @@
+// const int mod = 998244353;
+const int mod = 1e9 + 7;
+const long long linf = 3e18;
+
+long long pwr_mod(long long a, long long n) {
+    long long ans = 1;
+    while (n) {
+        if (n & 1) ans = (ans * a) % mod;
+        a = (a * a) % mod;
+        n >>= 1;
+    }
+    return ans;
+}
+
+// when using integers, keep overflow in mind
+template <typename T>
+T pwr(T a, long long n) {
+    T ans = 1;
+    while (n) {
+        if (n & 1) ans *= a;
+        if (n > 1) a *= a;
+        n >>= 1;
+    }
+    return ans;
+}
+
+long long power_overflow(long long a, long long n) {
+    long long ans = 1;
+    while (n) {
+        if (n & 1) {
+            if (ans < linf / a) ans *= a;
+            else return linf;
+        }
+        if (n > 1) {
+            if (a < linf / a) a *= a;
+            else return linf;
+        }
+        n >>= 1;
+    }
+    return ans;
+}
+
 // O(1) square root
 
 inline long long isqrt(long long n) {
-    double N = n;
-    N = sqrtl(N);
-    long long sq = N - 2;
+    long long sq = (long long) sqrtl((long double) n) - 2;
     sq = max(sq, 0LL);
-    while (sq * sq < n) {
-        sq++;
-    }
+    while (sq * sq < n) sq++;
     if ((sq * sq) == n) return sq;
     return sq - 1;
 }
 
 // kth roots from k = 1 to 64
 // keep a global struct
+
 struct KthRoot {
     using u32 = unsigned int;
     using u64 = unsigned long long int;
