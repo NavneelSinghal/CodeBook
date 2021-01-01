@@ -105,68 +105,67 @@ struct SegTree {
     }
 };
 
+struct SegTree {
 
+    using node = long long;
+    using T = long long;
 
-typedef struct {
-    // datatype
-} node;
+    const node ID = 0;
+    vector<node> t;
+    int n;
 
-const node ID;
-node t[4 * maxn];
-
-node combine(node n1, node n2) {
-    node ans;
-    // do something
-    return ans;
-}
-
-node make_node(int val) {
-    // make a node from val and return
-}
-
-// build segtree - 1 indexed
-void build(int v, int l, int r, vector<int>& a) {
-    if (l == r) {
-        t[v] = make_node(a[l]);
-        return;
+    SegTree(vector<T>& a) {
+        this->n = a.size();
+        this->t.resize(4 * a.size() + 4);
+        _build(1, 0, n - 1, a);
     }
-    int mid = (l + r) >> 1;
-    build(v << 1, l, mid, a);
-    build((v << 1) | 1, mid + 1, r, a);
-    t[v] = combine(t[(v << 1)], t[(v << 1) | 1]);
-}
 
-// update segtree by updating value to val at idx
-void update(int v, int l, int r, int idx, int val) {
-    if (l == r) {
-        t[v] = make_node(val);
-        return;
+    void update(int i, T val) {
+        _update(1, 0, n - 1, i, val);
     }
-    int mid = (l + r) >> 1;
-    if (idx <= mid)
-        update(v << 1, l, mid, idx, val);
-    else
-        update((v << 1) | 1, mid + 1, r, idx, val);
-    t[v] = combine(t[v << 1], t[(v << 1) | 1]);
-}
 
-// range query from l to r both inclusive
-node query(int v, int tl, int tr, int l, int r) {
-    if (l > r) return ID;
-    if (l == tl && r == tr) {
-        return t[v];
+    node query(int l, int r) {
+        return _query(1, 0, n - 1, l, r);
     }
-    int tm = (tl + tr) >> 1;
-    return combine(query(v << 1, tl, tm, l, min(r, tm)),
-                   query((v << 1) | 1, tm + 1, tr, max(l, tm + 1), r));
-}
 
-// slightly more efficient range query
-node query2(int v, int tl, int tr, int l, int r) {
-    if (l == tl && r == tr) return t[v];
-    int tm = (tl + tr) >> 1;
-    if (l > tm) return query((v << 1) | 1, tm + 1, tr, l, r);
-    if (tm + 1 > r) return query(v << 1, tl, tm, l, r);
-    return combine(query(v << 1, tl, tm, l, tm),
-                   query((v << 1) | 1, tm + 1, tr, tm + 1, r));
-}
+    node combine(node n1, node n2) {
+        return n1 + n2;
+    }
+
+    node make_node(T val) {
+        return val;
+    }
+
+    void _build(int v, int l, int r, vector<T>& a) {
+        if (l == r) {
+            t[v] = make_node(a[l]);
+            return;
+        }
+        int mid = (l + r) >> 1;
+        _build(v << 1, l, mid, a);
+        _build((v << 1) | 1, mid + 1, r, a);
+        t[v] = combine(t[(v << 1)], t[(v << 1) | 1]);
+    }
+
+    void _update(int v, int l, int r, int idx, T val) {
+        if (l == r) {
+            t[v] = make_node(val);
+            return;
+        }
+        int mid = (l + r) >> 1;
+        if (idx <= mid)
+            _update(v << 1, l, mid, idx, val);
+        else
+            _update((v << 1) | 1, mid + 1, r, idx, val);
+        t[v] = combine(t[v << 1], t[(v << 1) | 1]);
+    }
+
+    node _query(int v, int tl, int tr, int l, int r) {
+        if (l == tl && r == tr) return t[v];
+        int tm = (tl + tr) >> 1;
+        if (l > tm) return _query((v << 1) | 1, tm + 1, tr, l, r);
+        if (tm + 1 > r) return _query(v << 1, tl, tm, l, r);
+        return combine(_query(v << 1, tl, tm, l, tm),
+                _query((v << 1) | 1, tm + 1, tr, tm + 1, r));
+    }
+};
