@@ -1,4 +1,4 @@
-template<typename T>
+template <typename T>
 struct sparse_table {
     int n, l;
     vector<vector<T>> s;

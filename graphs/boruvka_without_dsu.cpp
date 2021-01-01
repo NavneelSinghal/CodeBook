@@ -10,39 +10,36 @@ void setIO(string name = "") {
     ios_base::sync_with_stdio(0);
     cin.tie(0);
     cout.tie(0);
-    if (name.size() == 0)
-        return;
+    if (name.size() == 0) return;
     FILE *fin = freopen((name + ".in").c_str(), "r", stdin);
     FILE *fout = freopen((name + ".out").c_str(), "w", stdout);
     cout << setprecision(10) << fixed;
 }
 
 struct edge {
-
     int a, b, id;
     long long w;
 
     bool operator<(const edge &o) const {
-        if (w != o.w)
-            return w < o.w;
+        if (w != o.w) return w < o.w;
         return id < o.id;
     }
 };
 
 vector<bool> boruvka(int n, vector<edge> edges) {
-
     vector<bool> res(edges.size());
 
     while (!edges.empty()) {
-
         // find local minimal edges
 
         vector<int> minEdge(n, -1);
 
         for (int i = 0; i < edges.size(); i++) {
-            if (minEdge[edges[i].a] < 0 || edges[i] < edges[minEdge[edges[i].a]])
+            if (minEdge[edges[i].a] < 0 ||
+                edges[i] < edges[minEdge[edges[i].a]])
                 minEdge[edges[i].a] = i;
-            if (minEdge[edges[i].b] < 0 || edges[i] < edges[minEdge[edges[i].b]])
+            if (minEdge[edges[i].b] < 0 ||
+                edges[i] < edges[minEdge[edges[i].b]])
                 minEdge[edges[i].b] = i;
         }
 
@@ -51,8 +48,7 @@ vector<bool> boruvka(int n, vector<edge> edges) {
         vector<vector<int>> adj(n);
 
         for (int x : minEdge) {
-            if (x < 0)
-                continue;
+            if (x < 0) continue;
             res[edges[x].id] = true;
             adj[edges[x].a].push_back(edges[x].b);
             adj[edges[x].b].push_back(edges[x].a);
@@ -65,9 +61,7 @@ vector<bool> boruvka(int n, vector<edge> edges) {
         int components = 0;
 
         for (int i = 0; i < n; i++) {
-
-            if (component[i] >= 0)
-                continue;
+            if (component[i] >= 0) continue;
 
             // dfs
             vector<int> s = {i};
@@ -77,8 +71,7 @@ vector<bool> boruvka(int n, vector<edge> edges) {
                 int x = s.back();
                 s.pop_back();
                 for (int y : adj[x]) {
-                    if (component[y] >= 0)
-                        continue;
+                    if (component[y] >= 0) continue;
                     component[y] = components;
                     s.push_back(y);
                 }
@@ -92,7 +85,6 @@ vector<bool> boruvka(int n, vector<edge> edges) {
         n = components;
 
         for (int i = 0; i < edges.size();) {
-
             edges[i].a = component[edges[i].a];
             edges[i].b = component[edges[i].b];
 
@@ -109,9 +101,8 @@ vector<bool> boruvka(int n, vector<edge> edges) {
 }
 
 void solve(int case_no) {
-
     long long ans = 0;
-    
+
     int n, m;
     cin >> n >> m;
 
@@ -123,7 +114,7 @@ void solve(int case_no) {
     }
 
     auto vbool = boruvka(n, g);
-    
+
     for (int i = 0; i < m; ++i) {
         if (vbool[i]) ans += g[i].w;
     }

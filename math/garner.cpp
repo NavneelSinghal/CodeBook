@@ -6,53 +6,57 @@ int r[][] = new int[SZ][SZ];
 
 void init() {
     for (int x = 1000 * 1000 * 1000, i = 0; i < SZ; ++x)
-        if (BigInteger.valueOf(x).isProbablePrime(100))
-            pr[i++] = x;
+        if (BigInteger.valueOf(x).isProbablePrime(100)) pr[i++] = x;
 
     for (int i = 0; i < SZ; ++i)
         for (int j = i + 1; j < SZ; ++j)
-            r[i][j] =
-                BigInteger.valueOf(pr[i]).modInverse(BigInteger.valueOf(pr[j])).intValue();
+            r[i][j] = BigInteger.valueOf(pr[i])
+                          .modInverse(BigInteger.valueOf(pr[j]))
+                          .intValue();
 }
 
 class Number {
     int a[] = new int[SZ];
 
-    public Number() {
+   public
+    Number() {}
+
+   public
+    Number(int n) {
+        for (int i = 0; i < SZ; ++i) a[i] = n % pr[i];
     }
 
-    public Number(int n) {
-        for (int i = 0; i < SZ; ++i)
-            a[i] = n % pr[i];
-    }
-
-    public Number(BigInteger n) {
+   public
+    Number(BigInteger n) {
         for (int i = 0; i < SZ; ++i)
             a[i] = n.mod(BigInteger.valueOf(pr[i])).intValue();
     }
 
-    public Number add(Number n) {
+   public
+    Number add(Number n) {
         Number result = new Number();
-        for (int i = 0; i < SZ; ++i)
-            result.a[i] = (a[i] + n.a[i]) % pr[i];
+        for (int i = 0; i < SZ; ++i) result.a[i] = (a[i] + n.a[i]) % pr[i];
         return result;
     }
 
-    public Number subtract(Number n) {
+   public
+    Number subtract(Number n) {
         Number result = new Number();
         for (int i = 0; i < SZ; ++i)
             result.a[i] = (a[i] - n.a[i] + pr[i]) % pr[i];
         return result;
     }
 
-    public Number multiply(Number n) {
+   public
+    Number multiply(Number n) {
         Number result = new Number();
         for (int i = 0; i < SZ; ++i)
             result.a[i] = (int)((a[i] * 1l * n.a[i]) % pr[i]);
         return result;
     }
 
-    public BigInteger bigIntegerValue(boolean can_be_negative) {
+   public
+    BigInteger bigIntegerValue(boolean can_be_negative) {
         BigInteger result = BigInteger.ZERO, mult = BigInteger.ONE;
         int x[] = new int[SZ];
         for (int i = 0; i < SZ; ++i) {
@@ -72,4 +76,3 @@ class Number {
         return result;
     }
 }
-

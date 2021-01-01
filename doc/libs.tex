@@ -1,144 +1,141 @@
-\documentclass[10pt]{extarticle}
-\usepackage[T1]{fontenc}
-\usepackage{listings}
-\usepackage{xcolor}
-\usepackage{multicol}
-\usepackage[landscape,margin=1cm,legalpaper]{geometry}
-\usepackage[scaled=.8]{beramono}
-\renewcommand{\baselinestretch}{0.7} 
-\lstset{
-  language=C++,
-  backgroundcolor=\color{black!7}, % set backgroundcolor
-  basicstyle=\footnotesize\ttfamily,% basic font setting
-  columns=fullflexible,
-  showstringspaces=false,
+\documentclass[10pt] { extarticle }
+\usepackage[T1] { fontenc }
+\usepackage { listings }
+\usepackage { xcolor }
+\usepackage { multicol }
+\usepackage[landscape, margin = 1cm, legalpaper] { geometry }
+\usepackage[scaled = .8] { beramono }
+\renewcommand{\baselinestretch} { 0.7 }
+\lstset {
+    language = C++, backgroundcolor =\color{black !7},
+    % set backgroundcolor basicstyle =\footnotesize\ttfamily,
+    % basic font setting columns = fullflexible, showstringspaces = false,
 }
 
-\begin{document}
+\begin { document }
 
-\begin{multicols*}{3}
+\begin{multicols * } { 3 }
 
 \tableofcontents
 
+    %\section{Bigint} %\lstinputlisting {
+    ../ bigint.cpp
+}
 
+\section { Data Structures }
+\subsection { Vector }
+\lstinputlisting { ../ vector.cpp }
 
-%\section{Bigint}
-%\lstinputlisting{../bigint.cpp}
+\subsection { Deque }
+\lstinputlisting { ../ deque.cpp }
 
-\section{Data Structures}
-\subsection{Vector}
-\lstinputlisting{../vector.cpp}
+\subsection { Priority Queue }
+\lstinputlisting { ../ pq.cpp }
 
-\subsection{Deque}
-\lstinputlisting{../deque.cpp}
+\subsection { Pair }
+\lstinputlisting { ../ pair.cpp }
 
-\subsection{Priority Queue}
-\lstinputlisting{../pq.cpp}
+\subsection { Fenwick }
+\lstinputlisting { ../ fenwick.cpp }
 
-\subsection{Pair}
-\lstinputlisting{../pair.cpp}
+\subsection { Segment Tree }
+\lstinputlisting { ../ segtree.cpp }
 
-\subsection{Fenwick}
-\lstinputlisting{../fenwick.cpp}
+\subsection { Sparse Table }
+\lstinputlisting { ../ sparsetable.cpp }
 
-\subsection{Segment Tree}
-\lstinputlisting{../segtree.cpp}
+\subsection { Binary Trie }
+\lstinputlisting { ../ binarytrie.cpp }
 
-\subsection{Sparse Table}
-\lstinputlisting{../sparsetable.cpp}
+\subsection { DSU }
+\lstinputlisting { ../ dsu.cpp }
 
-\subsection{Binary Trie}
-\lstinputlisting{../binarytrie.cpp}
+\subsection { AVL Tree }
+\lstinputlisting { ../ avl.cpp }
 
-\subsection{DSU}
-\lstinputlisting{../dsu.cpp}
+\subsection { Matrix }
+\lstinputlisting { ../ matrix.cpp }
 
-\subsection{AVL Tree}
-\lstinputlisting{../avl.cpp}
+\section { Graphs }
 
-\subsection{Matrix}
-\lstinputlisting{../matrix.cpp}
+\subsection { Bridges }
+\lstinputlisting { ../ bridges.cpp }
+\subsection { Undirected cycle }
+\lstinputlisting { ../ undirected_cycle.cpp }
+\subsection { Topological sort }
+\lstinputlisting { ../ toposort.cpp }
+\subsection { Strongly connected components }
+\lstinputlisting { ../ scc.cpp }
+\subsection {
+    Prim's MST}
+    \lstinputlisting { ../ prim.cpp }
+    \subsection { Minimum cost flow }
+    \lstinputlisting { ../ mincostflow.cpp }
+    \subsection { LCA }
+    \lstinputlisting { ../ lca.cpp }
+    \subsection { Floyd Warshall }
+    \lstinputlisting { ../ floyd_warshall.cpp }
+    \subsection { Dinic }
+    \lstinputlisting { ../ dinic.cpp }
+    \subsection { Directed cycle }
+    \lstinputlisting { ../ directed_cycle.cpp }
+    \subsection { Dijkstra }
+    \lstinputlisting { ../ dijkstra.cpp }
+    \subsection { DFS }
+    \lstinputlisting { ../ dfs.cpp }
+    \subsection { Bellman Ford }
+    \lstinputlisting { ../ bellman_ford.cpp }
+    \subsection { Articulation Points }
+    \lstinputlisting { ../ articulation_points.cpp }
+    \subsection { 2 - SAT }
+    \lstinputlisting { ../ 2sat.cpp }
+    \subsection { 0 - 1 BFS }
+    \lstinputlisting { ../ 01bfs.cpp }
 
-\section{Graphs}
+    \section { Strings }
 
-    \subsection{Bridges}
-    \lstinputlisting{../bridges.cpp}
-    \subsection{Undirected cycle}
-    \lstinputlisting{../undirected_cycle.cpp}
-    \subsection{Topological sort}
-    \lstinputlisting{../toposort.cpp}
-    \subsection{Strongly connected components}
-    \lstinputlisting{../scc.cpp}
-    \subsection{Prim's MST}
-    \lstinputlisting{../prim.cpp}
-    \subsection{Minimum cost flow}
-    \lstinputlisting{../mincostflow.cpp}
-    \subsection{LCA}
-    \lstinputlisting{../lca.cpp}
-    \subsection{Floyd Warshall}
-    \lstinputlisting{../floyd_warshall.cpp}
-    \subsection{Dinic}
-    \lstinputlisting{../dinic.cpp}
-    \subsection{Directed cycle}
-    \lstinputlisting{../directed_cycle.cpp}
-    \subsection{Dijkstra}
-    \lstinputlisting{../dijkstra.cpp}
-    \subsection{DFS}
-    \lstinputlisting{../dfs.cpp}
-    \subsection{Bellman Ford}
-    \lstinputlisting{../bellman_ford.cpp}
-    \subsection{Articulation Points}
-    \lstinputlisting{../articulation_points.cpp}
-    \subsection{2-SAT}
-    \lstinputlisting{../2sat.cpp}
-    \subsection{0-1 BFS}
-    \lstinputlisting{../01bfs.cpp}
+    \subsection { Suffix Array }
+    \lstinputlisting { ../ suffixarray.cpp }
+    \subsection { KMP }
+    \lstinputlisting { ../ kmp.cpp }
+    \subsection { Z - function }
+    \lstinputlisting { ../ z.cpp }
 
-\section{Strings}
+    \section { GCD }
+    \lstinputlisting { ../ gcd.cpp }
 
-\subsection{Suffix Array}
-\lstinputlisting{../suffixarray.cpp}
-\subsection{KMP}
-\lstinputlisting{../kmp.cpp}
-\subsection{Z-function}
-\lstinputlisting{../z.cpp}
+    \section { Grid }
+    \lstinputlisting { ../ grid.cpp }
 
-\section{GCD}
-\lstinputlisting{../gcd.cpp}
+    \section { Hash }
+    \lstinputlisting { ../ hash.cpp }
 
-\section{Grid}
-\lstinputlisting{../grid.cpp}
+    \section { O(1) square root }
+    \lstinputlisting { ../ lib.cpp }
 
-\section{Hash}
-\lstinputlisting{../hash.cpp}
+    \section { Mint }
+    \lstinputlisting { ../ mint.cpp }
 
-\section{O(1) square root}
-\lstinputlisting{../lib.cpp}
+    \section { NT }
+    \lstinputlisting { ../ nt.cpp }
 
-\section{Mint}
-\lstinputlisting{../mint.cpp}
+    \section { NTT }
+    \lstinputlisting { ../ ntt.cpp }
 
-\section{NT}
-\lstinputlisting{../nt.cpp}
+    \section { FFT }
+    \lstinputlisting{../ fft.cpp}
 
-\section{NTT}
-\lstinputlisting{../ntt.cpp}
+        %\section{Factorial} %\lstinputlisting{../ fact.cpp}
 
-\section{FFT}
-\lstinputlisting{../fft.cpp}
+        %\section{Polynomial} %\lstinputlisting{../ polynomial.cpp}
 
-%\section{Factorial}
-%\lstinputlisting{../fact.cpp}
+        %\section{Removable priority queue} %\lstinputlisting {
+        ../ removable_pq.cpp
+    }
 
-%\section{Polynomial}
-%\lstinputlisting{../polynomial.cpp}
+    \section { Template }
+    \lstinputlisting { ../ t.cpp }
 
-%\section{Removable priority queue}
-%\lstinputlisting{../removable_pq.cpp}
+    \end { multicols* }
 
-\section{Template}
-\lstinputlisting{../t.cpp}
-
-\end{multicols*}
-
-\end{document}
+    \end { document }

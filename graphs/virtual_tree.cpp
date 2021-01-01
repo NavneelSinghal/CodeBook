@@ -1,6 +1,6 @@
-#pragma GCC optimize ("Ofast")
-#pragma GCC target ("avx")
-#pragma GCC optimize ("unroll-loops")
+#pragma GCC optimize("Ofast")
+#pragma GCC target("avx")
+#pragma GCC optimize("unroll-loops")
 
 #include <bits/stdc++.h>
 
@@ -38,7 +38,8 @@ bool is_ancestor(int u, int v) {
 int lca(int u, int v) {
     if (is_ancestor(u, v)) return u;
     if (is_ancestor(v, u)) return v;
-    for (int i = l; i >= 0; --i) if (!is_ancestor(up[u][i], v)) u = up[u][i];
+    for (int i = l; i >= 0; --i)
+        if (!is_ancestor(up[u][i], v)) u = up[u][i];
     return up[u][0];
 }
 
@@ -56,7 +57,6 @@ void precompute_lca(int root = 0) {
 bool cmp(int u, int v) { return tin[u] < tin[v]; }
 
 int main() {
-
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
@@ -79,18 +79,18 @@ int main() {
     int q;
     cin >> q;
     while (q--) {
-        
         int k;
         cin >> k;
         vector<int> vertices(k);
-        
+
         for (auto &x : vertices) {
             cin >> x;
             --x;
             mark[x] = true;
         }
-        
-        // sort by dfs time (time when we enter vertex, also called tin-order), add lca of each pair of adjacent nodes, then sort again
+
+        // sort by dfs time (time when we enter vertex, also called tin-order),
+        // add lca of each pair of adjacent nodes, then sort again
         vector<int> v = vertices;
         sort(v.begin(), v.end(), cmp);
         for (int i = 1; i < k; ++i) v.push_back(lca(v[i - 1], v[i]));
@@ -102,7 +102,7 @@ int main() {
         }
 
         // create virtual tree from the found order
-        vector<int> st; // stack of vertices
+        vector<int> st;  // stack of vertices
         st.push_back(v[0]);
         for (int i = 1; i < (int)v.size(); ++i) {
             int u = v[i];
@@ -124,12 +124,14 @@ int main() {
             long long ans = 0;
             subtree_cnt[u] = mark[u];
             for (auto v : g_vt[u]) {
-                ans += solve(v, u); // g_vt is directed tree so no parent check needed
+                ans += solve(
+                    v, u);  // g_vt is directed tree so no parent check needed
                 subtree_cnt[u] += subtree_cnt[v];
             }
             if (p != -1) {
                 int weight = dep[u] - dep[p];
-                ans += weight * 1ll * subtree_cnt[u] * 1ll * (k - subtree_cnt[u]);
+                ans +=
+                    weight * 1ll * subtree_cnt[u] * 1ll * (k - subtree_cnt[u]);
             }
             return ans;
         };

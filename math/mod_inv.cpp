@@ -14,58 +14,58 @@ struct modular_int {
         x = (z % MOD);
         if (x < 0) x += MOD;
     }
-    
+
     modular_int(const modular_int<MOD>* z) { x = z->x; }
-    
+
     modular_int(const modular_int<MOD>& z) { x = z.x; }
-    
+
     modular_int operator-(const modular_int<MOD>& m) const {
         modular_int<MOD> U;
         U.x = x - m.x;
         if (U.x < 0) U.x += MOD;
         return U;
     }
-    
+
     modular_int operator+(const modular_int<MOD>& m) const {
         modular_int<MOD> U;
         U.x = x + m.x;
         if (U.x >= MOD) U.x -= MOD;
         return U;
     }
-    
+
     modular_int& operator-=(const modular_int<MOD>& m) {
         x -= m.x;
         if (x < 0) x += MOD;
         return *this;
     }
-    
+
     modular_int& operator+=(const modular_int<MOD>& m) {
         x += m.x;
         if (x >= MOD) x -= MOD;
         return *this;
     }
-    
+
     modular_int operator*(const modular_int<MOD>& m) const {
         modular_int<MOD> U;
         U.x = (x * 1ull * m.x) % MOD;
         return U;
     }
-    
+
     modular_int& operator*=(const modular_int<MOD>& m) {
         x = (x * 1ull * m.x) % MOD;
         return *this;
     }
-    
+
     template <typename T>
     friend modular_int operator+(const T& l, const modular_int<MOD>& p) {
         return (modular_int<MOD>(l) + p);
     }
-    
+
     template <typename T>
     friend modular_int operator-(const T& l, const modular_int<MOD>& p) {
         return (modular_int<MOD>(l) - p);
     }
-    
+
     template <typename T>
     friend modular_int operator*(const T& l, const modular_int<MOD>& p) {
         return (modular_int<MOD>(l) * p);
@@ -179,24 +179,24 @@ struct modular_int {
         pair<long long, long long> G = gcd(this->x, MOD);
         return modular_int<MOD>(G.first);
     }
-    
+
     modular_int<MOD> operator-() const {
         modular_int<MOD> v(0);
         v -= (*this);
         return v;
     }
-    
+
     modular_int operator/(const modular_int<MOD>& m) const {
         modular_int<MOD> U(this);
         U *= m.get_inv();
         return U;
     }
-    
+
     modular_int& operator/=(const modular_int<MOD>& m) {
         (*this) *= m.get_inv();
         return *this;
     }
-    
+
     bool operator==(const modular_int<MOD>& m) const { return x == m.x; }
 
     bool operator<(const modular_int<MOD>& m) const { return x < m.x; }
@@ -210,22 +210,22 @@ struct modular_int {
     bool operator<(const T& m) const {
         return x < (modular_int<MOD>(m)).x;
     }
-    
+
     template <typename T>
     bool operator>(const T& m) const {
         return x > (modular_int<MOD>(m)).x;
     }
-    
+
     template <typename T>
     friend bool operator==(const T& x, const modular_int<MOD>& m) {
         return (modular_int<MOD>(x)).x == m.x;
     }
-    
+
     template <typename T>
     friend bool operator<(const T& x, const modular_int<MOD>& m) {
         return (modular_int<MOD>(x)).x < m.x;
     }
-    
+
     template <typename T>
     friend bool operator>(const T& x, const modular_int<MOD>& m) {
         return (modular_int<MOD>(x)).x > m.x;
@@ -238,7 +238,7 @@ struct modular_int {
         if (p.x < 0) p.x += MOD;
         return is;
     }
-    
+
     friend ostream& operator<<(ostream& os, const modular_int<MOD>& p) {
         return os << p.x;
     }

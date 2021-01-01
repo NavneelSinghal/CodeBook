@@ -1,4 +1,4 @@
-typedef int T; // use mint instead
+typedef int T;  // use mint instead
 const int N = 1e6;
 
 vector<int> fact(N + 1);

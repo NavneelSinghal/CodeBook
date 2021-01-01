@@ -1,42 +1,44 @@
-\contentsline {section}{\numberline {1}Data Structures}{1}%
-\contentsline {subsection}{\numberline {1.1}Vector}{1}%
-\contentsline {subsection}{\numberline {1.2}Deque}{1}%
-\contentsline {subsection}{\numberline {1.3}Priority Queue}{2}%
-\contentsline {subsection}{\numberline {1.4}Pair}{2}%
-\contentsline {subsection}{\numberline {1.5}Fenwick}{2}%
-\contentsline {subsection}{\numberline {1.6}Segment Tree}{2}%
-\contentsline {subsection}{\numberline {1.7}Sparse Table}{3}%
-\contentsline {subsection}{\numberline {1.8}Binary Trie}{3}%
-\contentsline {subsection}{\numberline {1.9}DSU}{3}%
-\contentsline {subsection}{\numberline {1.10}AVL Tree}{3}%
-\contentsline {subsection}{\numberline {1.11}Matrix}{4}%
-\contentsline {section}{\numberline {2}Graphs}{5}%
-\contentsline {subsection}{\numberline {2.1}Bridges}{5}%
-\contentsline {subsection}{\numberline {2.2}Undirected cycle}{5}%
-\contentsline {subsection}{\numberline {2.3}Topological sort}{5}%
-\contentsline {subsection}{\numberline {2.4}Strongly connected components}{5}%
-\contentsline {subsection}{\numberline {2.5}Prim's MST}{5}%
-\contentsline {subsection}{\numberline {2.6}Minimum cost flow}{5}%
-\contentsline {subsection}{\numberline {2.7}LCA}{6}%
-\contentsline {subsection}{\numberline {2.8}Floyd Warshall}{6}%
-\contentsline {subsection}{\numberline {2.9}Dinic}{6}%
-\contentsline {subsection}{\numberline {2.10}Directed cycle}{6}%
-\contentsline {subsection}{\numberline {2.11}Dijkstra}{7}%
-\contentsline {subsection}{\numberline {2.12}DFS}{7}%
-\contentsline {subsection}{\numberline {2.13}Bellman Ford}{8}%
-\contentsline {subsection}{\numberline {2.14}Articulation Points}{8}%
-\contentsline {subsection}{\numberline {2.15}2-SAT}{8}%
-\contentsline {subsection}{\numberline {2.16}0-1 BFS}{8}%
-\contentsline {section}{\numberline {3}Strings}{8}%
-\contentsline {subsection}{\numberline {3.1}Suffix Array}{8}%
-\contentsline {subsection}{\numberline {3.2}KMP}{9}%
-\contentsline {subsection}{\numberline {3.3}Z-function}{9}%
-\contentsline {section}{\numberline {4}GCD}{9}%
-\contentsline {section}{\numberline {5}Grid}{9}%
-\contentsline {section}{\numberline {6}Hash}{9}%
-\contentsline {section}{\numberline {7}O(1) square root}{9}%
-\contentsline {section}{\numberline {8}Mint}{9}%
-\contentsline {section}{\numberline {9}NT}{10}%
-\contentsline {section}{\numberline {10}NTT}{11}%
-\contentsline {section}{\numberline {11}FFT}{12}%
-\contentsline {section}{\numberline {12}Template}{13}%
+\contentsline{section} {\numberline{1} Data Structures} {1} %
+\contentsline{subsection} {\numberline{1.1} Vector} {1} %
+\contentsline{subsection} {\numberline{1.2} Deque} {1} %
+\contentsline{subsection} {\numberline{1.3} Priority Queue} {2} %
+\contentsline{subsection} {\numberline{1.4} Pair} {2} %
+\contentsline{subsection} {\numberline{1.5} Fenwick} {2} %
+\contentsline{subsection} {\numberline{1.6} Segment Tree} {2} %
+\contentsline{subsection} {\numberline{1.7} Sparse Table} {3} %
+\contentsline{subsection} {\numberline{1.8} Binary Trie} {3} %
+\contentsline{subsection} {\numberline{1.9} DSU} {3} %
+\contentsline{subsection} {\numberline{1.10} AVL Tree} {3} %
+\contentsline{subsection} {\numberline{1.11} Matrix} {4} %
+\contentsline{section} {\numberline{2} Graphs} {5} %
+\contentsline{subsection} {\numberline{2.1} Bridges} {5} %
+\contentsline{subsection} {\numberline{2.2} Undirected cycle} {5} %
+\contentsline{subsection} {\numberline{2.3} Topological sort} {5} %
+\contentsline{subsection} {\numberline{2.4} Strongly connected components} {
+    5} %
+\contentsline{subsection} {
+    \numberline{2.5} Prim's MST}{5}%
+\contentsline{subsection} {\numberline{2.6} Minimum cost flow} {5} %
+\contentsline{subsection} {\numberline{2.7} LCA} {6} %
+\contentsline{subsection} {\numberline{2.8} Floyd Warshall} {6} %
+\contentsline{subsection} {\numberline{2.9} Dinic} {6} %
+\contentsline{subsection} {\numberline{2.10} Directed cycle} {6} %
+\contentsline{subsection} {\numberline{2.11} Dijkstra} {7} %
+\contentsline{subsection} {\numberline{2.12} DFS} {7} %
+\contentsline{subsection} {\numberline{2.13} Bellman Ford} {8} %
+\contentsline{subsection} {\numberline{2.14} Articulation Points} {8} %
+\contentsline{subsection} {\numberline{2.15} 2 - SAT} {8} %
+\contentsline{subsection} {\numberline{2.16} 0 - 1 BFS} {8} %
+\contentsline{section} {\numberline{3} Strings} {8} %
+\contentsline{subsection} {\numberline{3.1} Suffix Array} {8} %
+\contentsline{subsection} {\numberline{3.2} KMP} {9} %
+\contentsline{subsection} {\numberline{3.3} Z - function} {9} %
+\contentsline{section} {\numberline{4} GCD} {9} %
+\contentsline{section} {\numberline{5} Grid} {9} %
+\contentsline{section} {\numberline{6} Hash} {9} %
+\contentsline{section} {\numberline{7} O(1) square root} {9} %
+\contentsline{section} {\numberline{8} Mint} {9} %
+\contentsline{section} {\numberline{9} NT} {10} %
+\contentsline{section} {\numberline{10} NTT} {11} %
+\contentsline{section} {\numberline{11} FFT} {12} %
+\contentsline{section} {\numberline{12} Template} {13} %

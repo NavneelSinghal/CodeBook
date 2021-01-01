@@ -25,9 +25,8 @@ struct Trie {
     }
 };
 
-
-
-// might be better than below due to caching - change in the binary trie too maybe
+// might be better than below due to caching - change in the binary trie too
+// maybe
 
 struct Trie {
     static const int CHARSET = 26;
@@ -82,5 +81,4 @@ struct Trie {
             node = next_node;
         }
     }
-
 };

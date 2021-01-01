@@ -1,4 +1,5 @@
-// some issue with iterative segtree - see https://codeforces.com/contest/1420 C2
+// some issue with iterative segtree - see https://codeforces.com/contest/1420
+// C2
 
 // implementation with optimal space
 // to allow for O(1) query for [0..n) by t[1], see the segtree below this one
@@ -106,7 +107,6 @@ struct SegTree {
 };
 
 struct SegTree {
-
     using node = long long;
     using T = long long;
 
@@ -120,21 +120,13 @@ struct SegTree {
         _build(1, 0, n - 1, a);
     }
 
-    void update(int i, T val) {
-        _update(1, 0, n - 1, i, val);
-    }
+    void update(int i, T val) { _update(1, 0, n - 1, i, val); }
 
-    node query(int l, int r) {
-        return _query(1, 0, n - 1, l, r);
-    }
+    node query(int l, int r) { return _query(1, 0, n - 1, l, r); }
 
-    node combine(node n1, node n2) {
-        return n1 + n2;
-    }
+    node combine(node n1, node n2) { return n1 + n2; }
 
-    node make_node(T val) {
-        return val;
-    }
+    node make_node(T val) { return val; }
 
     void _build(int v, int l, int r, vector<T>& a) {
         if (l == r) {
@@ -166,6 +158,6 @@ struct SegTree {
         if (l > tm) return _query((v << 1) | 1, tm + 1, tr, l, r);
         if (tm + 1 > r) return _query(v << 1, tl, tm, l, r);
         return combine(_query(v << 1, tl, tm, l, tm),
-                _query((v << 1) | 1, tm + 1, tr, tm + 1, r));
+                       _query((v << 1) | 1, tm + 1, tr, tm + 1, r));
     }
 };

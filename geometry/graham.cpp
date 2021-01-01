@@ -33,7 +33,8 @@ vector<pt> convex_hull(vector<pt>& a) {
             up.push_back(a[i]);
         }
         if (i == n - 1 || ccw(p1, a[i], p2)) {
-            while (down.size() >= 2 && !ccw(down[down.size() - 2], down.back(), a[i])) {
+            while (down.size() >= 2 &&
+                   !ccw(down[down.size() - 2], down.back(), a[i])) {
                 down.pop_back();
             }
             down.push_back(a[i]);
@@ -43,17 +44,15 @@ vector<pt> convex_hull(vector<pt>& a) {
     for (auto p : up) {
         ans.push_back(p);
     }
-    for (int i = (int) down.size() - 2; i > 0; --i) {
+    for (int i = (int)down.size() - 2; i > 0; --i) {
         ans.push_back(down[i]);
     }
     return ans;
 }
 
-int main () {
+int main() {
     int n;
     cin >> n;
     vector<pt> a(n);
-    for (auto &x : a) cin >> x.x >> x.y;
-
-    
+    for (auto& x : a) cin >> x.x >> x.y;
 }

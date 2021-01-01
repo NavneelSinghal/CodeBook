@@ -60,25 +60,22 @@ struct PHI {
 };
 
 int main() {
-
     int n;
     cin >> n;
     int ans = 0;
-   
+
     // finding the number of pairs (i, j) \in [n]^2 such that gcd(i, j) = 1
     /*MU<> s;
     for (int i = 1; i <= n; ++i) {
         ans += (n / i) * (n / i) * s.mu[i];
     }*/
-    
-    
+
     /*PHI<> s;
     for (int i = 1; i <= n; ++i) {
         ans += s.phi[i];
     }
     ans = ans * 2 - 1;
     */
-    
-    cout << ans << '\n';
 
+    cout << ans << '\n';
 }

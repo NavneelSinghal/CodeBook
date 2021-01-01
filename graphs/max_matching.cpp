@@ -63,7 +63,6 @@ int hopcroft_karp() {
     // match[] is assumed NIL for all vertex in G
     while (bfs())
         for (i = 1; i <= n; i++)
-            if (match[i] == NIL && dfs(i))
-                matching++;
+            if (match[i] == NIL && dfs(i)) matching++;
     return matching;
 }

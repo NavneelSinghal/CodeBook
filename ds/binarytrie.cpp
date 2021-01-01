@@ -4,7 +4,7 @@ struct binaryTrie {
     static const int CHARSET = 2;
     static const int MAXLEN = 31;
     static const int ROOT = 0;
-    
+
     int sz;
     vector<vector<int>> trie;
     vector<int> cnt;
@@ -31,7 +31,8 @@ struct binaryTrie {
         // ends_here[node] = n; // or whatever data we need to store at the end
     }
 
-    void remove(int n) { // assumes that n is already inside the trie - if not, then just do a simple traversal
+    void remove(int n) {  // assumes that n is already inside the trie - if not,
+                          // then just do a simple traversal
         int node = ROOT;
         for (int i = MAXLEN - 1; ~i; --i) {
             int next_node = trie[(n >> i) & 1][node];
@@ -40,7 +41,8 @@ struct binaryTrie {
         }
     }
 
-    void removeAll(int n) { // assumes that n is already inside the trie - if not, then just do a simple traversal
+    void removeAll(int n) {  // assumes that n is already inside the trie - if
+                             // not, then just do a simple traversal
         int node = ROOT;
         for (int i = MAXLEN - 1; ~i; --i) {
             int next_node = trie[(n >> i) & 1][node];
@@ -80,7 +82,6 @@ struct binaryTrie {
         }
         return ans;
     }
-
 };
 
 // if we need to make a binary trie on an array
@@ -90,7 +91,7 @@ struct binaryTrie {
     static const int CHARSET = 2;
     static const int MAXLEN = 31;
     static const int ROOT = 0;
-    
+
     int sz;
     vector<vector<int>> trie;
     vector<int> cnt;
@@ -120,7 +121,8 @@ struct binaryTrie {
         ends_here[node] = n;
     }
 
-    void remove(int n) { // assumes that n is already inside the trie - if not, then just do a simple traversal
+    void remove(int n) {  // assumes that n is already inside the trie - if not,
+                          // then just do a simple traversal
         int node = ROOT;
         int to_remove = a[n];
         for (int i = MAXLEN - 1; ~i; --i) {
@@ -145,9 +147,7 @@ struct binaryTrie {
         }
         return make_pair(ans, ends_here[node]);
     }
-
 };
-
 
 // when assuming all distinct, without deletion
 struct binaryTrie {
@@ -189,11 +189,9 @@ struct binaryTrie {
         }
         return ans;
     }
-
 };
 
 struct binaryTrie {
-
     struct trie {
         // bool isLeaf;
         // can also implement using a counter for frequency
@@ -250,8 +248,4 @@ struct binaryTrie {
     // TODO: add functionality to delete and search
 
     void maxXor(int n) { maxXor(root, n); }
-
 };
-
-
-

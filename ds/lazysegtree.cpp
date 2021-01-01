@@ -7,7 +7,7 @@ struct node {
 };
 
 // how to combine two nodes
-node merge(node &a, node &b) {
+node merge(node& a, node& b) {
     node x;
     x.heads = a.heads + b.heads;
     return x;
@@ -59,5 +59,6 @@ int query(int v, int tl, int tr, int l, int r) {
     if (l <= tl && tr <= r) return t[v].heads;
     int tm = (tl + tr) >> 1;
     push(v, tl, tm, tr);
-    return query(v << 1, tl, tm, l, min(r, tm)) + query(v << 1 | 1, tm + 1, tr, max(l, tm + 1), r);
+    return query(v << 1, tl, tm, l, min(r, tm)) +
+           query(v << 1 | 1, tm + 1, tr, max(l, tm + 1), r);
 }

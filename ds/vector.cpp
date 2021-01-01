@@ -4,13 +4,11 @@ using namespace std;
 
 template <typename T>
 class vector {
-   
-    private:
-    
+   private:
     T* a;
     int capacity;
     int length;
-    
+
     void sort(T* a, int l, int r) {
         if (l >= r) return;
         vector<T> v(r - l + 1);
@@ -41,7 +39,6 @@ class vector {
     }
 
    public:
-    
     vector() : capacity(16), length(0), a(new T[16]) {}
     vector(int n) : capacity(n), length(n), a(new T[n]) {}
     vector(int n, T v) : capacity(n), length(n), a(new T[n]) {

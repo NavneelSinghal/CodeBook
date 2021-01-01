@@ -23,7 +23,8 @@ void dfs(int v, int p) {
     tout[v] = ++timer;
 }
 
-// slightly more efficient for cache - replace tout[v] by tin[v] because if tin[v] \in [tin[u], tout[u]] then tout[v] also satisfies
+// slightly more efficient for cache - replace tout[v] by tin[v] because if
+// tin[v] \in [tin[u], tout[u]] then tout[v] also satisfies
 bool is_ancestor(int u, int v) {
     return tin[u] <= tin[v] && tout[u] >= tout[v];
 }

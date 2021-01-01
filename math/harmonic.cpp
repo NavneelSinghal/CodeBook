@@ -1,5 +1,5 @@
-#include <iostream>
 #include <cassert>
+#include <iostream>
 
 using namespace std;
 
@@ -26,5 +26,4 @@ int main() {
     if (n < bound) assert(ans_clever == ans_brute);
     cout << ans_clever << '\n';
     return 0;
-
 }

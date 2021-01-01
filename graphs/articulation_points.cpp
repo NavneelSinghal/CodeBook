@@ -2,7 +2,7 @@ int n;                    // number of nodes
 vector<vector<int>> adj;  // adjacency list of graph
 
 vector<bool> visited;
-vector<int> tin, low;     // low is as in bridge
+vector<int> tin, low;  // low is as in bridge
 int timer;
 
 void dfs(int v, int p = -1) {

@@ -5,10 +5,10 @@ vector<vector<int>> adj;  // adjacency list of graph
 vector<int> tin, low;
 int timer;
 
-// low[v] is the minimum tin for all vertices reachable from the subtree of the dfs tree rooted at v
+// low[v] is the minimum tin for all vertices reachable from the subtree of the
+// dfs tree rooted at v
 
 void dfs(int v, int p = -1) {
-    
     // visited[v] = true;
     tin[v] = low[v] = ++timer;
 

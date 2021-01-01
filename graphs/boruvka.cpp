@@ -10,8 +10,7 @@ void setIO(string name = "") {
     ios_base::sync_with_stdio(0);
     cin.tie(0);
     cout.tie(0);
-    if (name.size() == 0)
-        return;
+    if (name.size() == 0) return;
     FILE *fin = freopen((name + ".in").c_str(), "r", stdin);
     FILE *fout = freopen((name + ".out").c_str(), "w", stdout);
     cout << setprecision(10) << fixed;
@@ -56,7 +55,6 @@ bool merge(int v, int u) {
 }
 
 void solve(int case_no) {
-
     cin >> n >> m;
 
     for (int i = 1; i <= m; ++i) {
@@ -64,18 +62,16 @@ void solve(int case_no) {
     }
 
     init_dsu();
-    
+
     int current_components = n;
     long long ans = 0;
-    
+
     while (current_components > 1) {
-        
         for (int i = 1; i <= n; ++i) {
             min_edge[i] = -1;
         }
-        
-        for (int i = 1; i <= m; ++i) {
 
+        for (int i = 1; i <= m; ++i) {
             int r_v = root(g[i].v);
             int r_u = root(g[i].u);
 
@@ -91,17 +87,15 @@ void solve(int case_no) {
         }
 
         for (int i = 1; i <= n; ++i) {
-
             if (min_edge[i] == -1) continue;
 
             if (merge(g[min_edge[i]].v, g[min_edge[i]].u)) {
                 ans += g[min_edge[i]].cost;
                 --current_components;
-                // add g[min_edge[i]] to the final list of edges to be returned by this
+                // add g[min_edge[i]] to the final list of edges to be returned
+                // by this
             }
-
         }
-
     }
 
     cout << ans << '\n';

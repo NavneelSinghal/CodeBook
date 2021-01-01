@@ -1,8 +1,8 @@
-#include <iostream>
+#include <algorithm>
 #include <cassert>
 #include <chrono>
+#include <iostream>
 #include <random>
-#include <algorithm>
 
 using namespace std;
 using u64 = uint64_t;
@@ -10,17 +10,16 @@ using u128 = __uint128_t;
 using i64 = int64_t;
 using i128 = __int128_t;
 
-i64 mult (i64 a, i64 b, i64 mod) { return (i128)a * b % mod; }
-i64 f (i64 x, i64 c, i64 mod) { return (mult(x, x, mod) + c) % mod; }
+i64 mult(i64 a, i64 b, i64 mod) { return (i128)a * b % mod; }
+i64 f(i64 x, i64 c, i64 mod) { return (mult(x, x, mod) + c) % mod; }
 
-i64 rho (i64 n, i64 x0 = 2, i64 c = 1) {
-    
+i64 rho(i64 n, i64 x0 = 2, i64 c = 1) {
     if ((n & 1) == 0) return 2;
     i64 g = n;
-   
+
     mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
     uniform_int_distribution<i64> d(1, n - 1), e(2, n - 1);
-    
+
     while (g == n) {
         i64 x0 = e(rng), c = d(rng), x = x0, y = x0;
         g = 1;
@@ -31,7 +30,7 @@ i64 rho (i64 n, i64 x0 = 2, i64 c = 1) {
             g = __gcd(abs(x - y), n);
         }
     }
-    
+
     return g;
 }
 
@@ -75,9 +74,8 @@ bool MillerRabin(u64 n) { // returns true if n is prime, else returns false.
 
 // this literally makes no difference
 
-bool MillerRabin(u64 n) { // returns true if n is prime, else returns false.
-    if (n < 2)
-        return false;
+bool MillerRabin(u64 n) {  // returns true if n is prime, else returns false.
+    if (n < 2) return false;
 
     int r = 0;
     u64 d = n - 1;
@@ -91,12 +89,10 @@ bool MillerRabin(u64 n) { // returns true if n is prime, else returns false.
     }
 
     for (int a : {2, 325, 9375, 28178, 450775, 9780504, 1795265022}) {
-        if (check_composite(n, a, d, r))
-            return false;
+        if (check_composite(n, a, d, r)) return false;
     }
     return true;
 }
-
 
 vector<u64> factors(u64 n) {
     if (n == 1) return vector<u64>();
