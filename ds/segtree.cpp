@@ -5,19 +5,11 @@
 // to allow for O(1) query for [0..n) by t[1], see the segtree below this one
 
 struct SegTree {
-    // datatype of nodes of segment tree
     typedef int T;
-    // datatype of vector that's generating the segment tree
     typedef int S;
-    // identity element of monoid
-    // if you have any issues with unit, define it outside the struct as a
-    // normal variable
     static constexpr T unit = 0;
-    // node of segment tree from a value
     T make_node(S val) { return val; }
-    // combine function - needs to be an associative function
     T combine(T a, T b) { return a + b; }
-    // point update function - updating the element in the array
     void update_val(T& a, S b) { a += b; }
 
     vector<T> t;

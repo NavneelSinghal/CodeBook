@@ -1,0 +1,11 @@
+1. do all bridge components admit a cycle passing through all of them 
+        - actually maybe false
+        - however, by robbin's theorem, there is always a strong orientation of any bridge component (https://en.wikipedia.org/wiki/Strong_orientation)
+2. study chain decompositions - https://en.wikipedia.org/wiki/Bridge_(graph_theory)
+3. study ear decompositions - article by ramchandra
+4. dominator tree - https://codeforces.com/blog/entry/22811
+https://www.cs.princeton.edu/courses/archive/fall03/cs528/handouts/a%20fast%20algorithm%20for%20finding.pdf
+https://www.quora.com/q/threadsiiithyderabad/The-Bridge-Tree-of-a-graph
+
+lightoj
+block cut tree - can be seen on benq's repo
