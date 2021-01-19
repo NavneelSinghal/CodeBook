@@ -10,5 +10,7 @@ int main() {
     cout.tie(nullptr);
     // use '\n' instead of endl to speed up output
 
+    // code goes here
+
     return 0;
 }

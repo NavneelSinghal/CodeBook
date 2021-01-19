@@ -17,8 +17,8 @@ def get_tuple_ints():
 def print_iterable(p):
     print(" ".join(map(str, p)))
 
-# code goes here
 def main():
+    # code goes here
     pass
 
 if __name__ == '__main__':
