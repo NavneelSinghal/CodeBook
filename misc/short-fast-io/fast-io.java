@@ -6,10 +6,13 @@ public class Main {
     public static void main(String[] args) throws IOException {
         Scanner scan = new Scanner(System.in);
         OutputWriter out = new OutputWriter(System.out);
-        int in = scan.nextInt();
         // Always print a trailing "\n" as shown at the end of your output
+        
+        // example:
+        int in = scan.nextInt();
         out.print(in + " ");
         out.print(in + "\n");
+        
         out.close();
     }
 
