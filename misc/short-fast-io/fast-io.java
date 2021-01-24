@@ -7,7 +7,7 @@ public class Main {
         Scanner scan = new Scanner(System.in);
         OutputWriter out = new OutputWriter(System.out);
         int in = scan.nextInt();
-        // Always print a trailing string like " " or "\n" as shown
+        // Always print a trailing "\n" as shown at the end of your output
         out.print(in + " ");
         out.print(in + "\n");
         out.close();
