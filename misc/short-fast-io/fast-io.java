@@ -6,7 +6,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         Scanner scan = new Scanner(System.in);
         OutputWriter out = new OutputWriter(System.out);
-        // Always print a trailing "\n" as shown at the end of your output
+        // Always print a trailing "\n" and close the OutputWriter as shown at the end of your output
         
         // example:
         int in = scan.nextInt();
