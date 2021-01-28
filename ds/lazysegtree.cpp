@@ -1,3 +1,6 @@
+// see problem - https://codeforces.com/contest/1477/problem/B
+// ^ for another solution
+
 const int N = 100100;
 
 struct node {
