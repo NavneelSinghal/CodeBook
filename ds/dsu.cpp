@@ -18,14 +18,16 @@ struct dsu {
         return par[v] = find_set(par[v]);
     }
 
-    void union_sets(int32_t a, int32_t b) {
+    bool union_sets(int32_t a, int32_t b) {
         a = find_set(a);
         b = find_set(b);
         if (a != b) {
             if (siz[a] < siz[b]) swap(a, b);
             par[b] = a;
             siz[a] += siz[b];
+            return true;
         }
+        return false;
     }
 
     vector<vector<int>> components() {
