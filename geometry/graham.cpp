@@ -1,58 +1,76 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-struct pt {
-    double x, y;
-}
+struct convex_hull {
+    using TYPE = long long;  // use double normally
+    using point = pair<TYPE, TYPE>;
+    vector<point> points;
+    vector<point> hull_up, hull_down, hull_tot;
 
-bool cmp(pt a, pt b) {
-    return a.x < b.x || (a.x == b.x && a.y < b.y);
-}
+    convex_hull() { init(); }
+    convex_hull(vector<point> &a) {
+        init();
+        points = a;
+    }
 
-bool cw(pt a, pt b, pt c) {
-    return a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y) < 0;
-}
+    void init() { points = hull_up = hull_down = hull_tot = vector<point>(); }
+    void add_point(TYPE a, TYPE b) { points.push_back(make_pair(a, b)); }
+    /* sort by x, then y */
+    static bool point_comp(point a, point b) {
+        return a.first < b.first || (a.first == b.first && a.second < b.second);
+    }
+    /*
+    -1 - clockwise
+    0 - collinear
+    1 - counterclockwise
+    */
+    int orient(point a, point b, point c) {
+        TYPE val = a.first * (b.second - c.second) +
+                   b.first * (c.second - a.second) +
+                   c.first * (a.second - b.second);
 
-bool ccw(pt a, pt b, pt c) {
-    return a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y) > 0;
-}
-
-vector<pt> convex_hull(vector<pt>& a) {
-    if (a.size() == 1) return a;
-    sort(a.begin(), a.end(), &cmp);
-    pt p1 = a[0], p2 = a.back();
-    vector<pt> up, down;
-    up.push_back(p1);
-    down.push_back(p2);
-    int n = a.size();
-    for (int i = 1; i < n; ++i) {
-        if (i == n - 1 || cw(p1, a[i], p2)) {
-            while (up.size() >= 2 && !cw(up[up.size() - 2], up.back(), a[i])) {
-                up.pop_back();
-            }
-            up.push_back(a[i]);
+        if (val < 0)
+            return -1;
+        else if (val > 0)
+            return 1;
+        return 0;
+    }
+    void find_hull() {
+        if (points.size() == 1) {
+            hull_up = hull_down = hull_tot = points;
+            return;
         }
-        if (i == n - 1 || ccw(p1, a[i], p2)) {
-            while (down.size() >= 2 &&
-                   !ccw(down[down.size() - 2], down.back(), a[i])) {
-                down.pop_back();
+        sort(points.begin(), points.end(), point_comp);
+        point p1 = points[0], p2 = points.back();
+        hull_up.push_back(p1);
+        hull_down.push_back(p1);
+        int sz = (int)points.size();
+        for (int i = 1; i < sz; i++) {
+            /* end or clockwise */
+            if (i == points.size() - 1 || orient(p1, points[i], p2) == -1) {
+                /* while not cw */
+                while (hull_up.size() >= 2 &&
+                       orient(hull_up[hull_up.size() - 2], hull_up.back(),
+                              points[i]) != -1)
+                    hull_up.pop_back();
+                hull_up.push_back(points[i]);
             }
-            down.push_back(a[i]);
+            /* end or ccw */
+            if (i == points.size() - 1 || orient(p1, points[i], p2) == 1) {
+                /* while not ccw */
+                while (hull_down.size() >= 2 &&
+                       orient(hull_down[hull_down.size() - 2], hull_down.back(),
+                              points[i]) != 1)
+                    hull_down.pop_back();
+                hull_down.push_back(points[i]);
+            }
         }
+        for (int i = 0; i < (int)hull_up.size(); i++)
+            hull_tot.push_back(hull_up[i]);
+        for (int i = hull_down.size() - 2; i > 0; i--)
+            hull_tot.push_back(hull_down[i]);
     }
-    vector<pt> ans;
-    for (auto p : up) {
-        ans.push_back(p);
-    }
-    for (int i = (int)down.size() - 2; i > 0; --i) {
-        ans.push_back(down[i]);
-    }
-    return ans;
-}
+};
 
 int main() {
-    int n;
-    cin >> n;
-    vector<pt> a(n);
-    for (auto& x : a) cin >> x.x >> x.y;
 }
