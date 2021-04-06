@@ -4,7 +4,61 @@
 // implementation with optimal space
 // to allow for O(1) query for [0..n) by t[1], see the segtree below this one
 
-// TODO: implement binary search on SegTree
+// TODO: implement binary search on SegTree, and space optimized version
+
+template <typename node = long long, typename T = long long, node N>
+struct SegTree {
+
+    // change this
+    node combine(node n1, node n2) { return n1 + n2; }
+    node make_node(T val) { return val; }
+    
+    const node ID = N;
+    vector<node> t;
+    int n;
+
+    SegTree(vector<T>& a) {
+        this->n = a.size();
+        this->t.resize(4 * a.size() + 4);
+        _build(1, 0, n - 1, a);
+    }
+
+    void update(int i, T val) { _update(1, 0, n - 1, i, val); }
+    node query(int l, int r) { return _query(1, 0, n - 1, l, r); }
+
+    void _build(int v, int l, int r, vector<T>& a) {
+        if (l == r) {
+            t[v] = make_node(a[l]);
+            return;
+        }
+        int mid = (l + r) >> 1;
+        _build(v << 1, l, mid, a);
+        _build((v << 1) | 1, mid + 1, r, a);
+        t[v] = combine(t[(v << 1)], t[(v << 1) | 1]);
+    }
+
+    void _update(int v, int l, int r, int idx, T val) {
+        if (l == r) {
+            t[v] = make_node(val);
+            return;
+        }
+        int mid = (l + r) >> 1;
+        if (idx <= mid)
+            _update(v << 1, l, mid, idx, val);
+        else
+            _update((v << 1) | 1, mid + 1, r, idx, val);
+        t[v] = combine(t[v << 1], t[(v << 1) | 1]);
+    }
+
+    node _query(int v, int tl, int tr, int l, int r) {
+        if (l == tl && r == tr) return t[v];
+        int tm = (tl + tr) >> 1;
+        if (l > tm) return _query((v << 1) | 1, tm + 1, tr, l, r);
+        if (tm + 1 > r) return _query(v << 1, tl, tm, l, r);
+        return combine(_query(v << 1, tl, tm, l, tm),
+                       _query((v << 1) | 1, tm + 1, tr, tm + 1, r));
+    }
+};
 
 struct SegTree {
     typedef int T;
@@ -100,58 +154,4 @@ struct SegTree {
     }
 };
 
-struct SegTree {
-    using node = long long;
-    using T = long long;
 
-    const node ID = 0;
-    vector<node> t;
-    int n;
-
-    SegTree(vector<T>& a) {
-        this->n = a.size();
-        this->t.resize(4 * a.size() + 4);
-        _build(1, 0, n - 1, a);
-    }
-
-    void update(int i, T val) { _update(1, 0, n - 1, i, val); }
-
-    node query(int l, int r) { return _query(1, 0, n - 1, l, r); }
-
-    node combine(node n1, node n2) { return n1 + n2; }
-
-    node make_node(T val) { return val; }
-
-    void _build(int v, int l, int r, vector<T>& a) {
-        if (l == r) {
-            t[v] = make_node(a[l]);
-            return;
-        }
-        int mid = (l + r) >> 1;
-        _build(v << 1, l, mid, a);
-        _build((v << 1) | 1, mid + 1, r, a);
-        t[v] = combine(t[(v << 1)], t[(v << 1) | 1]);
-    }
-
-    void _update(int v, int l, int r, int idx, T val) {
-        if (l == r) {
-            t[v] = make_node(val);
-            return;
-        }
-        int mid = (l + r) >> 1;
-        if (idx <= mid)
-            _update(v << 1, l, mid, idx, val);
-        else
-            _update((v << 1) | 1, mid + 1, r, idx, val);
-        t[v] = combine(t[v << 1], t[(v << 1) | 1]);
-    }
-
-    node _query(int v, int tl, int tr, int l, int r) {
-        if (l == tl && r == tr) return t[v];
-        int tm = (tl + tr) >> 1;
-        if (l > tm) return _query((v << 1) | 1, tm + 1, tr, l, r);
-        if (tm + 1 > r) return _query(v << 1, tl, tm, l, r);
-        return combine(_query(v << 1, tl, tm, l, tm),
-                       _query((v << 1) | 1, tm + 1, tr, tm + 1, r));
-    }
-};
