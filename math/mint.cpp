@@ -1,15 +1,16 @@
 // modular int library
 
-template <int32_t MOD = 998'244'353>
+template <int MOD = 998'244'353>
 struct Modular {
-    int32_t value;
-    static const int32_t MOD_value = MOD;
+    int value;
+    static constexpr int MOD_value = MOD;
 
-    Modular(long long v = 0) {
+    Modular(ll v = 0) {
         value = v % MOD;
         if (value < 0) value += MOD;
     }
-    Modular(long long a, long long b) : value(0) {
+
+    Modular(ll a, ll b) : value(0) {
         *this += a;
         *this /= b;
     }
@@ -19,17 +20,19 @@ struct Modular {
         if (value >= MOD) value -= MOD;
         return *this;
     }
+
     Modular& operator-=(Modular const& b) {
         value -= b.value;
         if (value < 0) value += MOD;
         return *this;
     }
+
     Modular& operator*=(Modular const& b) {
-        value = (long long)value * b.value % MOD;
+        value = (ll)value * b.value % MOD;
         return *this;
     }
 
-    friend Modular mexp(Modular a, long long e) {
+    friend Modular mexp(Modular a, ll e) {
         Modular res = 1;
         while (e) {
             if (e & 1) res *= a;
@@ -38,6 +41,7 @@ struct Modular {
         }
         return res;
     }
+
     friend Modular inverse(Modular a) { return mexp(a, MOD - 2); }
 
     Modular& operator/=(Modular const& b) { return *this *= inverse(b); }
@@ -46,15 +50,17 @@ struct Modular {
     friend Modular operator-(Modular const a) { return 0 - a; }
     friend Modular operator*(Modular a, Modular const b) { return a *= b; }
     friend Modular operator/(Modular a, Modular const b) { return a /= b; }
+
     friend std::ostream& operator<<(std::ostream& os, Modular const& a) {
         return os << a.value;
     }
+
     friend bool operator==(Modular const& a, Modular const& b) {
         return a.value == b.value;
     }
+
     friend bool operator!=(Modular const& a, Modular const& b) {
         return a.value != b.value;
     }
 };
-
 using mint = Modular<mod>;
