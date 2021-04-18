@@ -6,14 +6,14 @@
 
 // TODO: implement binary search on SegTree, and space optimized version
 
-template <typename node = long long, typename T = long long, node N>
+template <typename node = long long, typename T = long long>
 struct SegTree {
 
     // change this
     node combine(node n1, node n2) { return n1 + n2; }
     node make_node(T val) { return val; }
     
-    const node ID = N;
+    const node ID = {};
     vector<node> t;
     int n;
 
