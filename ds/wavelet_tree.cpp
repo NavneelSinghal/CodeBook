@@ -46,6 +46,7 @@ struct wavelet_tree {
         }
 
         // count of numbers in [l, r] less than or equal to k
+        // TODO: implement with range [k1, k2] instead of k
         int count_less_equal(int l, int r, T k) {
             if (l > r or k < lo)
                 return 0;

@@ -11,28 +11,31 @@ class avl {
         node(T v) : data(v), l(NULL), r(NULL), ht(0) {}
     };
 
-    node* root;
+    node *root;
 
-    void clear(node* t) {
-        if (t == NULL) return;
+    void clear(node *t) {
+        if (t == NULL)
+            return;
         clear(t->l);
         clear(t->r);
         delete t;
     }
 
-    int height(node* t) {
-        if (t == NULL) return -1;
+    int height(node *t) {
+        if (t == NULL)
+            return -1;
         return t->ht;
     }
 
-    int balance(node* t) {
-        if (t == NULL) return 0;
+    int balance(node *t) {
+        if (t == NULL)
+            return 0;
         return height(t->l) - height(t->r);
     }
 
-    node* right_rot(node*& t) {
+    node *right_rot(node *&t) {
         if (t->l != NULL) {
-            node* u = t->l;
+            node *u = t->l;
             t->l = u->r;
             u->r = t;
             t->ht = 1 + max(height(t->l), height(t->r));
@@ -42,9 +45,9 @@ class avl {
         return t;
     }
 
-    node* left_rot(node*& t) {
+    node *left_rot(node *&t) {
         if (t->r != NULL) {
-            node* u = t->r;
+            node *u = t->r;
             t->r = u->l;
             u->l = t;
             t->ht = 1 + max(height(t->l), height(t->r));
@@ -54,27 +57,29 @@ class avl {
         return t;
     }
 
-    node* double_left_rot(node*& t) {
+    node *double_left_rot(node *&t) {
         t->r = right_rot(t->r);
         return left_rot(t);
     }
 
-    node* double_right_rot(node*& t) {
+    node *double_right_rot(node *&t) {
         t->l = left_rot(t->l);
         return right_rot(t);
     }
 
-    node* begin(node* t) {
-        if (t == NULL || (t->l == NULL)) return t;
+    node *begin(node *t) {
+        if (t == NULL || (t->l == NULL))
+            return t;
         return begin(t->l);
     }
 
-    node* end(node* t) {
-        if (t == NULL || (t->r == NULL)) return t;
+    node *end(node *t) {
+        if (t == NULL || (t->r == NULL))
+            return t;
         return end(t->r);
     }
 
-    node* _insert(node* t, T x) {
+    node *_insert(node *t, T x) {
         if (t == NULL) {
             return new node(x);
         }
@@ -105,8 +110,8 @@ class avl {
         return t;
     }
 
-    node* _remove(node* t, T x) {
-        node* temp;
+    node *_remove(node *t, T x) {
+        node *temp;
 
         if (t == NULL) {
             return t;
@@ -151,8 +156,9 @@ class avl {
         return t;
     }
 
-    void print(node* t) {
-        if (t == NULL) return;
+    void print(node *t) {
+        if (t == NULL)
+            return;
         print(t->l);
         std::cout << t->data << ' ';
         print(t->r);
