@@ -8,14 +8,16 @@ struct Range {
         T i;
         const T skip;
         void operator++() { i += skip; }
-        int operator*() const { return i; }
+        T operator*() const { return i; }
         bool operator!=(It o) const {
             return (skip >= 0) ? (i < *o) : (i > *o);
         }
     };
     const T l_, r_, skip_;
     Range(T l, T r, T skip = 1) : l_(l), r_(r), skip_(skip) {
+#ifdef DEBUG
         assert(skip != 0);
+#endif
     }
     Range(T n) : Range(T(0), n, T(1)) {}
     It begin() const {
@@ -34,11 +36,13 @@ int change() {
 }
 
 int main() {
+    decltype(chrono::high_resolution_clock::now()) start, stop;
+    decltype(
+        chrono::duration_cast<chrono::microseconds>(stop - start)) duration;
+
     int w1 = 0, w2 = 0;
     const int N = int(1e9) + 1;
-    decltype(chrono::high_resolution_clock::now()) start, stop;
-    decltype(chrono::duration_cast<chrono::microseconds>(stop - start)) duration;
-
+    
     start = chrono::high_resolution_clock::now();
     reset();
     for (int i = N - 1; i >= 1; i -= 5) w1 += change();
@@ -53,4 +57,6 @@ int main() {
     duration = chrono::duration_cast<chrono::microseconds>(stop - start);
     cout << duration.count() << '\n';
     assert(w1 == w2);
+
+    // same testing for long long instead of int
 }

@@ -1,13 +1,13 @@
 template <uint32_t Modulus>
-class ModularInt {
-    using M = ModularInt;
+class Modular {
+    using M = Modular;
 
    public:
     static_assert(int(Modulus) >= 1, "Modulus must be in the range [1, 2^31)");
     static constexpr int modulus() { return Modulus; }
     static M raw(uint32_t v) { return *reinterpret_cast<M*>(&v); }
-    ModularInt() : v_(0) {}
-    ModularInt(int64_t v) : v_((v %= Modulus) < 0 ? v + Modulus : v) {}
+    Modular() : v_(0) {}
+    Modular(int64_t v) : v_((v %= Modulus) < 0 ? v + Modulus : v) {}
     template <class T>
     explicit operator T() const {
         return v_;
@@ -52,5 +52,4 @@ class ModularInt {
 };
 
 using mint = ModularInt<int(1e9 + 7)>;
-
 
