@@ -1,5 +1,5 @@
 template <typename I, typename P, bool b>
-I bin_search_split(const P& predicate, I l, I r) {
+I bin_search_split(I l, I r, const P &predicate) {
     --l, ++r;
     while (r - l > 1) {
         // auto mid = std::midpoint(l, r);
@@ -16,14 +16,14 @@ I bin_search_split(const P& predicate, I l, I r) {
     }
 }
 
-// returns first i in [l, r] with p(i) true, and if none found, returns r + 1
+// returns first i in [l, r], p(i) true, and if none found, returns r + 1
 template <typename I, typename P>
-I first_true(const P& p, I l, I r) {
-    return bin_search_split<I, P, true>(p, l, r);
+I first_true(I l, I r, const P &p) {
+    return bin_search_split<I, P, true>(l, r, p);
 }
 
-// returns last i in [l, r] with p(i) false, and if none found, returns l - 1
+// returns last i in [l, r], p(i) false, and if none found, returns l - 1
 template <typename I, typename P>
-I last_false(const P& p, I l, I r) {
-    return bin_search_split<I, P, false>(p, l, r);
+I last_false(I l, I r, const P &p) {
+    return bin_search_split<I, P, false>(l, r, p);
 }
