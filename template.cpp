@@ -1,15 +1,15 @@
-#pragma GCC optimize("Ofast")
-#pragma GCC target("avx")
-#pragma GCC optimize("unroll-loops")
+// #pragma GCC optimize("Ofast")
+// #pragma GCC target("avx")
+// #pragma GCC optimize("unroll-loops")
 
+// clang-format off
 #define BITSET64 0
-
 #if BITSET64
-    #include <bits/cxxabi_forced.h>
-    #include <bits/functexcept.h>
-    #include <bits/functional_hash.h>
-    #include <iosfwd>
     #include <string>
+    #include <bits/functexcept.h>
+    #include <iosfwd>
+    #include <bits/cxxabi_forced.h>
+    #include <bits/functional_hash.h>
     #pragma push_macro("__SIZEOF_LONG__")
     #pragma push_macro("__cplusplus")
     #define __SIZEOF_LONG__ __SIZEOF_LONG_LONG__
@@ -24,24 +24,33 @@
     #undef __builtin_popcountl
     #undef __builtin_ctzl
 #endif
+// clang-format on
 
 #include "bits/stdc++.h"
 #include "ext/pb_ds/assoc_container.hpp"
 #include "ext/pb_ds/tree_policy.hpp"
 // #include <ext/rope>
 
-#define int int_fast32_t
-#define unsigned uint_fast32_t
-#define ll int_fast64_t
-#define ull uint_fast64_t
-#define ld long double
+// #define int int_fast32_t
+// #define unsigned uint_fast32_t
+// #define ll int_fast64_t
+// #define ull uint_fast64_t
+// #define ld long double
+// #define ulll __uint128_t
+// #define lll __int128
+
+using ll = int_fast64_t;
+using ull = uint_fast64_t;
+using ld = long double;
+using ulll = __uint128_t;
+using lll = __int128;
 
 template <typename T>
 void ignore_unused(const T &) {}
 
 namespace ExtendedIO {
 #ifdef __SIZEOF_INT128__
-    ostream &operator<<(ostream &os, __int128 const &value) {
+    std::ostream &operator<<(std::ostream &os, __int128 const &value) {
         static char buffer[64];
         int index = 0;
         __uint128_t T = (value < 0) ? (-(value + 1)) + __uint128_t(1) : value;
@@ -56,10 +65,10 @@ namespace ExtendedIO {
         while (index > 0) os << buffer[--index];
         return os;
     }
-    istream &operator>>(istream &is, __int128 &T) {
+    std::istream &operator>>(std::istream &is, __int128 &T) {
         static char buffer[64];
         is >> buffer;
-        size_t len = strlen(buffer), index = 0;
+        std::size_t len = strlen(buffer), index = 0;
         T = 0;
         int mul = 1;
         if (buffer[index] == '-') ++index, mul *= -1;
@@ -181,24 +190,17 @@ namespace CPPDS {
 #ifdef PB_DS_TREE_POLICY_HPP
     template <typename T>
     using ordered_set =
-        __gnu_pbds::tree<T,
-                         __gnu_pbds::null_type,
-                         std::less<T>,
+        __gnu_pbds::tree<T, __gnu_pbds::null_type, std::less<T>,
                          __gnu_pbds::rb_tree_tag,
                          __gnu_pbds::tree_order_statistics_node_update>;
     template <typename T>
     using ordered_multiset =
-        __gnu_pbds::tree<T,
-                         __gnu_pbds::null_type,
-                         std::less_equal<T>,
+        __gnu_pbds::tree<T, __gnu_pbds::null_type, std::less_equal<T>,
                          __gnu_pbds::rb_tree_tag,
                          __gnu_pbds::tree_order_statistics_node_update>;
     template <class key, class value, class cmp = std::less<key>>
     using ordered_map =
-        __gnu_pbds::tree<key,
-                         value,
-                         cmp,
-                         __gnu_pbds::rb_tree_tag,
+        __gnu_pbds::tree<key, value, cmp, __gnu_pbds::rb_tree_tag,
                          __gnu_pbds::tree_order_statistics_node_update>;
     // find_by_order(k)  returns iterator to kth element starting from 0;
     // order_of_key(k) returns count of elements strictly smaller than k;
@@ -212,24 +214,14 @@ using namespace CPPDS;
 
 namespace Utility {
 
-    template <typename X, typename Y>
-    X &remin(X &x, const Y &y) {
-        return x = (y < x) ? y : x;
+    template <class T, class U = T>
+    bool ckmin(T &a, U &&b) {
+        return b < a ? a = std::forward<U>(b), true : false;
     }
 
-    template <typename X, typename Y>
-    X &remax(X &x, const Y &y) {
-        return x = (x < y) ? y : x;
-    }
-
-    template <typename X, typename Y>
-    [[nodiscard]] bool ckmin(X &x, const Y &y) {
-        return (y < x) ? (x = y, 1) : 0;
-    }
-
-    template <typename X, typename Y>
-    [[nodiscard]] bool ckmax(X &x, const Y &y) {
-        return (x < y) ? (x = y, 1) : 0;
+    template <class T, class U = T>
+    bool ckmax(T &a, U &&b) {
+        return a < b ? a = std::forward<U>(b), true : false;
     }
 
     template <typename T>
@@ -300,6 +292,32 @@ namespace Utility {
         return y_combinator_result<std::decay_t<Fun>>(std::forward<Fun>(fun));
     }
 
+    template <typename T>
+    struct Range {
+        struct It {
+            T i;
+            const T skip;
+            void operator++() { i += skip; }
+            T operator*() const { return i; }
+            bool operator!=(It o) const {
+                return (skip >= 0) ? (i < *o) : (i > *o);
+            }
+        };
+        const T l_, r_, skip_;
+        Range(T l, T r, T skip = 1) : l_(l), r_(r), skip_(skip) {
+#ifdef DEBUG
+            assert(skip != 0);
+#endif
+        }
+        Range(T n) : Range(T(0), n, T(1)) {}
+        It begin() const {
+            return (skip_ >= 0) ? It{l_, skip_} : It{r_ - 1, skip_};
+        }
+        It end() const {
+            return (skip_ >= 0) ? It{r_, skip_} : It{l_ - 1, skip_};
+        }
+    };
+
     void setIO(std::string name = "") {
         std::ios_base::sync_with_stdio(0);
         std::cin.tie(0);
@@ -317,21 +335,11 @@ namespace Utility {
     constexpr int nttmod = 998244353;
     constexpr int inf = 1e9;
     constexpr ll linf = 3e18;
-    constexpr ld pi = acosl(-1.0);
     constexpr ld eps = 1e-9;
+    ld pi = acosl(-1.0);
 
     std::mt19937 rng(
         std::chrono::steady_clock::now().time_since_epoch().count());
-
-    [[nodiscard]] ll pwr_mod(ll a, ll n, int MOD = Utility::mod) {
-        ll ans = 1;
-        while (n) {
-            if (n & 1) ans = (ans * a) % MOD;
-            a = (a * a) % MOD;
-            n >>= 1;
-        }
-        return ans;
-    }
 
     // when using integers, keep overflow in mind
     template <typename T>
@@ -345,102 +353,119 @@ namespace Utility {
         return ans;
     }
 
+    template <typename I, typename P, bool b>
+    I bin_search_split(I l, I r, const P &predicate) {
+        --l, ++r;
+        while (r - l > 1) {
+            // auto mid = std::midpoint(l, r);
+            auto mid = l + (r - l) / 2;
+            if (predicate(mid))
+                r = mid;
+            else
+                l = mid;
+        }
+        if constexpr (b)
+            return r;
+        else
+            return l;
+    }
+
+    // returns first i in [l, r], p(i) true, and if none found, returns r + 1
+    template <typename I, typename P>
+    I first_true(I l, I r, const P &p) {
+        return bin_search_split<I, P, true>(l, r, p);
+    }
+
+    // returns last i in [l, r], p(i) false, and if none found, returns l - 1
+    template <typename I, typename P>
+    I last_false(I l, I r, const P &p) {
+        return bin_search_split<I, P, false>(l, r, p);
+    }
+
 }  // namespace Utility
 
 using namespace Utility;
 
+/* structs start */
+
+template <uint32_t Modulus>
+class Modular {
+    using M = Modular;
+
+   public:
+    static_assert(int(Modulus) >= 1, "Modulus must be in the range [1, 2^31)");
+    static constexpr int modulus() { return Modulus; }
+    static M raw(uint32_t v) { return *reinterpret_cast<M *>(&v); }
+    Modular() : v_(0) {}
+    Modular(int64_t v) : v_((v %= Modulus) < 0 ? v + Modulus : v) {}
+    template <class T>
+    explicit operator T() const {
+        return v_;
+    }
+    M &operator++() { return v_ = ++v_ == Modulus ? 0 : v_, *this; }
+    M &operator--() { return --(v_ ? v_ : v_ = Modulus), *this; }
+    M &operator*=(M o) { return v_ = uint64_t(v_) * o.v_ % Modulus, *this; }
+    M &operator/=(M o) {
+        auto [inv, gcd] = extgcd(o.v_, Modulus);
+        assert(gcd == 1);
+        return *this *= inv;
+    }
+    M &operator+=(M o) {
+        return v_ = int(v_ += o.v_ - Modulus) < 0 ? v_ + Modulus : v_, *this;
+    }
+    M &operator-=(M o) {
+        return v_ = int(v_ -= o.v_) < 0 ? v_ + Modulus : v_, *this;
+    }
+    friend M operator++(M &a, int) { return exchange(a, ++M(a)); }
+    friend M operator--(M &a, int) { return exchange(a, --M(a)); }
+    friend M operator+(M a) { return a; }
+    friend M operator-(M a) { return a.v_ = a.v_ ? Modulus - a.v_ : 0, a; }
+    friend M operator*(M a, M b) { return a *= b; }
+    friend M operator/(M a, M b) { return a /= b; }
+    friend M operator+(M a, M b) { return a += b; }
+    friend M operator-(M a, M b) { return a -= b; }
+    friend std::istream &operator>>(std::istream &is, M &x) {
+        int64_t v;
+        return is >> v, x = v, is;
+    }
+    friend std::ostream &operator<<(std::ostream &os, M x) {
+        return os << x.v_;
+    }
+    friend bool operator==(M a, M b) { return a.v_ == b.v_; }
+    friend bool operator!=(M a, M b) { return a.v_ != b.v_; }
+
+   private:
+    static std::pair<int, int> extgcd(int a, int b) {
+        std::array<int, 2> x{1, 0};
+        while (b) std::swap(x[0] -= a / b * x[1], x[1]), std::swap(a %= b, b);
+        return {x[0], a};
+    }
+    uint32_t v_;
+};
+
+using mint = Modular<mod>;
+
+/* structs end */
+
 using namespace std;
 using namespace __gnu_pbds;
 // using namespace __gnu_cxx;
-
-/* structs start */
-
-template <int MOD = 998'244'353>
-struct Modular {
-    int value;
-    static constexpr int MOD_value = MOD;
-
-    Modular(ll v = 0) {
-        value = v % MOD;
-        if (value < 0) value += MOD;
-    }
-
-    Modular(ll a, ll b) : value(0) {
-        *this += a;
-        *this /= b;
-    }
-
-    Modular &operator+=(Modular const &b) {
-        value += b.value;
-        if (value >= MOD) value -= MOD;
-        return *this;
-    }
-
-    Modular &operator-=(Modular const &b) {
-        value -= b.value;
-        if (value < 0) value += MOD;
-        return *this;
-    }
-
-    Modular &operator*=(Modular const &b) {
-        value = (ll)value * b.value % MOD;
-        return *this;
-    }
-
-    friend Modular mexp(Modular a, ll e) {
-        Modular res = 1;
-        while (e) {
-            if (e & 1) res *= a;
-            a *= a;
-            e >>= 1;
-        }
-        return res;
-    }
-
-    friend Modular inverse(Modular a) { return mexp(a, MOD - 2); }
-
-    Modular &operator/=(Modular const &b) { return *this *= inverse(b); }
-    friend Modular operator+(Modular a, Modular const b) { return a += b; }
-    friend Modular operator-(Modular a, Modular const b) { return a -= b; }
-    friend Modular operator-(Modular const a) { return 0 - a; }
-    friend Modular operator*(Modular a, Modular const b) { return a *= b; }
-    friend Modular operator/(Modular a, Modular const b) { return a /= b; }
-
-    friend std::ostream &operator<<(std::ostream &os, Modular const &a) {
-        return os << a.value;
-    }
-
-    friend bool operator==(Modular const &a, Modular const &b) {
-        return a.value == b.value;
-    }
-
-    friend bool operator!=(Modular const &a, Modular const &b) {
-        return a.value != b.value;
-    }
-};
-
-using mint = Modular<>;
-
-/* structs end */
 
 /* main code starts */
 
 auto main() -> signed {
     setIO();
     int TESTS = 1;
-    cin >> TESTS;
+    // cin >> TESTS;
 
     auto precompute = [&]() -> void {
-
     };
 
     auto solve = [&](int t) -> void {
         ignore_unused(t);
-        ll n, k;
     };
 
     auto brute = [&]() -> void {
-
     };
 
     ignore_unused(brute);
