@@ -1,0 +1,9 @@
+NamespaceIndentation: All
+BasedOnStyle: google
+IndentWidth: 4
+IndentPPDirectives: BeforeHash
+AlignTrailingComments: true
+PointerAlignment: Right
+AllowShortFunctionsOnASingleLine: Inline
+#AllowShortIfStatementsOnASingleLine: Always
+AllowShortLambdasOnASingleLine: Inline
