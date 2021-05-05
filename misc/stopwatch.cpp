@@ -15,7 +15,7 @@ struct Stopwatch {
     void pause() {
         if (!running) return;
         running = false;
-        elapsed_time += C::now() - last_played;
+        elapsed_time += std::chrono::duration_cast<T1>(C::now() - last_played);
     }
     void play() {
         if (running) return;
@@ -24,8 +24,9 @@ struct Stopwatch {
     }
     int_fast64_t elapsed() const {
         return std::chrono::duration_cast<T2>(
-                   elapsed_time +
-                   (running ? (C::now() - last_played) : T1::zero()))
+                   elapsed_time + (running ? std::chrono::duration_cast<T1>(
+                                                 C::now() - last_played)
+                                           : T1::zero()))
             .count();
     }
     void print() const {
