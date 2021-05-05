@@ -236,7 +236,8 @@ namespace Utility {
         std::chrono::time_point<C> last_played;
         T elapsed_time;
         bool running;
-        Stopwatch() : name("Time"), running(true) { reset(); }
+        Stopwatch(const std::string &s) : name(s), running(true) { reset(); }
+        Stopwatch() : Stopwatch("Time") {}
         void reset() {
             last_played = C::now();
             elapsed_time = T(0);
