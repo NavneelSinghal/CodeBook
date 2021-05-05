@@ -1,15 +1,16 @@
 template <typename C = std::chrono::steady_clock,
-          typename T = std::chrono::duration<int_fast64_t, std::nano>>
+          typename T1 = std::chrono::nanoseconds,
+          typename T2 = std::chrono::milliseconds>
 struct Stopwatch {
     std::string name;
     std::chrono::time_point<C> last_played;
-    T elapsed_time;
+    T1 elapsed_time;
     bool running;
     Stopwatch(const std::string &s) : name(s), running(true) { reset(); }
     Stopwatch() : Stopwatch("Time") {}
     void reset() {
         last_played = C::now();
-        elapsed_time = T(0);
+        elapsed_time = T1::zero();
     }
     void pause() {
         if (!running) return;
@@ -22,8 +23,9 @@ struct Stopwatch {
         last_played = C::now();
     }
     int_fast64_t elapsed() const {
-        return std::chrono::duration_cast<std::chrono::milliseconds>(
-                   elapsed_time + (running ? (C::now() - last_played) : T(0)))
+        return std::chrono::duration_cast<T2>(
+                   elapsed_time +
+                   (running ? (C::now() - last_played) : T1::zero()))
             .count();
     }
     void print() const {
