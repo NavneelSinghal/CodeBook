@@ -32,12 +32,6 @@
 // #include <ext/rope>
 
 // #define int int_fast32_t
-// #define unsigned uint_fast32_t
-// #define ll int_fast64_t
-// #define ull uint_fast64_t
-// #define ld long double
-// #define ulll __uint128_t
-// #define lll __int128
 
 using ll = int_fast64_t;
 using ull = uint_fast64_t;
@@ -214,6 +208,45 @@ using namespace CPPDS;
 
 namespace Utility {
 
+    void setIO(std::string name = "") {
+        std::ios_base::sync_with_stdio(0);
+        std::cin.tie(0);
+        std::cout.tie(0);
+        std::cin.exceptions(std::cin.failbit);
+        std::cout << std::setprecision(20) << std::fixed;
+        if (name.size() == 0) return;
+        ignore_unused(freopen((name + ".in").c_str(), "r", stdin));
+        ignore_unused(freopen((name + ".out").c_str(), "w", stdout));
+    }
+
+    constexpr int mod = int(1e9) + 7;
+    constexpr int nttmod = 998244353;
+    constexpr int inf = int(1e9);
+    constexpr ll linf = ll(3e18L);
+    constexpr ld eps = 1e-9;
+    ld pi = acosl(-1.0);
+
+    std::mt19937 rng(
+        std::chrono::steady_clock::now().time_since_epoch().count());
+
+    struct Stopwatch {
+        std::string name = "Time";
+        std::chrono::time_point<std::chrono::steady_clock> t =
+            std::chrono::steady_clock::now();
+        void restart() { t = std::chrono::steady_clock::now(); }
+        int elapsed() const {
+            return std::chrono::duration_cast<std::chrono::milliseconds>(
+                       std::chrono::steady_clock::now() - t)
+                .count();
+        }
+        void print() const {
+#ifdef TIMING
+            std::cerr << name << ": " << elapsed() << " ms\n";
+#endif
+        }
+        ~Stopwatch() { print(); }
+    };
+
     template <class T, class U = T>
     bool ckmin(T &a, U &&b) {
         return b < a ? a = std::forward<U>(b), true : false;
@@ -317,29 +350,6 @@ namespace Utility {
             return (skip_ >= 0) ? It{r_, skip_} : It{l_ - 1, skip_};
         }
     };
-
-    void setIO(std::string name = "") {
-        std::ios_base::sync_with_stdio(0);
-        std::cin.tie(0);
-        std::cout.tie(0);
-        std::cin.exceptions(std::cin.failbit);
-        std::cout << std::setprecision(20) << std::fixed;
-        if (name.size() == 0) return;
-        FILE *fin = freopen((name + ".in").c_str(), "r", stdin);
-        FILE *fout = freopen((name + ".out").c_str(), "w", stdout);
-        ignore_unused(fin);
-        ignore_unused(fout);
-    }
-
-    constexpr int mod = 1e9 + 7;
-    constexpr int nttmod = 998244353;
-    constexpr int inf = 1e9;
-    constexpr ll linf = 3e18;
-    constexpr ld eps = 1e-9;
-    ld pi = acosl(-1.0);
-
-    std::mt19937 rng(
-        std::chrono::steady_clock::now().time_since_epoch().count());
 
     // when using integers, keep overflow in mind
     template <typename T>
@@ -463,6 +473,7 @@ auto main() -> signed {
 
     auto solve = [&](int t) -> void {
         ignore_unused(t);
+        Stopwatch stopwatch;
     };
 
     auto brute = [&]() -> void {
