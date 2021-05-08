@@ -1,4 +1,5 @@
 namespace IO {
+#define CUSTOM_IO
     using namespace std;
     const int BUFFER_SIZE = 1 << 15;
 
