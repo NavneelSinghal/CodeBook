@@ -1,3 +1,147 @@
+struct LazySegTree {
+    struct node_t {
+        int mn;
+        long long sum;
+        int sz;
+    };
+
+    using base_t = int;
+    using update_t = int;
+
+    // struct update_t {
+    //     long long remx;
+    // };
+
+    // combining two nodes
+    node_t combine(const node_t &n1, const node_t &n2) {
+        return node_t{std::min(n1.mn, n2.mn), n1.sum + n2.sum, n1.sz + n2.sz};
+    }
+
+    // create node from base value and indices l, r
+    node_t make_node(const base_t &val, int l, int r) { return {val, val, 1}; }
+
+    // node corresponding to empty interval
+    node_t id_node() { return {inf + 1, 0, 0}; }
+
+    // apply update u to the whole node n
+    node_t apply_update(const update_t &u, const node_t &nd) {
+        // assume that updates are applied as assignments
+        if (u == 0) return nd;  // id
+        return {u, 1LL * u * nd.sz, nd.sz};
+    }
+
+    // effective update if v is applied to node, followed by u
+    update_t compose_updates(const update_t &u, const update_t &v) {
+        return {std::max(u, v)};
+    }
+
+    // identity update
+    update_t id_update() { return 0; }
+
+    std::vector<node_t> t;
+    std::vector<update_t> lazy;
+    int n;
+
+    LazySegTree(std::vector<base_t> &a) {
+        this->n = a.size();
+        if (this->n == 0) return;
+        this->t.assign(4 * a.size(), id_node());
+        this->lazy.assign(2 * a.size(), id_update());
+        _build(1, 0, n, a);
+    }
+
+    // half open
+    void update(int l, int r, const update_t &u) { _update(1, 0, n, l, r, u); }
+    node_t query(int l, int r) { return _query(1, 0, n, l, r); }
+
+    // find least R in [l, n] such that f(combine(a[l..r])) is false
+    // and f(combine(a[l..r-1])) = true
+    // Requires f to be contiguous (possibly empty) segments of true and false
+    // b is true if stuff needs to be pushed, and false otherwise
+    template <bool b = true, typename F>
+    int first_false_right(int l, const F &f) {
+        auto acc = id_node();
+        // assert(f(acc));
+        auto i = _first_false_right<b, F>(1, 0, n, l, n, f, acc);
+        if (i == -1) return n;
+        return i;
+    }
+
+    // helper functions
+    void _pullUp(int v) { t[v] = combine(t[2 * v], t[2 * v + 1]); }
+    void _updateNode(int v, const update_t &u) {
+        t[v] = apply_update(u, t[v]);
+        if (v < (int)lazy.size()) lazy[v] = compose_updates(u, lazy[v]);
+    }
+    void _pushDown(int v) {
+        // for optimizing, try removing this maybe
+        if (lazy[v] == id_update()) return;
+        _updateNode(2 * v, lazy[v]);
+        _updateNode(2 * v + 1, lazy[v]);
+        lazy[v] = id_update();
+    }
+
+    // actual functions
+    void _build(int v, int l, int r, const std::vector<base_t> &a) {
+        if (l == r - 1) {
+            t[v] = make_node(a[l], l, r);
+            return;
+        }
+        int mid = (l + r) / 2;
+        _build(2 * v, l, mid, a);
+        _build(2 * v + 1, mid, r, a);
+        _pullUp(v);
+    }
+
+    void _update(int v, int l, int r, int ql, int qr, const update_t &u) {
+        if (qr <= l || r <= ql) return;  // empty intersection
+        if (ql <= l && r <= qr) {        // completely inside query
+            _updateNode(v, u);
+            return;
+        }
+        _pushDown(v);
+        int mid = (l + r) / 2;
+        _update(2 * v, l, mid, ql, qr, u);
+        _update(2 * v + 1, mid, r, ql, qr, u);
+        _pullUp(v);
+    }
+
+    node_t _query(int v, int l, int r, int ql, int qr) {
+        if (qr <= l || r <= ql) return id_node();  // empty intersection
+        if (ql <= l && r <= qr) return t[v];       // completely inside query
+        _pushDown(v);
+        int mid = (l + r) / 2;
+        return combine(_query(2 * v, l, mid, ql, qr),
+                       _query(2 * v + 1, mid, r, ql, qr));
+    }
+
+    // find least R in [l, r] such that f(combine(a[ql..R])) is false
+    // and f(combine(a[ql..R-1])) = true. -1 if not found
+    // Requires f to be contiguous (possibly empty) segments of true and false
+    // b = whether pushing is needed or not
+    template <bool b = true, typename F>
+    int _first_false_right(int v, int l, int r, int ql, int qr, const F &f,
+                           node_t &acc) {
+        if (r <= ql) return -1;
+        if (qr <= l) return l;
+        auto new_acc = combine(acc, t[v]);
+        if (ql <= l && r <= qr) {
+            if (f(new_acc)) {
+                acc = new_acc;
+                return -1;
+            }
+        }
+        if (l == r - 1) return l;
+        if constexpr (b) _pushDown(v);
+        int mid = (r + l) / 2;
+        auto res = _first_false_right<b, F>(2 * v, l, mid, ql, qr, f, acc);
+        if (res != -1)
+            return res;
+        else
+            return _first_false_right<b, F>(2 * v + 1, mid, r, ql, qr, f, acc);
+    }
+};
+
 template <class node, node (*op)(node, node), node (*e)(), class fun,
           node (*eval)(fun, node), fun (*composition)(fun, fun), fun (*id)()>
 class lazy_segtree {
