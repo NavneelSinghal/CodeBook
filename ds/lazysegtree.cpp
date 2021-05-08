@@ -1,3 +1,4 @@
+template <bool is_lazy = true>
 struct LazySegTree {
     struct node_t {
         int mn;
@@ -7,10 +8,6 @@ struct LazySegTree {
 
     using base_t = int;
     using update_t = int;
-
-    // struct update_t {
-    //     long long remx;
-    // };
 
     // combining two nodes
     node_t combine(const node_t &n1, const node_t &n2) {
@@ -46,22 +43,25 @@ struct LazySegTree {
         this->n = a.size();
         if (this->n == 0) return;
         this->t.assign(4 * a.size(), id_node());
-        this->lazy.assign(2 * a.size(), id_update());
+        if constexpr (is_lazy) this->lazy.assign(2 * a.size(), id_update());
         _build(1, 0, n, a);
     }
 
     // half open
-    void update(int l, int r, const update_t &u) { _update(1, 0, n, l, r, u); }
+    void update(int l, int r, const update_t &u) {
+        if constexpr (!is_lazy) assert(l == r - 1);
+        _update(1, 0, n, l, r, u);
+    }
     node_t query(int l, int r) { return _query(1, 0, n, l, r); }
 
     // find least R in [l, n] such that f(combine(a[l..r])) is false
     // and f(combine(a[l..r-1])) = true
     // Requires f to be contiguous (possibly empty) segments of true and false
     // b is true if stuff needs to be pushed, and false otherwise
-    template <bool b = true, typename F>
+    template <bool b = is_lazy, typename F>
     int first_false_right(int l, const F &f) {
         auto acc = id_node();
-        // assert(f(acc));
+        assert(f(acc));
         auto i = _first_false_right<b, F>(1, 0, n, l, n, f, acc);
         if (i == -1) return n;
         return i;
@@ -71,9 +71,11 @@ struct LazySegTree {
     void _pullUp(int v) { t[v] = combine(t[2 * v], t[2 * v + 1]); }
     void _updateNode(int v, const update_t &u) {
         t[v] = apply_update(u, t[v]);
-        if (v < (int)lazy.size()) lazy[v] = compose_updates(u, lazy[v]);
+        if constexpr (is_lazy)
+            if (v < (int)lazy.size()) lazy[v] = compose_updates(u, lazy[v]);
     }
     void _pushDown(int v) {
+        if constexpr (!is_lazy) return;
         // for optimizing, try removing this maybe
         if (lazy[v] == id_update()) return;
         _updateNode(2 * v, lazy[v]);
