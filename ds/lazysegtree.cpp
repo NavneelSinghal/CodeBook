@@ -15,7 +15,9 @@ struct LazySegTree {
     }
 
     // create node from base value and index i
-    inline node_t make_node(const base_t &val, int i) const { return {val, val, 1}; }
+    inline node_t make_node(const base_t &val, int i) const {
+        return {val, val, 1};
+    }
 
     // node corresponding to empty interval
     inline node_t id_node() const { return {inf + 1, 0, 0}; }
@@ -28,7 +30,8 @@ struct LazySegTree {
     }
 
     // effective update if v is applied to node, followed by u
-    inline update_t compose_updates(const update_t &u, const update_t &v) const {
+    inline update_t compose_updates(const update_t &u,
+                                    const update_t &v) const {
         return {std::max(u, v)};
     }
 
@@ -140,11 +143,19 @@ struct LazySegTree {
         if (l == r - 1) return l;
         int m = (r + l) / 2;
         if constexpr (b) _pushDown(v, l, m);
-        auto res = _first_false_right<b, F>(v + 1, l, m, f, acc);
-        if (res != -1)
-            return res;
-        else
+        // auto res = _first_false_right<b, F>(v + 1, l, m, f, acc);
+        // if (res != -1)
+        //     return res;
+        // else
+        //     return _first_false_right<b, F>(v + ((m - l) << 1), m, r, f,
+        //     acc);
+        if (ql < m) {
+            auto res = _first_false_right<b, F>(v + 1, l, m, f, acc);
+            if (res != -1) return res;
+        }
+        if (m < qr)
             return _first_false_right<b, F>(v + ((m - l) << 1), m, r, f, acc);
+        return -1;
     }
 };
 
