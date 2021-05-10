@@ -1,4 +1,72 @@
 template <typename T>
+T combine(const T &a, const T &b) {
+    return std::min(a, b);
+}
+
+// idea: Pa.Nic
+template <typename T>
+struct sparse_table {
+    sparse_table(std::vector<T> a) {
+        n = (int)a.size();
+        s = std::move(a);
+        if (n == 1) {
+            N = 1;
+            return;
+        }
+        int l = __lg(n - 1) + 1;
+        N = 1 << l;
+        s.resize(N * l, s[0]);
+        int current_offset = N;
+        for (int j = 2; j < N; j <<= 1, current_offset += N) {
+            int stride = 2 * j;
+            for (int k = 0; k < N; k += stride) {
+                int middle = k + j;
+                int next_k = k + stride;
+                s[current_offset + middle - 1] = s[middle - 1];
+                s[current_offset + middle] = s[middle];
+                for (int l = middle - 2; l >= k; --l)
+                    s[current_offset + l] =
+                        combine(s[l], s[current_offset + l + 1]);
+                for (int l = middle + 1; l < next_k; ++l)
+                    s[current_offset + l] =
+                        combine(s[current_offset + l - 1], s[l]);
+            }
+        }
+    }
+
+    // [l, r)
+    T query(int l, int r) {
+        // find x such that x is 2^k * w
+        // [l, x - 1] and [x, r] are completely inside [x - 2^k, x - 1] and [x,
+        // x + 2^k - 1]
+        //
+        // l >= x - 2^k r <= x + 2^k - 1
+        //
+        // l = 01001010010, r = 01010100111
+        //
+        // middle - 1 = 0100111111 middle     = 0101000000
+        assert(l < r && 0 <= l && r <= n);
+        --r;
+        if (l == r) return s[l];
+        int base = __lg(l ^ r) * N;
+        return combine(s[base + l], s[base + r]);
+    }
+
+    // nothing in particular for the first row
+    // left right left right left right left right
+    // left       right      left       right
+
+    // 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11' | 12' | 13' | 14' | 15'
+    // 0   1 | 2   3 | 4   5 | 6   7 | 8   9 | 10   11' | 12'   13' | 14'   15'
+    // 0   1   2   3 | 4   5   6   7 | 8   9   10   11' | 12'   13'   14'   15'
+    // 0   1   2   3   4   5   6   7 | 8   9   10   11'   12'   13'   14'   15'
+
+   private:
+    int n, N;
+    std::vector<T> s;
+};
+
+template <typename T>
 struct sparse_table {
     int n, l;
     vector<vector<T>> s;
