@@ -1,5 +1,6 @@
 template <bool is_lazy = true>
 struct LazySegTree {
+   
     struct node_t {
         int mn;
         long long sum;
