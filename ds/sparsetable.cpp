@@ -3,8 +3,6 @@ T combine(const T &a, const T &b) {
     return std::min(a, b);
 }
 
-// introduced by: Pa.Nic
-//
 // doesn't need idempotence, only associativity, like a segtree
 // doesn't need identity either
 template <typename T>
