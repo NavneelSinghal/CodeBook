@@ -16,7 +16,7 @@ struct sparse_table {
         n = (int)a.size();
         s = std::move(a);
         if (n == 1) return;
-        int l = __lg(n - 1) + 1;
+        int l = std::__lg(n - 1) + 1;
         s.resize(n * l, s[0]);
         int current_offset = n;
         for (int j = 2; j < n; j <<= 1, current_offset += n) {
@@ -44,7 +44,7 @@ struct sparse_table {
         assert(l < r && 0 <= l && r <= n);
         --r;
         if (l == r) return s[l];
-        int base = __lg(l ^ r) * n;
+        int base = std::__lg(l ^ r) * n;
         return combine(s[base + l], s[base + r]);
     }
    private:
@@ -59,7 +59,7 @@ struct sparse_table {
         n = (int)a.size();
         s = std::move(a);
         if (n == 1) return;
-        int l = __lg(n - 1) + 1;
+        int l = std::__lg(n - 1) + 1;
         s.resize(n * l, s[0]);
         int current_offset = n;
         for (int j = 2; j < n; j <<= 1, current_offset += n) {
@@ -97,7 +97,7 @@ struct sparse_table {
         assert(l < r && 0 <= l && r <= n);
         --r;
         if (l == r) return s[l];
-        int base = __lg(l ^ r) * n;
+        int base = std::__lg(l ^ r) * n;
         return combine(s[base + l], s[base + r]);
     }
 
@@ -124,7 +124,7 @@ struct sparse_table {
 //             N = 1;
 //             return;
 //         }
-//         int l = __lg(n - 1) + 1;
+//         int l = std::__lg(n - 1) + 1;
 //         N = 1 << l;
 //         s.resize(N * l, s[0]);
 //         int current_offset = N;
@@ -160,7 +160,7 @@ struct sparse_table {
 //         assert(l < r && 0 <= l && r <= n);
 //         --r;
 //         if (l == r) return s[l];
-//         int base = __lg(l ^ r) * N;
+//         int base = std::__lg(l ^ r) * N;
 //         return combine(s[base + l], s[base + r]);
 //     }
 // 
@@ -184,7 +184,7 @@ struct sparse_table {
     vector<vector<T>> s;
     sparse_table(vector<T>& a) {
         n = a.size();
-        l = 2 + __lg(n + 1);
+        l = 2 + std::__lg(n + 1);
         s.assign(l, vector<T>(n));
         s[0] = a;
         for (int j = 0; j < l - 1; ++j) {
@@ -195,7 +195,7 @@ struct sparse_table {
     }
     // [l, r)
     T query(int l, int r) {
-        int sz = __lg(r - l);
+        int sz = std::__lg(r - l);
         return min(s[sz][l], s[sz][r - (1 << sz)]);
     }
 };
@@ -221,6 +221,6 @@ void build_sparse_table(vector<int>& a) {
 
 //[l, r)
 int query(int l, int r) {
-    int sz = __lg(r - l);
+    int sz = std::__lg(r - l);
     return min(sparse_table[sz][l], sparse_table[sz][r - (1 << sz)]);
 }
