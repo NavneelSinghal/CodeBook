@@ -16,8 +16,8 @@ struct sparse_table {
         n = (int)a.size();
         s = std::move(a);
         if (n == 1) return;
-        int l = std::__lg(n - 1) + 1;
-        s.resize(n * l, s[0]);
+        int log_n = __lg(n - 1) + 1;
+        s.resize(n * log_n, s[0]);
         int current_offset = n;
         for (int j = 2; j < n; j <<= 1, current_offset += n) {
             int stride = 2 * j;
@@ -44,7 +44,7 @@ struct sparse_table {
         assert(l < r && 0 <= l && r <= n);
         --r;
         if (l == r) return s[l];
-        int base = std::__lg(l ^ r) * n;
+        int base = __lg(l ^ r) * n;
         return combine(s[base + l], s[base + r]);
     }
    private:

@@ -1,3 +1,4 @@
+
 struct graph_edge_pointers {
     struct edge {
         int to, nxt, disable;  // to = other vertex,
@@ -5,8 +6,8 @@ struct graph_edge_pointers {
         edge(int to, int nxt) : to(to), nxt(nxt), disable(0) {}
     };
 
-    vector<int>
-        head;  // head[i] = index of the last edge emanating from vertex i
+    vector<int> head;
+    // head[i] = index of the last edge emanating from vertex i
     vector<edge> edges;
     vector<int> siz;
     int cur_edges;
