@@ -266,6 +266,7 @@ struct fast_sieve_func_spf {
                 const int k = i * p;
                 if (k > n) break;
                 is_prime[k] = false;
+                // p <= spfi
                 spf[k] = p;
                 if (spfi == p) {
                     // p divides i
@@ -276,6 +277,7 @@ struct fast_sieve_func_spf {
                         func[k] = 1 + p * func[i];
                     else
                         func[k] = func[w] * func[pwi];
+
                     break;
                 } else {
                     // p and i are coprime
