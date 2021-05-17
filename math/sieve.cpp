@@ -208,21 +208,100 @@ vector<bool> segmentedSieveNoPreGen(long long L, long long R) {
     return isPrime;
 }
 
-// memory - N + N/(log N)
-// how to compute a multiplicative function in O(N) for all values
-template <int N = 1'000'000>
+// memory - n + n/(log n)
+// how to compute a multiplicative function in o(n) for all values
+template <int n = 1'000'000>
+struct fast_sieve_func_optimized {
+    vector<int> primes, func;
+    vector<char> is_prime;
+    fast_sieve_func_optimized() {
+        is_prime.assign(n + 1, true);
+        is_prime[0] = is_prime[1] = false;
+        func.resize(n + 1);
+        func[1] = 1;  // for multiplicative functions, it is either 0 or 1
+        for (int i = 2; i <= n; ++i) {
+            if (is_prime[i]) primes.push_back(i);
+            // here you should handle the case of primes by updating func[i]
+            for (auto p : primes) {
+                if (i * p > n) break;
+                is_prime[i * p] = false;
+                // update func[i * p] in the following branches
+                // or maintain the smallest prime factor and check using that
+                if (i % p == 0) {
+                    // p divides i
+                    // see how to update here
+                    break;
+                } else {
+                    // p and i are coprime
+                    // see how to update here
+                }
+            }
+        }
+    }
+};
+
+// memory - 3n + n/(log n)
+// how to compute a multiplicative function in o(n) for all values
+template <int n = 1'000'000>
+struct fast_sieve_func_spf {
+    vector<int> primes, spf;
+    vector<ll> func;
+    vector<char> is_prime;
+    fast_sieve_func_spf() {
+        is_prime.assign(n + 1, true);
+        is_prime[0] = is_prime[1] = false;
+        spf.resize(n + 1);
+
+        func.resize(n + 1);
+        func[1] = 1;
+
+        for (int i = 2; i <= n; ++i) {
+            if (is_prime[i]) {
+                primes.push_back(i), spf[i] = i;
+                // handle the case of primes by updating func[i]
+                func[i] = 1 + i;
+            }
+            int spfi = spf[i];
+            for (const auto p : primes) {
+                const int k = i * p;
+                if (k > n) break;
+                is_prime[k] = false;
+                spf[k] = p;
+                if (spfi == p) {
+                    // p divides i
+                    // see how to update here
+                    int w = i, pwi = p;
+                    while (w % p == 0) pwi *= p, w /= p;
+                    if (w == 1)
+                        func[k] = 1 + p * func[i];
+                    else
+                        func[k] = func[w] * func[pwi];
+                    break;
+                } else {
+                    // p and i are coprime
+                    // see how to update here
+                    func[k] = func[i] * func[p];
+                }
+            }
+        }
+    }
+};
+
+// memory - n + n/(log n)
+// how to compute a multiplicative function in o(n) for all values
+template <int n = 1'000'000>
 struct fast_sieve_func {
     vector<int> primes, func;
     vector<char> is_prime;
     fast_sieve_func() {
-        is_prime.assign(N + 1, true);
+        is_prime.assign(n + 1, true);
         is_prime[0] = is_prime[1] = false;
-        func.resize(N + 1);
+        func.resize(n + 1);
         func[1] = 1;  // for multiplicative functions, it is either 0 or 1
-        for (int i = 2; i <= N; ++i) {
+        for (int i = 2; i <= n; ++i) {
             if (is_prime[i]) primes.push_back(i);
             // and handle the case of primes by updating func[i]
-            for (int j = 0; j < primes.size() && i * primes[j] <= N; ++j) {
+            for (int j = 0; j < primes.size() && i * primes[j] <= n; ++j) {
                 is_prime[i * primes[j]] = false;
                 // update func[i * primes[j]] in the following branches
                 if (i % primes[j] == 0) {
