@@ -220,9 +220,8 @@ struct fast_sieve_func {
         func.resize(N + 1);
         func[1] = 1;  // for multiplicative functions, it is either 0 or 1
         for (int i = 2; i <= N; ++i) {
-            if (is_prime[i])
-                primes.push_back(
-                    i);  // and handle the case of primes by updating func[i]
+            if (is_prime[i]) primes.push_back(i);
+            // and handle the case of primes by updating func[i]
             for (int j = 0; j < primes.size() && i * primes[j] <= N; ++j) {
                 is_prime[i * primes[j]] = false;
                 // update func[i * primes[j]] in the following branches
