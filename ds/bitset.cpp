@@ -20,7 +20,6 @@ DONE - last unset bit
 #include <climits>
 #include <cstdint>
 #include <iostream>
-
 namespace BITSET {
     template <int N>
     struct Bitset {
@@ -69,17 +68,6 @@ namespace BITSET {
             bool operator~() const noexcept { return !((*a >> pos) & 1); }
             reference &flip() noexcept { *a ^= ONE << pos; }
         };
-
-        __attribute__((target("popcnt"))) int popcnt_ll(
-            uint64_t x) const noexcept {
-            return __builtin_popcountll(x);
-        }
-        inline int ctz_ll(const uint64_t x) const noexcept {
-            return __builtin_ctzll(x);
-        }
-        inline int clz_ll(const uint64_t x) const noexcept {
-            return __builtin_clzll(x);
-        }
 
         inline void cleanup() noexcept { a[CAPACITY - 1] &= CLEANUP_MASK; }
 
@@ -143,7 +131,7 @@ namespace BITSET {
 
         int count() const noexcept {
             int ans = 0;
-            for (int i = 0; i < CAPACITY; ++i) ans += popcnt_ll(a[i]);
+            for (int i = 0; i < CAPACITY; ++i) ans += __builtin_popcountll(a[i]);
             return ans;
         }
 
@@ -211,9 +199,7 @@ namespace BITSET {
         }
 
         Bitset operator<<(int n) const noexcept {
-            Bitset<N> b = *this;
-            return b <<= n;
-            // return Bitset<N>(*this) <<= n;
+            return Bitset<N>(*this) <<= n;
         }
 
         Bitset operator>>(int n) const noexcept {
@@ -230,7 +216,7 @@ namespace BITSET {
         int find_first_set() const noexcept {
             for (int i = 0; i < CAPACITY; ++i) {
                 uint64_t w = a[i];
-                if (w) return i * BITS + ctz_ll(w);
+                if (w) return i * BITS + __builtin_ctzll(w);
             }
             return N;
         }
@@ -238,7 +224,7 @@ namespace BITSET {
         int find_first_unset() const noexcept {
             for (int i = 0; i < CAPACITY; ++i) {
                 uint64_t w = ~a[i];
-                if (w) return i * BITS + ctz_ll(w);
+                if (w) return i * BITS + __builtin_ctzll(w);
             }
             return N;
         }
@@ -248,10 +234,10 @@ namespace BITSET {
             if (i >= BITS * CAPACITY) return N;
             int loc = i / BITS;
             uint64_t w = a[loc] & (ALL_MASK << (i & ALL));
-            if (w) return loc * BITS + ctz_ll(w);
+            if (w) return loc * BITS + __builtin_ctzll(w);
             for (++loc; loc < CAPACITY; ++loc) {
                 w = a[loc];
-                if (w) return loc * BITS + ctz_ll(w);
+                if (w) return loc * BITS + __builtin_ctzll(w);
             }
             return N;
         }
@@ -261,10 +247,10 @@ namespace BITSET {
             if (i >= BITS * CAPACITY) return N;
             int loc = i / BITS;
             uint64_t w = (~a[loc]) & (ALL_MASK << (i & ALL));
-            if (w) return loc * BITS + ctz_ll(w);
+            if (w) return loc * BITS + __builtin_ctzll(w);
             for (++loc; loc < CAPACITY; ++loc) {
                 w = ~a[loc];
-                if (w) return loc * BITS + ctz_ll(w);
+                if (w) return loc * BITS + __builtin_ctzll(w);
             }
             return N;
         }
@@ -272,7 +258,7 @@ namespace BITSET {
         int find_last_set() const noexcept {
             for (int i = CAPACITY - 1; i >= 0; --i) {
                 uint64_t w = a[i];
-                if (w) return i * BITS + (ALL ^ clz_ll(w));
+                if (w) return i * BITS + (ALL ^ __builtin_clzll(w));
             }
             return -1;
         }
@@ -280,7 +266,7 @@ namespace BITSET {
         int find_last_unset() const noexcept {
             for (int i = CAPACITY - 1; i >= 0; --i) {
                 uint64_t w = ~a[i];
-                if (w) return i * BITS + (ALL ^ clz_ll(w));
+                if (w) return i * BITS + (ALL ^ __builtin_clzll(w));
             }
             return -1;
         }
