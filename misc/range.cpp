@@ -10,7 +10,7 @@ struct iterable<T &&> {
 };
 template <typename T, std::size_t N>
 struct iterable<T(&&)[N]> {
-    using type = typename T::rvalue_reference_to_array_is_not_supported;
+    using type = typename T::unsupported;
 };
 template <typename T>
 struct iterator_from_iterable {
@@ -132,10 +132,9 @@ template <typename I>
 struct enumerate {
    public:
     using size_type = typename std::make_signed<std::size_t>::type;
-    using traits = iterable_traits<I>;
-    using wrapped_iterable = typename traits::wrapped_iterable;
-    using raw_iterator = typename traits::raw_iterator;
-    using value_type = std::pair<size_type, typename traits::deref_value_type>;
+    using wrapped_iterable = typename iterable_traits<I>::wrapped_iterable;
+    using raw_iterator = typename iterable_traits<I>::raw_iterator;
+    using value_type = std::pair<size_type, typename iterable_traits<I>::deref_value_type>;
     struct It : public std::iterator<std::forward_iterator_tag, value_type> {
         raw_iterator iter_;
         size_type start_;
