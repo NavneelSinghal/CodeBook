@@ -1,3 +1,59 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+// https://atcoder.jp/contests/abc169/tasks/abc169_f
+
+using i32 = int_fast32_t;
+using i64 = int_fast64_t;
+using u64 = uint_fast64_t;
+
+template <class T, class F = multiplies<T>>
+T pwr(T a, long long n, F op = multiplies<T>(), T e = {1}) {
+    assert(n >= 0);
+    T res = e;
+    while (n) {
+        if (n & 1) res = op(res, a);
+        if (n >>= 1) a = op(a, a);
+    }
+    return res;
+}
+
+template <unsigned Mod = 998'244'353>
+struct Modular {
+    using M = Modular;
+    unsigned v;
+    Modular(long long a = 0) : v((a %= Mod) < 0 ? a + Mod : a) {}
+    M operator-() const { return M() -= *this; }
+    M& operator+=(M r) {
+        if ((v += r.v) >= Mod) v -= Mod;
+        return *this;
+    }
+    M& operator-=(M r) {
+        if ((v += Mod - r.v) >= Mod) v -= Mod;
+        return *this;
+    }
+    M& operator*=(M r) {
+        v = (u64)v * r.v % Mod;
+        return *this;
+    }
+    M& operator/=(M r) { return *this *= pwr(r, Mod - 2); }
+    friend M operator+(M l, M r) { return l += r; }
+    friend M operator-(M l, M r) { return l -= r; }
+    friend M operator*(M l, M r) { return l *= r; }
+    friend M operator/(M l, M r) { return l /= r; }
+    friend bool operator==(M l, M r) { return l.v == r.v; }
+    friend bool operator!=(M l, M r) { return l.v != r.v; }
+    friend ostream& operator<<(ostream& os, M a) { return os << a.v; }
+    friend istream& operator>>(istream& is, M& a) {
+        i64 w;
+        is >> w;
+        a = M(w);
+        return is;
+    }
+};
+
+using mint = Modular<998'244'353>;
+
 namespace ntt {
 
     template <unsigned Mod>
@@ -101,3 +157,31 @@ namespace ntt {
 
 using namespace ntt;
 
+int main() {
+    const i32 MOD = 998'244'353;
+
+    i32 n, s;
+    cin >> n >> s;
+
+    vector<mint> a(n);
+    for (auto& x : a) cin >> x;
+
+    function<vector<mint>(i32, i32)> multiply_many = [&](i32 l, i32 r) {
+        if (l > r) return vector<mint>(1, 1);
+        if (l == r) {
+            vector<mint> w(a[l].v + 1);
+            w[0] = 1;
+            w[a[l].v] = pwr(mint(2), MOD - 2);
+            return w;
+        }
+        i32 m = (l + r) >> 1;
+        auto p = multiply_many(l, m);
+        auto q = multiply_many(m + 1, r);
+        auto x = p * q;
+        return vector<mint>(x.begin(), x.begin() + min(s + 1, (i32)x.size()));
+    };
+
+    auto p = multiply_many(0, n - 1);
+
+    cout << (pwr(mint(2), n) * p[s]) << endl;
+}

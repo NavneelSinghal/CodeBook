@@ -1,6 +1,5 @@
 // z[i] is the length of the longest common prefix between s and the suffix of s
 // starting at i.
-
 vector<int> z_function(string s) {
     int n = (int)s.length();
     vector<int> z(n);

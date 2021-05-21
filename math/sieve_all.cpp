@@ -220,8 +220,10 @@ struct fast_sieve_func_optimized {
         func.resize(n + 1);
         func[1] = 1;  // for multiplicative functions, it is either 0 or 1
         for (int i = 2; i <= n; ++i) {
-            if (is_prime[i]) primes.push_back(i);
-            // here you should handle the case of primes by updating func[i]
+            if (is_prime[i]) {
+                primes.push_back(i);
+                // here you should handle the case of primes by updating func[i]
+            }
             for (auto p : primes) {
                 if (i * p > n) break;
                 is_prime[i * p] = false;
@@ -241,7 +243,6 @@ struct fast_sieve_func_optimized {
 };
 
 // memory - 3n + n/(log n)
-// how to compute a multiplicative function in o(n) for all values
 template <int n = 1'000'000>
 struct fast_sieve_func_spf {
     vector<int> primes, spf;

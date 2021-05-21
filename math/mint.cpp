@@ -1,66 +1,58 @@
-// modular int library
+constexpr int mod = int(1e9) + 7;
+constexpr int nttmod = 998'244'353;
 
-template <int MOD = 998'244'353>
-struct Modular {
-    int value;
-    static constexpr int MOD_value = MOD;
+template <uint32_t Modulus>
+class Modular {
+    using M = Modular;
 
-    Modular(ll v = 0) {
-        value = v % MOD;
-        if (value < 0) value += MOD;
+   public:
+    static_assert(int(Modulus) >= 1, "Modulus must be in the range [1, 2^31)");
+    static constexpr int modulus() { return Modulus; }
+    static M raw(uint32_t v) { return *reinterpret_cast<M*>(&v); }
+    Modular() : v_(0) {}
+    Modular(int64_t v) : v_((v %= Modulus) < 0 ? v + Modulus : v) {}
+    template <class T>
+    explicit operator T() const {
+        return v_;
     }
-
-    Modular(ll a, ll b) : value(0) {
-        *this += a;
-        *this /= b;
+    M& operator++() { return v_ = ++v_ == Modulus ? 0 : v_, *this; }
+    M& operator--() { return --(v_ ? v_ : v_ = Modulus), *this; }
+    M& operator*=(M o) { return v_ = uint64_t(v_) * o.v_ % Modulus, *this; }
+    M& operator/=(M o) {
+        auto [inv, gcd] = extgcd(o.v_, Modulus);
+        assert(gcd == 1);
+        return *this *= inv;
     }
-
-    Modular& operator+=(Modular const& b) {
-        value += b.value;
-        if (value >= MOD) value -= MOD;
-        return *this;
+    M& operator+=(M o) {
+        return v_ = int(v_ += o.v_ - Modulus) < 0 ? v_ + Modulus : v_, *this;
     }
-
-    Modular& operator-=(Modular const& b) {
-        value -= b.value;
-        if (value < 0) value += MOD;
-        return *this;
+    M& operator-=(M o) {
+        return v_ = int(v_ -= o.v_) < 0 ? v_ + Modulus : v_, *this;
     }
-
-    Modular& operator*=(Modular const& b) {
-        value = (ll)value * b.value % MOD;
-        return *this;
+    friend M operator++(M& a, int) { return exchange(a, ++M(a)); }
+    friend M operator--(M& a, int) { return exchange(a, --M(a)); }
+    friend M operator+(M a) { return a; }
+    friend M operator-(M a) { return a.v_ = a.v_ ? Modulus - a.v_ : 0, a; }
+    friend M operator*(M a, M b) { return a *= b; }
+    friend M operator/(M a, M b) { return a /= b; }
+    friend M operator+(M a, M b) { return a += b; }
+    friend M operator-(M a, M b) { return a -= b; }
+    friend istream& operator>>(istream& is, M& x) {
+        int64_t v;
+        return is >> v, x = v, is;
     }
+    friend ostream& operator<<(ostream& os, M x) { return os << x.v_; }
+    friend bool operator==(M a, M b) { return a.v_ == b.v_; }
+    friend bool operator!=(M a, M b) { return a.v_ != b.v_; }
 
-    friend Modular mexp(Modular a, ll e) {
-        Modular res = 1;
-        while (e) {
-            if (e & 1) res *= a;
-            a *= a;
-            e >>= 1;
-        }
-        return res;
+   private:
+    static pair<int, int> extgcd(int a, int b) {
+        array<int, 2> x{1, 0};
+        while (b) swap(x[0] -= a / b * x[1], x[1]), swap(a %= b, b);
+        return {x[0], a};
     }
-
-    friend Modular inverse(Modular a) { return mexp(a, MOD - 2); }
-
-    Modular& operator/=(Modular const& b) { return *this *= inverse(b); }
-    friend Modular operator+(Modular a, Modular const b) { return a += b; }
-    friend Modular operator-(Modular a, Modular const b) { return a -= b; }
-    friend Modular operator-(Modular const a) { return 0 - a; }
-    friend Modular operator*(Modular a, Modular const b) { return a *= b; }
-    friend Modular operator/(Modular a, Modular const b) { return a /= b; }
-
-    friend std::ostream& operator<<(std::ostream& os, Modular const& a) {
-        return os << a.value;
-    }
-
-    friend bool operator==(Modular const& a, Modular const& b) {
-        return a.value == b.value;
-    }
-
-    friend bool operator!=(Modular const& a, Modular const& b) {
-        return a.value != b.value;
-    }
+    uint32_t v_;
 };
-using mint = Modular<mod>;
+
+using mint = ModularInt<mod>;
+

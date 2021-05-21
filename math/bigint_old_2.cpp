@@ -1,6 +1,44 @@
+#pragma GCC optimize("Ofast")
+#include <cassert>
+#include <complex>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <vector>
+
+using namespace std;
+
+// NOTE:
+// This code contains various bug fixes compared to the original version from
+// indy256
+// (github.com/indy256/codelibrary/blob/master/cpp/numbertheory/BigInt-full.cpp),
+// including:
+// - Fix overflow bug in mul_karatsuba.
+// - Fix overflow bug in fft.
+// - Fix bug in initialization from long long.
+// - Optimized operators + - *.
+//
+// Tested:
+// - https://www.e-olymp.com/en/problems/266: Comparison
+// - https://www.e-olymp.com/en/problems/267: Subtraction
+// - https://www.e-olymp.com/en/problems/271: Multiplication
+// - https://www.e-olymp.com/en/problems/272: Multiplication
+// - https://www.e-olymp.com/en/problems/313: Addition
+// - https://www.e-olymp.com/en/problems/314: Addition/Subtraction
+// - https://www.e-olymp.com/en/problems/317: Multiplication (simple / karatsuba
+// / fft)
+// - https://www.e-olymp.com/en/problems/1327: Multiplication
+// - https://www.e-olymp.com/en/problems/1328
+// - VOJ BIGNUM: Addition, Subtraction, Multiplication.
+// - SGU 111: sqrt
+// - SGU 193
+// - SPOJ MUL, VFMUL: Multiplication.
+// - SPOJ FDIV, VFDIV: Division.
+
+const int BASE_DIGITS = 9;
+const int BASE = 1000000000;
+
 struct BigInt {
-    static constexpr int BASE_DIGITS = 9;
-    static constexpr int BASE = 1000000000;
     int sign;
     vector<int> a;
 
@@ -534,3 +572,39 @@ struct BigInt {
     }
 };
 
+BigInt fib_slow(int n) {
+    BigInt a(0);
+    BigInt b(1);
+    for (int i = 2; i <= n; ++i) {
+        BigInt t = a;
+        a = b;
+        b += t;
+    }
+    return b;
+}
+
+// return {f_n, f_(n+1)} in A, B
+void fib(int n, BigInt &A, BigInt &B) {
+    if (n == 0) {
+        A = BigInt(0);
+        B = BigInt(1);
+        return;
+    }
+    fib(n >> 1, A, B);
+    BigInt a = A;
+    BigInt b = B;
+    A = (BigInt(2) * b - a) * a;
+    B = (a * a + b * b);
+    if (n & 1) {
+        swap(A, B);
+        B += A;
+    }
+}
+
+int main() {
+    int n = 100000;
+    cout << fib_slow(n) << endl;
+    BigInt A, B;
+    // fib(n, A, B);
+    cout << A << endl;
+}

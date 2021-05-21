@@ -1,6 +1,3 @@
-#include <bits/stdc++.h>
-using namespace std;
-
 struct convex_hull {
     using TYPE = long long;  // use double normally
     using point = pair<TYPE, TYPE>;
@@ -72,5 +69,3 @@ struct convex_hull {
     }
 };
 
-int main() {
-}
