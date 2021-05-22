@@ -34,22 +34,18 @@ struct Range {
     struct It : public std::iterator<std::forward_iterator_tag, T> {
         T i;
         const T skip;
-        It(T _i, T _skip) : i(_i), skip(_skip) {}
-        It &operator++() {
-            i += skip;
-            return *this;
-        }
+        explicit It(T _i, T _skip) : i(_i), skip(_skip) {}
+        It &operator++() { return i += skip, *this; }
         const It &operator++(int) {
             auto temp = *this;
-            operator++();
-            return temp;
+            return operator++(), temp;
         }
         T operator*() const { return i; }
-        bool operator!=(const It &o) const {
-            return (skip >= 0) ? (i < *o) : (i > *o);
+        bool operator!=(const It &it) const {
+            return (skip >= 0) ? (i < *it) : (i > *it);
         }
-        bool operator==(const It &o) const {
-            return (skip >= 0) ? (i >= *o) : (i <= *o);
+        bool operator==(const It &it) const {
+            return (skip >= 0) ? (i >= *it) : (i <= *it);
         }
     };
     using iterator = It;
@@ -60,10 +56,10 @@ struct Range {
 #endif
     }
     Range(T n) : Range(T(0), n, T(1)) {}
-    iterator begin() const { return It{l, skip}; }
-    iterator end() const { return It{r, skip}; }
-    iterator begin() { return It{l, skip}; }
-    iterator end() { return It{r, skip}; }
+    It begin() const { return It(l, skip); }
+    It end() const { return It(r, skip); }
+    It begin() { return It(l, skip); }
+    It end() { return It(r, skip); }
 };
 
 template <typename... T>
@@ -108,10 +104,10 @@ struct zip {
     using iterator = It;
     explicit zip(T &&... iterables)
         : iterables_(std::forward<T>(iterables)...) {}
-    iterator begin() { return begin_(sequence()); }
-    iterator end() { return end_(sequence()); }
-    iterator begin() const { return begin_(sequence()); }
-    iterator end() const { return end_(sequence()); }
+    It begin() { return begin_(sequence()); }
+    It end() { return end_(sequence()); }
+    It begin() const { return begin_(sequence()); }
+    It end() const { return end_(sequence()); }
 
    private:
     wrapped_iterables iterables_;
@@ -128,13 +124,14 @@ struct zip {
 template <typename... T>
 zip(T &&...) -> zip<T &&...>;
 
-template <typename I>
+template <typename T>
 struct enumerate {
    public:
     using size_type = typename std::make_signed<std::size_t>::type;
-    using wrapped_iterable = typename iterable_traits<I>::wrapped_iterable;
-    using raw_iterator = typename iterable_traits<I>::raw_iterator;
-    using value_type = std::pair<size_type, typename iterable_traits<I>::deref_value_type>;
+    using wrapped_iterable = typename iterable_traits<T>::wrapped_iterable;
+    using raw_iterator = typename iterable_traits<T>::raw_iterator;
+    using value_type =
+        std::pair<size_type, typename iterable_traits<T>::deref_value_type>;
     struct It : public std::iterator<std::forward_iterator_tag, value_type> {
         raw_iterator iter_;
         size_type start_;
@@ -151,12 +148,12 @@ struct enumerate {
         value_type operator*() const { return {start_, *iter_}; }
     };
     using iterator = It;
-    explicit enumerate(I &&iterable, size_type start = 0)
-        : iterable_(std::forward<I>(iterable)), start_(start) {}
-    iterator begin() { return iterator(std::begin(iterable_), start_); }
-    iterator end() { return iterator(std::end(iterable_), 0); }
-    iterator begin() const { return iterator(std::begin(iterable_), start_); }
-    iterator end() const { return iterator(std::end(iterable_), 0); }
+    explicit enumerate(T &&iterable, size_type start = 0)
+        : iterable_(std::forward<T>(iterable)), start_(start) {}
+    It begin() { return It(std::begin(iterable_), start_); }
+    It end() { return It(std::end(iterable_), 0); }
+    It begin() const { return It(std::begin(iterable_), start_); }
+    It end() const { return It(std::end(iterable_), 0); }
 
    private:
     wrapped_iterable iterable_;
@@ -164,7 +161,7 @@ struct enumerate {
 };
 
 template <typename I>
-enumerate(I &&) -> enumerate<I &&>;
+enumerate(T &&) -> enumerate<T &&>;
 template <typename I, typename Index>
-enumerate(I &&, Index) -> enumerate<I &&>;
+enumerate(T &&, Index) -> enumerate<T &&>;
 
