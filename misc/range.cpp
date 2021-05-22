@@ -160,8 +160,8 @@ struct enumerate {
     size_type start_;
 };
 
-template <typename I>
+template <typename T>
 enumerate(T &&) -> enumerate<T &&>;
-template <typename I, typename Index>
+template <typename T, typename Index>
 enumerate(T &&, Index) -> enumerate<T &&>;
 
