@@ -8,8 +8,6 @@
 #include <utility>
 #include <vector>
 
-#define DEBUG
-
 namespace Debug {
 
 // clang-format off
@@ -110,20 +108,17 @@ namespace Debug {
             std::replace(_s.begin(), _s.end(), ',', ' '); \
             std::stringstream _ss(_s);                    \
             std::istream_iterator<std::string> _it(_ss);  \
-            location_stats(__LINE__);                     \
-            err(_it, args);                               \
-            clear_colours();                              \
+            Debug::location_stats(__LINE__);              \
+            Debug::err(_it, args);                        \
+            Debug::clear_colours();                       \
         }
 
     void location_stats(int line) {
         std::cerr << DEBUG_LINE << "Line " << DEBUG_LINENUM << line << "\n"
                   << DEBUG_RESET;
     }
-
     void clear_colours() { std::cerr << DEBUG_RESET; }
-
     void err(std::istream_iterator<std::string> it) { std::ignore = it; }
-
     template <typename T, typename... Args>
     void err(std::istream_iterator<std::string> it, T a, Args... args) {
         std::cerr << DEBUG_VAR << *it << " = ";
@@ -163,6 +158,4 @@ namespace Debug {
 #undef DEBUG_LINENUM
 
 }  // namespace Debug
-
-using namespace Debug;
 
