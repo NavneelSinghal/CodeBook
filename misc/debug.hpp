@@ -1,4 +1,42 @@
+#include <algorithm>
+#include <iostream>
+#include <iterator>
+#include <sstream>
+#include <string>
+#include <tuple>
+#include <type_traits>
+#include <utility>
+#include <vector>
+
+#define DEBUG
+
 namespace Debug {
+
+// clang-format off
+#define DEBUG_RED              "\x1B[0m\x1B[31m"
+#define DEBUG_GREEN            "\x1B[0m\x1B[32m"
+#define DEBUG_YELLOW           "\x1B[0m\x1B[33m"
+#define DEBUG_BLUE             "\x1B[0m\x1B[34m"
+#define DEBUG_MAGENTA          "\x1B[0m\x1B[35m"
+#define DEBUG_CYAN             "\x1B[0m\x1B[36m"
+#define DEBUG_WHITE            "\x1B[0m\x1B[37m"
+#define DEBUG_RESET            "\x1B[0m"
+#define DEBUG_BOLD_GREEN       "\x1B[0m\x1B[32;1m"
+#define DEBUG_BOLD_YELLOW      "\x1B[0m\x1B[33;1m"
+#define DEBUG_BOLD_BLUE        "\x1B[0m\x1B[34;1m"
+#define DEBUG_BOLD_MAGENTA     "\x1B[0m\x1B[35;1m"
+#define DEBUG_BOLD_CYAN        "\x1B[0m\x1B[36;1m"
+#define DEBUG_BOLD_WHITE       "\x1B[0m\x1B[37;1m"
+#define DEBUG_UNDERLINE        "\x1B[4m"
+#define DEBUG_BODY             DEBUG_BOLD_CYAN
+#define DEBUG_VAR              DEBUG_RED
+#define DEBUG_PAREN            DEBUG_YELLOW
+#define DEBUG_BRAC             DEBUG_GREEN
+#define DEBUG_COMMA            DEBUG_BOLD_MAGENTA
+#define DEBUG_CONTENT          DEBUG_BODY DEBUG_UNDERLINE
+#define DEBUG_LINE             DEBUG_BOLD_YELLOW
+#define DEBUG_LINENUM          DEBUG_BOLD_BLUE
+    // clang-format on
 
 #define SFINAE(x, ...)             \
     template <class, class = void> \
@@ -10,34 +48,37 @@ namespace Debug {
     SFINAE(IsTuple, typename std::tuple_size<T>::type);
     SFINAE(Iterable, decltype(std::begin(std::declval<T>())));
 
-    template <class T>
-    constexpr char Space(const T &) {
-        return (Iterable<T>::value or IsTuple<T>::value) ? '\n' : ' ';
-    }
-
     template <auto &os>
     struct Writer {
+        static constexpr auto lbrac = DEBUG_BRAC "[";
+        static constexpr auto rbrac = DEBUG_BRAC "]";
+        static constexpr auto lparen = DEBUG_PAREN "(";
+        static constexpr auto rparen = DEBUG_PAREN ")";
+        static constexpr auto comma = DEBUG_COMMA ", ";
         template <class T>
         void Impl(T const &t) const {
-            if constexpr (DefaultIO<T>::value)
-                os << t;
-            else if constexpr (Iterable<T>::value) {
+            if constexpr (DefaultIO<T>::value) {
+                os << DEBUG_CONTENT << t;
+            } else if constexpr (Iterable<T>::value) {
                 int i = 0;
-                for (auto &&x : t)
-                    ((i++) ? (os << Space(x), Impl(x)) : Impl(x));
-            } else if constexpr (IsTuple<T>::value)
+                os << lbrac;
+                for (auto &&x : t) ((i++) ? (os << comma, Impl(x)) : Impl(x));
+                os << rbrac;
+            } else if constexpr (IsTuple<T>::value) {
+                os << lparen;
                 std::apply(
                     [this](auto const &... args) {
                         int i = 0;
-                        (((i++) ? (os << ' ', Impl(args)) : Impl(args)), ...);
+                        (((i++) ? (os << comma, Impl(args)) : Impl(args)), ...);
                     },
                     t);
-            else
+                os << rparen;
+            } else
                 static_assert(IsTuple<T>::value, "No matching type for print");
         }
         template <class F, class... Ts>
         auto &operator()(F const &f, Ts const &... ts) const {
-            return Impl(f), ((os << ' ', Impl(ts)), ...), os << '\n', *this;
+            return Impl(f), ((os << comma, Impl(ts)), ...), os << '\n', *this;
         }
     };
 
@@ -63,23 +104,30 @@ namespace Debug {
     };
 
 #ifdef DEBUG
-    #define debug(args...)                               \
-        {                                                \
-            std::string _s = #args;                      \
-            replace(_s.begin(), _s.end(), ',', ' ');     \
-            std::stringstream _ss(_s);                   \
-            std::istream_iterator<std::string> _it(_ss); \
-            std::cerr << "Line " << __LINE__ << "\n";    \
-            err(_it, args);                              \
+    #define debug(args...)                                \
+        {                                                 \
+            std::string _s = #args;                       \
+            std::replace(_s.begin(), _s.end(), ',', ' '); \
+            std::stringstream _ss(_s);                    \
+            std::istream_iterator<std::string> _it(_ss);  \
+            location_stats(__LINE__);                     \
+            err(_it, args);                               \
+            clear_colours();                              \
         }
 
-    void err(std::istream_iterator<std::string> it) { ignore_unused(it); }
+    void location_stats(int line) {
+        std::cerr << DEBUG_LINE << "Line " << DEBUG_LINENUM << line << "\n"
+                  << DEBUG_RESET;
+    }
+
+    void clear_colours() { std::cerr << DEBUG_RESET; }
+
+    void err(std::istream_iterator<std::string> it) { std::ignore = it; }
 
     template <typename T, typename... Args>
     void err(std::istream_iterator<std::string> it, T a, Args... args) {
-        std::cerr << "\033[0;31m" << *it << " = ";
+        std::cerr << DEBUG_VAR << *it << " = ";
         Writer<std::cerr>{}(a);
-        std::cerr << "\033[0m";
         err(++it, args...);
     }
 
@@ -90,8 +138,29 @@ namespace Debug {
     #define ASSERT(...) 0
 #endif
 
-    constexpr Writer<std::cout> print;
-    constexpr Reader<std::cin> read;
+#undef DEBUG_RED
+#undef DEBUG_GREEN
+#undef DEBUG_YELLOW
+#undef DEBUG_BLUE
+#undef DEBUG_MAGENTA
+#undef DEBUG_CYAN
+#undef DEBUG_WHITE
+#undef DEBUG_RESET
+#undef DEBUG_BOLD_GREEN
+#undef DEBUG_BOLD_YELLOW
+#undef DEBUG_BOLD_BLUE
+#undef DEBUG_BOLD_MAGENTA
+#undef DEBUG_BOLD_CYAN
+#undef DEBUG_BOLD_WHITE
+#undef DEBUG_UNDERLINE
+#undef DEBUG_BODY
+#undef DEBUG_VAR
+#undef DEBUG_PAREN
+#undef DEBUG_BRAC
+#undef DEBUG_COMMA
+#undef DEBUG_CONTENT
+#undef DEBUG_LINE
+#undef DEBUG_LINENUM
 
 }  // namespace Debug
 

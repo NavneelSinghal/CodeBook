@@ -54,7 +54,7 @@ namespace ITERATORS {
         using value_type = T;
         Range(T _l, T _r, T _skip = 1) : l(_l), r(_r), skip(_skip) {
 #ifdef DEBUG
-            assert(skip_ != 0);
+            assert(skip != 0);
 #endif
         }
         Range(T n) : Range(T(0), n, T(1)) {}

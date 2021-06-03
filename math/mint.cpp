@@ -54,5 +54,5 @@ class Modular {
     uint32_t v_;
 };
 
-using mint = ModularInt<mod>;
+using mint = Modular<mod>;
 
