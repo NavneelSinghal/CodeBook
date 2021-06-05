@@ -1,47 +1,50 @@
+// TODO: look at the constructor with default elements
+
 template <bool is_lazy = true>
 struct LazySegTree {
-   
-    struct node_t {
-        int mn;
-        long long sum;
-        int sz;
-    };
-
-    using base_t = int;
-    using update_t = int;
+    using node_t = ll;
+    using base_t = ll;
+    using update_t = ll;
 
     // combining two nodes
     inline node_t combine(const node_t &n1, const node_t &n2) const {
-        return node_t{std::min(n1.mn, n2.mn), n1.sum + n2.sum, n1.sz + n2.sz};
+        return n1 + n2;
     }
 
     // create node from base value and index i
-    inline node_t make_node(const base_t &val, int i) const {
-        return {val, val, 1};
-    }
+    inline node_t make_node(const base_t &val, int i) const { return 0; }
 
     // node corresponding to empty interval
-    inline node_t id_node() const { return {inf + 1, 0, 0}; }
+    inline node_t id_node() const { return 0; }
 
     // apply update u to the whole node n
     inline node_t apply_update(const update_t &u, const node_t &nd) const {
-        // assume that updates are applied as assignments
-        if (u == 0) return nd;  // id
-        return {u, 1LL * u * nd.sz, nd.sz};
+        if (u == -inf) return nd;
+        return u;
     }
 
     // effective update if v is applied to node, followed by u
     inline update_t compose_updates(const update_t &u,
                                     const update_t &v) const {
-        return {std::max(u, v)};
+        if (u == -inf) return v;
+        return u;
     }
 
     // identity update
-    inline update_t id_update() const { return 0; }
+    inline update_t id_update() const { return -inf; }
 
     std::vector<node_t> t;
     std::vector<update_t> lazy;
     int n;
+
+    LazySegTree(int n) {
+        this->n = n;
+        if (this->n == 0) return;
+        this->t.assign(2 * n - 1, id_node());
+        if constexpr (is_lazy) this->lazy.assign(2 * n - 1, id_update());
+        std::vector<base_t> a(n, 0);
+        _build(0, 0, n, a);
+    }
 
     LazySegTree(std::vector<base_t> &a) {
         this->n = (int)a.size();
@@ -71,7 +74,6 @@ struct LazySegTree {
     template <bool b = is_lazy, typename F>
     int first_false_right(int l, const F &f) {
         auto acc = id_node();
-        // assert(f(acc));
         ql = l, qr = n;
         auto i = _first_false_right<b, F>(0, 0, n, f, acc);
         if (i == -1) return n;
@@ -108,9 +110,8 @@ struct LazySegTree {
         _pullUp(v, l, m);
     }
 
-    // only go down branches with at non-empty intersection, same for _query
     void _update(int v, int l, int r, const update_t &u) {
-        if (ql <= l && r <= qr) {  // completely inside query
+        if (ql <= l && r <= qr) {
             _updateNode(v, u);
             return;
         }
@@ -122,7 +123,7 @@ struct LazySegTree {
     }
 
     node_t _query(int v, int l, int r) {
-        if (ql <= l && r <= qr) return t[v];  // completely inside query
+        if (ql <= l && r <= qr) return t[v];
         int m = (l + r) / 2;
         _pushDown(v, l, m);
         if (m >= qr) return _query(v + 1, l, m);
@@ -130,8 +131,6 @@ struct LazySegTree {
         return combine(_query(v + 1, l, m), _query(v + ((m - l) << 1), m, r));
     }
 
-    // find least R in [l, r] such that f(combine(a[ql..R])) is false
-    // and f(combine(a[ql..R-1])) = true. -1 if not found
     template <bool b = true, typename F>
     int _first_false_right(int v, int l, int r, const F &f, node_t &acc) {
         if (r <= ql) return -1;
@@ -144,12 +143,6 @@ struct LazySegTree {
         if (l == r - 1) return l;
         int m = (r + l) / 2;
         if constexpr (b) _pushDown(v, l, m);
-        // auto res = _first_false_right<b, F>(v + 1, l, m, f, acc);
-        // if (res != -1)
-        //     return res;
-        // else
-        //     return _first_false_right<b, F>(v + ((m - l) << 1), m, r, f,
-        //     acc);
         if (ql < m) {
             auto res = _first_false_right<b, F>(v + 1, l, m, f, acc);
             if (res != -1) return res;

@@ -165,7 +165,7 @@ namespace BITSET {
                     for (int i = CAPACITY - 1; i >= loc; --i) a[i] = a[i - loc];
                 else {
                     const int complement = BITS - pos;
-                    for (int i = CAPACITY; i > loc; --i)
+                    for (int i = CAPACITY - 1; i > loc; --i)
                         a[i] = (a[i - loc] << pos) |
                                (a[i - loc - 1] >> complement);
                     a[loc] = a[0] << pos;
