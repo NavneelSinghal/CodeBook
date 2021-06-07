@@ -1,50 +1,3 @@
-using node_t = int;
-using base_t = int;
-using update_t = int;
-
-// combining two nodes
-// always needed
-inline node_t combine(const node_t &n1, const node_t &n2) {
-    return max(n1, n2);
-}
-
-// create node from base value and index i
-// always needed
-inline node_t make_node(const base_t &val, int i) {
-    return val;
-}
-
-// node corresponding to empty interval
-// always needed
-inline node_t id_node() {
-    return -inf;
-}
-
-// apply update u to the whole node n
-// always needed
-inline node_t apply_update(const update_t &u, const node_t &nd) {
-    if (u == -inf) return nd;
-    return u;
-}
-
-// effective update if v is applied to node, followed by u
-// needed only for lazy
-inline update_t compose_updates(const update_t &u, const update_t &v) {
-    return u;
-}
-
-// identity update
-// needed only for lazy
-inline update_t id_update() {
-    return -inf;
-}
-
-// initial value of base
-// needed only when initializing with value instead of vector
-inline base_t init_base() {
-    return 0;
-}
-
 // clang-format off
 template <class base_t,
           class node_t,
@@ -64,11 +17,8 @@ struct lazy_segtree {
 
    public:
     lazy_segtree() : lazy_segtree(0) {}
-    explicit lazy_segtree(int n) {
-        std::vector<S> initial(n);
-        for (int i = 0; i < n; ++i) initial[i] = make_node(init_base(), i);
-        *this = lazy_segtree(initial);
-    }
+    explicit lazy_segtree(int n)
+        : lazy_segtree(std::vector<B>(n, init_base())) {}
     explicit lazy_segtree(const std::vector<B> &v) : _n(int(v.size())) {
         log = 0;
         while ((1 << log) < _n) ++log;
