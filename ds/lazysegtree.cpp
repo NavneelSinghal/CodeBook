@@ -1,38 +1,45 @@
 // clang-format off
-template <class base_t,
-          class node_t,
-          class update_t,
-          node_t (*make_node)(const base_t&, int),
-          node_t (*combine)(const node_t&, const node_t&),
-          node_t (*id_node)(),
-          node_t (*apply_update)(const update_t&, const node_t&),
-          update_t (*compose_updates)(const update_t&, const update_t&),
-          update_t (*id_update)(),
-          bool is_lazy>
-// clang-format on
+template <class Base,
+          class Node,
+          class Update,
+          class MakeNode,
+          class CombineNodes,
+          class ApplyUpdate,
+          class ComposeUpdates = std::nullptr_t>
 struct lazy_segtree {
-    using S = node_t;
-    using F = update_t;
-    using B = base_t;
+    static constexpr bool is_lazy =
+        !std::is_same<ComposeUpdates, std::nullptr_t>::value;
 
    public:
-    lazy_segtree() : lazy_segtree(0) {}
-    explicit lazy_segtree(int n)
-        : lazy_segtree(std::vector<B>(n, init_base())) {}
-    explicit lazy_segtree(const std::vector<B> &v) : _n(int(v.size())) {
+    template <typename... T>
+    explicit lazy_segtree(int n, const Base& id_base, T... args)
+        : lazy_segtree(std::vector<Base>(n, id_base), args...) {}
+    explicit lazy_segtree(const std::vector<Base>& v,
+                          const Node& _id_node,
+                          const MakeNode& _make_node,
+                          const CombineNodes& _combine,
+                          const Update& _id_update,
+                          const ApplyUpdate& _apply_update,
+                          const ComposeUpdates& _compose_updates = nullptr)
+        : _n(int(v.size())),
+          make_node(_make_node),
+          combine(_combine),
+          id_node(_id_node),
+          apply_update(_apply_update),
+          id_update(_id_update),
+          compose_updates(_compose_updates) {
         log = 0;
         while ((1 << log) < _n) ++log;
         size = 1 << log;
-        d = std::vector<S>(2 * size, id_node());
-        if constexpr (is_lazy) lz = std::vector<F>(size, id_update());
+        d = std::vector<Node>(2 * size, id_node);
+        if constexpr (is_lazy) lz = std::vector<Update>(size, id_update);
         for (int i = 0; i < _n; i++) d[size + i] = make_node(v[i], i);
         for (int i = size - 1; i >= 1; i--) {
             update(i);
         }
     }
-
-    void set(int p, S x) {
-        // assert(0 <= p && p < _n);
+    
+    void set(int p, Node x) {
         p += size;
         if constexpr (is_lazy)
             for (int i = log; i >= 1; i--) push(p >> i);
@@ -40,24 +47,22 @@ struct lazy_segtree {
         for (int i = 1; i <= log; i++) update(p >> i);
     }
 
-    S get(int p) {
-        // assert(0 <= p && p < _n);
+    Node get(int p) {
         p += size;
         if constexpr (is_lazy)
             for (int i = log; i >= 1; i--) push(p >> i);
         return d[p];
     }
 
-    S query(int l, int r) {
-        // assert(0 <= l && l <= r && r <= _n);
-        if (l == r) return id_node();
+    Node query(int l, int r) {
+        if (l == r) return id_node;
         l += size, r += size;
         if constexpr (is_lazy)
             for (int i = log; i >= 1; i--) {
                 if (((l >> i) << i) != l) push(l >> i);
                 if (((r >> i) << i) != r) push((r - 1) >> i);
             }
-        S sml = id_node(), smr = id_node();
+        Node sml = id_node, smr = id_node;
         while (l < r) {
             if (l & 1) sml = combine(sml, d[l++]);
             if (r & 1) smr = combine(d[--r], smr);
@@ -65,17 +70,15 @@ struct lazy_segtree {
         }
         return combine(sml, smr);
     }
-    S all_query() { return d[1]; }
-    void update(int p, F f) {
-        // assert(0 <= p && p < _n);
+    Node all_query() { return d[1]; }
+    void update(int p, Update f) {
         p += size;
         if constexpr (is_lazy)
             for (int i = log; i >= 1; i--) push(p >> i);
         d[p] = apply_update(f, d[p]);
         for (int i = 1; i <= log; i++) update(p >> i);
     }
-    void update(int l, int r, F f) {
-        // assert(0 <= l && l <= r && r <= _n);
+    void update(int l, int r, Update f) {
         if (l == r) return;
         l += size, r += size;
         if constexpr (is_lazy)
@@ -98,19 +101,15 @@ struct lazy_segtree {
         }
     }
 
-    template <bool (*g)(S)>
-    int max_right(int l) {
-        return max_right(l, [](S x) { return g(x); });
-    }
     template <class G>
     int max_right(int l, G g) {
         // assert(0 <= l && l <= _n);
-        // assert(g(id_node()));
+        // assert(g(id_node));
         if (l == _n) return _n;
         l += size;
         if constexpr (is_lazy)
             for (int i = log; i >= 1; i--) push(l >> i);
-        S sm = id_node();
+        Node sm = id_node;
         do {
             while (l % 2 == 0) l >>= 1;
             if (!g(combine(sm, d[l]))) {
@@ -130,19 +129,15 @@ struct lazy_segtree {
         return _n;
     }
 
-    template <bool (*g)(S)>
-    int min_left(int r) {
-        return min_left(r, [](S x) { return g(x); });
-    }
     template <class G>
     int min_left(int r, G g) {
         // assert(0 <= r && r <= _n);
-        // assert(g(id_node()));
+        // assert(g(id_node));
         if (r == 0) return 0;
         r += size;
         if constexpr (is_lazy)
             for (int i = log; i >= 1; i--) push((r - 1) >> i);
-        S sm = id_node();
+        Node sm = id_node;
         do {
             r--;
             while (r > 1 && (r % 2)) r >>= 1;
@@ -164,11 +159,17 @@ struct lazy_segtree {
 
    private:
     int _n, size, log;
-    std::vector<S> d;
-    std::vector<F> lz;
+    std::vector<Node> d;
+    std::vector<Update> lz;
+    const MakeNode make_node;
+    const CombineNodes combine;
+    const Node id_node;
+    const ApplyUpdate apply_update;
+    const Update id_update;
+    const ComposeUpdates compose_updates;
 
     void update(int k) { d[k] = combine(d[2 * k], d[2 * k + 1]); }
-    void all_apply(int k, F f) {
+    void all_apply(int k, Update f) {
         d[k] = apply_update(f, d[k]);
         if constexpr (is_lazy)
             if (k < size) lz[k] = compose_updates(f, lz[k]);
@@ -176,12 +177,35 @@ struct lazy_segtree {
     void push(int k) {
         all_apply(2 * k, lz[k]);
         all_apply(2 * k + 1, lz[k]);
-        if constexpr (is_lazy) lz[k] = id_update();
+        if constexpr (is_lazy) lz[k] = id_update;
     }
 };
 
-template <bool is_lazy>
-using lazy_seg =
-    lazy_segtree<base_t, node_t, update_t, make_node, combine, id_node,
-                 apply_update, compose_updates, id_update, is_lazy>;
+/* verification: judge.yosupo.jp (both lazy and non-lazy)
+ *
+ * usage example:
+    struct Node { mint sum, size; };
+    const Node id_node = {0, 0};
+    using Base = mint;
+    auto make_node = [](const Base& c, int i) {
+        return Node{c, 1};
+    };
+    auto combine = [](const Node& n1, const Node& n2) {
+        return Node{n1.sum + n2.sum, n1.size + n2.size};
+    };
+    struct Update { mint a, b; };
+    const Update id_update = {1, 0};
+    auto apply_update = [](const Update& u, const Node& nd) {
+        return Node{nd.sum * u.a + nd.size * u.b, nd.size};
+    };
+    auto compose_updates = [](const Update& u, const Update& v) {
+        return Update{u.a * v.a, u.a * v.b + u.b};
+    };
+    vector<Base> a(n);
+    for (auto& x : a) IO::read_int(x.v_);
+    lazy_segtree seg(a, id_node, make_node, combine, id_update, apply_update,
+                     compose_updates);
+    static_assert(decltype(seg)::is_lazy);
+*/
 
+// clang-format on

@@ -1,4 +1,5 @@
 // for sample usage, see https://codeforces.com/contest/1514/problem/D - highest memory submission
+// https://users.dcc.uchile.cl/~gnavarro/ps/is14.pdf -- wavelet matrix is much faster
 
 /* works only when all elements are non-negative 
  * to reduce to log n instead of log U, use coordinate compression */
