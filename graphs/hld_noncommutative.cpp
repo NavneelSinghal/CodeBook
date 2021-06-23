@@ -251,7 +251,6 @@ struct NonCommutativeHLD {
     void update_path(int u, int v, update_t val) {
         // should customize val if breaking into segments changes val
         int l = lca(u, v);
-        if (in_time[u] > in_time[v]) swap(u, v);
         // u -> l, l -> v
         while (u != -1 && is_anc(l, u)) {
             int ql = N - (in_time[u] + 1);
@@ -271,7 +270,6 @@ struct NonCommutativeHLD {
     }
     node_t query_path(int u, int v) {
         const int l = lca(u, v);
-        if (in_time[u] > in_time[v]) swap(u, v);
         // u -> l, l -> v
         node_t res_l = id_node(), res_r = id_node();
         while (u != -1 && is_anc(l, u)) {

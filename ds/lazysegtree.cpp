@@ -28,17 +28,20 @@ struct lazy_segtree {
           apply_update(_apply_update),
           id_update(_id_update),
           compose_updates(_compose_updates) {
+        build(v);
+    }
+
+    void build(const std::vector<Base>& v) {
+        _n = int(v.size());
         log = 0;
         while ((1 << log) < _n) ++log;
         size = 1 << log;
         d = std::vector<Node>(2 * size, id_node);
         if constexpr (is_lazy) lz = std::vector<Update>(size, id_update);
         for (int i = 0; i < _n; i++) d[size + i] = make_node(v[i], i);
-        for (int i = size - 1; i >= 1; i--) {
-            update(i);
-        }
+        for (int i = size - 1; i >= 1; i--) update(i);
     }
-    
+
     void set(int p, Node x) {
         p += size;
         if constexpr (is_lazy)
@@ -177,7 +180,7 @@ struct lazy_segtree {
     void push(int k) {
         all_apply(2 * k, lz[k]);
         all_apply(2 * k + 1, lz[k]);
-        if constexpr (is_lazy) lz[k] = id_update;
+        lz[k] = id_update;
     }
 };
 
