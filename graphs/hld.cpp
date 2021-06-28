@@ -43,13 +43,13 @@ struct lazy_segtree {
         for (int i = 0; i < _n; i++) d[size + i] = make_node(v[i], i);
         for (int i = size - 1; i >= 1; i--) update(i);
     }
-
+    
     void set(int p, Node x) {
         p += size;
         if constexpr (is_lazy)
             for (int i = log; i >= 1; i--) push(p >> i);
         d[p] = x;
-        for (int i = 1; i <= log; i++) update(p >> i);
+        for (int i = 1; i <= log; ++i) update(p >> i);
     }
 
     Node get(int p) {
@@ -62,11 +62,12 @@ struct lazy_segtree {
     Node query(int l, int r) {
         if (l == r) return id_node;
         l += size, r += size;
-        if constexpr (is_lazy)
-            for (int i = log; i >= 1; i--) {
-                if (((l >> i) << i) != l) push(l >> i);
-                if (((r >> i) << i) != r) push((r - 1) >> i);
-            }
+        int l_ctz = __builtin_ctz(l);
+        int r_ctz = __builtin_ctz(r);
+        if constexpr (is_lazy) {
+            for (int i = log; i > l_ctz; --i) push(l >> i);
+            for (int i = log; i > r_ctz; --i) push((r - 1) >> i);
+        }
         Node sml = id_node, smr = id_node;
         while (l < r) {
             if (l & 1) sml = combine(sml, d[l++]);
@@ -81,16 +82,17 @@ struct lazy_segtree {
         if constexpr (is_lazy)
             for (int i = log; i >= 1; i--) push(p >> i);
         d[p] = apply_update(f, d[p]);
-        for (int i = 1; i <= log; i++) update(p >> i);
+        for (int i = 1; i <= log; ++i) update(p >> i);
     }
     void update(int l, int r, Update f) {
         if (l == r) return;
         l += size, r += size;
-        if constexpr (is_lazy)
-            for (int i = log; i >= 1; i--) {
-                if (((l >> i) << i) != l) push(l >> i);
-                if (((r >> i) << i) != r) push((r - 1) >> i);
-            }
+        int l_ctz = __builtin_ctz(l);
+        int r_ctz = __builtin_ctz(r);
+        if constexpr (is_lazy) {
+            for (int i = log; i > l_ctz; --i) push(l >> i);
+            for (int i = log; i > r_ctz; --i) push((r - 1) >> i);
+        }
         {
             int l2 = l, r2 = r;
             while (l < r) {
@@ -100,12 +102,14 @@ struct lazy_segtree {
             }
             l = l2, r = r2;
         }
-        for (int i = 1; i <= log; i++) {
-            if (((l >> i) << i) != l) update(l >> i);
-            if (((r >> i) << i) != r) update((r - 1) >> i);
-        }
+        for (int i = l_ctz + 1; i <= log; ++i) update(l >> i);
+        for (int i = r_ctz + 1; i <= log; ++i) update((r - 1) >> i);
     }
 
+    template <bool (*g)(Node)>
+    int max_right(int l) {
+        return max_right(l, [](Node x) { return g(x); });
+    }
     template <class G>
     int max_right(int l, G g) {
         // assert(0 <= l && l <= _n);
@@ -134,6 +138,10 @@ struct lazy_segtree {
         return _n;
     }
 
+    template <bool (*g)(Node)>
+    int min_left(int r) {
+        return min_left(r, [](Node x) { return g(x); });
+    }
     template <class G>
     int min_left(int r, G g) {
         // assert(0 <= r && r <= _n);
@@ -182,9 +190,10 @@ struct lazy_segtree {
     void push(int k) {
         all_apply(2 * k, lz[k]);
         all_apply(2 * k + 1, lz[k]);
-        if constexpr (is_lazy) lz[k] = id_update;
+        lz[k] = id_update;
     }
 };
+// clang-format on
 
 // clang-format off
 template <class Base,
@@ -257,7 +266,7 @@ struct HLD {
                        tree.query(in_time[u] + vals_in_edges, in_time[v] + 1));
     }
     Node query_vertex(int u) { return tree.get(in_time[u]); }
-    void update_vertex(int u, Update val) { tree.set(in_time[u], val); }
+    void update_vertex(int u, Update val) { tree.update(in_time[u], val); }
     void update_subtree(int u, Node val) {
         int l = in_time[u] + vals_in_edges;
         int r = in_time[u] + sz[u];

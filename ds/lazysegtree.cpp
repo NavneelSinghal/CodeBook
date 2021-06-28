@@ -41,13 +41,13 @@ struct lazy_segtree {
         for (int i = 0; i < _n; i++) d[size + i] = make_node(v[i], i);
         for (int i = size - 1; i >= 1; i--) update(i);
     }
-
+    
     void set(int p, Node x) {
         p += size;
         if constexpr (is_lazy)
             for (int i = log; i >= 1; i--) push(p >> i);
         d[p] = x;
-        for (int i = 1; i <= log; i++) update(p >> i);
+        for (int i = 1; i <= log; ++i) update(p >> i);
     }
 
     Node get(int p) {
@@ -60,11 +60,12 @@ struct lazy_segtree {
     Node query(int l, int r) {
         if (l == r) return id_node;
         l += size, r += size;
-        if constexpr (is_lazy)
-            for (int i = log; i >= 1; i--) {
-                if (((l >> i) << i) != l) push(l >> i);
-                if (((r >> i) << i) != r) push((r - 1) >> i);
-            }
+        int l_ctz = __builtin_ctz(l);
+        int r_ctz = __builtin_ctz(r);
+        if constexpr (is_lazy) {
+            for (int i = log; i > l_ctz; --i) push(l >> i);
+            for (int i = log; i > r_ctz; --i) push((r - 1) >> i);
+        }
         Node sml = id_node, smr = id_node;
         while (l < r) {
             if (l & 1) sml = combine(sml, d[l++]);
@@ -79,16 +80,17 @@ struct lazy_segtree {
         if constexpr (is_lazy)
             for (int i = log; i >= 1; i--) push(p >> i);
         d[p] = apply_update(f, d[p]);
-        for (int i = 1; i <= log; i++) update(p >> i);
+        for (int i = 1; i <= log; ++i) update(p >> i);
     }
     void update(int l, int r, Update f) {
         if (l == r) return;
         l += size, r += size;
-        if constexpr (is_lazy)
-            for (int i = log; i >= 1; i--) {
-                if (((l >> i) << i) != l) push(l >> i);
-                if (((r >> i) << i) != r) push((r - 1) >> i);
-            }
+        int l_ctz = __builtin_ctz(l);
+        int r_ctz = __builtin_ctz(r);
+        if constexpr (is_lazy) {
+            for (int i = log; i > l_ctz; --i) push(l >> i);
+            for (int i = log; i > r_ctz; --i) push((r - 1) >> i);
+        }
         {
             int l2 = l, r2 = r;
             while (l < r) {
@@ -98,12 +100,14 @@ struct lazy_segtree {
             }
             l = l2, r = r2;
         }
-        for (int i = 1; i <= log; i++) {
-            if (((l >> i) << i) != l) update(l >> i);
-            if (((r >> i) << i) != r) update((r - 1) >> i);
-        }
+        for (int i = l_ctz + 1; i <= log; ++i) update(l >> i);
+        for (int i = r_ctz + 1; i <= log; ++i) update((r - 1) >> i);
     }
 
+    template <bool (*g)(Node)>
+    int max_right(int l) {
+        return max_right(l, [](Node x) { return g(x); });
+    }
     template <class G>
     int max_right(int l, G g) {
         // assert(0 <= l && l <= _n);
@@ -132,6 +136,10 @@ struct lazy_segtree {
         return _n;
     }
 
+    template <bool (*g)(Node)>
+    int min_left(int r) {
+        return min_left(r, [](Node x) { return g(x); });
+    }
     template <class G>
     int min_left(int r, G g) {
         // assert(0 <= r && r <= _n);
@@ -183,32 +191,4 @@ struct lazy_segtree {
         lz[k] = id_update;
     }
 };
-
-/* verification: judge.yosupo.jp (both lazy and non-lazy)
- *
- * usage example:
-    struct Node { mint sum, size; };
-    const Node id_node = {0, 0};
-    using Base = mint;
-    auto make_node = [](const Base& c, int i) {
-        return Node{c, 1};
-    };
-    auto combine = [](const Node& n1, const Node& n2) {
-        return Node{n1.sum + n2.sum, n1.size + n2.size};
-    };
-    struct Update { mint a, b; };
-    const Update id_update = {1, 0};
-    auto apply_update = [](const Update& u, const Node& nd) {
-        return Node{nd.sum * u.a + nd.size * u.b, nd.size};
-    };
-    auto compose_updates = [](const Update& u, const Update& v) {
-        return Update{u.a * v.a, u.a * v.b + u.b};
-    };
-    vector<Base> a(n);
-    for (auto& x : a) IO::read_int(x.v_);
-    lazy_segtree seg(a, id_node, make_node, combine, id_update, apply_update,
-                     compose_updates);
-    static_assert(decltype(seg)::is_lazy);
-*/
-
 // clang-format on

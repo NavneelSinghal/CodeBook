@@ -1,5 +1,7 @@
 namespace IO {
 
+#ifndef DEBUG
+
 #define CHANGE_DEFAULT_STREAMS
 
     static struct FastInput {
@@ -182,5 +184,8 @@ namespace IO {
     } fast_output;
 
 #define cout IO::fast_output
+
+#endif
+
 }  // namespace IO
  
