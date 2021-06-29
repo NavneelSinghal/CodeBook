@@ -5,13 +5,14 @@ T combine(const T &a, const T &b) {
     return a + b;
 }
 
-template <typename T>
+template <class T, class Combine>
 struct sparse_table {
-    sparse_table(std::vector<T> a) {
+    sparse_table(std::vector<T> a, const Combine& _combine)
+        : combine(_combine) {
         n = (int)a.size();
         s = std::move(a);
         if (n == 1) return;
-        int log_n = __lg(n - 1) + 1;
+        int log_n = std::__lg(n - 1) + 1;
         s.resize(n * log_n, s[0]);
         int current_offset = n;
         for (int j = 2; j < n; j <<= 1, current_offset += n) {
@@ -39,11 +40,13 @@ struct sparse_table {
         assert(l < r && 0 <= l && r <= n);
         --r;
         if (l == r) return s[l];
-        int base = __lg(l ^ r) * n;
+        int base = std::__lg(l ^ r) * n;
         return combine(s[base + l], s[base + r]);
     }
+
    private:
     int n;
     std::vector<T> s;
+    const Combine combine;
 };
 

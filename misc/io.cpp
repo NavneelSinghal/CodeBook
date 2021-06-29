@@ -1,8 +1,11 @@
+
 namespace IO {
+
+    using namespace std;
 
 #ifndef DEBUG
 
-#define CHANGE_DEFAULT_STREAMS
+    #define CHANGE_DEFAULT_STREAMS
 
     static struct FastInput {
         static constexpr int BUF_SIZE = 1 << 14;
@@ -76,9 +79,9 @@ namespace IO {
             return read_integer(n);
         }
 
-#if !defined(_WIN32) || defined(_WIN64)
+    #if !defined(_WIN32) || defined(_WIN64)
         inline FastInput& operator>>(__int128& n) { return read_integer(n); }
-#endif
+    #endif
 
         template <typename T>
         inline typename enable_if<is_floating_point<T>::value, FastInput&>::type
@@ -94,7 +97,7 @@ namespace IO {
         }
     } fast_input;
 
-#define cin IO::fast_input
+    #define cin IO::fast_input
 
     static struct FastOutput {
         static constexpr int BUF_SIZE = 1 << 14;
@@ -162,9 +165,9 @@ namespace IO {
             return integer_to_string(n);
         }
 
-#if !defined(_WIN32) || defined(_WIN64)
+    #if !defined(_WIN32) || defined(_WIN64)
         inline char* stringify(__int128 n) { return integer_to_string(n); }
-#endif
+    #endif
 
         template <typename T>
         inline typename enable_if<is_floating_point<T>::value, char*>::type
@@ -183,9 +186,8 @@ namespace IO {
         }
     } fast_output;
 
-#define cout IO::fast_output
+    #define cout IO::fast_output
 
 #endif
 
 }  // namespace IO
- 
