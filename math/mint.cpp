@@ -107,30 +107,35 @@ class Modular {
     M& operator-=(M o) {
         return v_ = int(v_ -= o.v_) < 0 ? v_ + Modulus : v_, *this;
     }
-    friend M operator++(M& a, int) { return exchange(a, ++M(a)); }
-    friend M operator--(M& a, int) { return exchange(a, --M(a)); }
+    friend M operator++(M& a, int) { return std::exchange(a, ++M(a)); }
+    friend M operator--(M& a, int) { return std::exchange(a, --M(a)); }
     friend M operator+(M a) { return a; }
     friend M operator-(M a) { return a.v_ = a.v_ ? Modulus - a.v_ : 0, a; }
     friend M operator*(M a, M b) { return a *= b; }
     friend M operator/(M a, M b) { return a /= b; }
     friend M operator+(M a, M b) { return a += b; }
     friend M operator-(M a, M b) { return a -= b; }
-    friend istream& operator>>(istream& is, M& x) {
+    template <class T>
+    friend T& operator>>(T& is, M& x) {
         int64_t v;
         return is >> v, x = v, is;
     }
-    friend ostream& operator<<(ostream& os, M x) { return os << x.v_; }
+    template <class T>
+    friend T& operator<<(T& os, M x) {
+        return os << x.v_;
+    }
     friend bool operator==(M a, M b) { return a.v_ == b.v_; }
     friend bool operator!=(M a, M b) { return a.v_ != b.v_; }
 
    private:
-    static pair<int, int> extgcd(int a, int b) {
-        array<int, 2> x{1, 0};
-        while (b) swap(x[0] -= a / b * x[1], x[1]), swap(a %= b, b);
+    static std::pair<int, int> extgcd(int a, int b) {
+        std::array<int, 2> x{1, 0};
+        while (b) std::swap(x[0] -= a / b * x[1], x[1]), std::swap(a %= b, b);
         return {x[0], a};
     }
     uint32_t v_;
 };
 
+// using mint = LazyMontgomeryModInt<nttmod>;
 using mint = Modular<mod>;
 

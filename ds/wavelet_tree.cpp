@@ -1,101 +1,133 @@
-// for sample usage, see https://codeforces.com/contest/1514/problem/D - highest memory submission
-// https://users.dcc.uchile.cl/~gnavarro/ps/is14.pdf -- wavelet matrix is much faster
-
-/* works only when all elements are non-negative 
- * to reduce to log n instead of log U, use coordinate compression */
-template <typename T>
-struct wavelet_tree {
-    struct node {
-        T lo, hi;
-        node *left_child, *right_child;
-        std::vector<int> b;
-        using iter = typename std::vector<T>::iterator;
-
-        // numbers are in range [x, y]
-        // array indices are [from, to)
-        node(iter from, iter to, T x, T y) {
-            lo = x, hi = y;
-            left_child = nullptr;
-            right_child = nullptr;
-            if (lo == hi || from >= to)
-                return;
-            T mid = lo + (hi - lo) / 2;
-            auto f = [mid](T e) { return e <= mid; };
-            b.reserve(to - from + 1);
-            b.push_back(0);
-            for (auto it = from; it != to; it++)
-                b.push_back(b.back() + f(*it));
-            auto pivot = std::stable_partition(from, to, f);
-            left_child = new node(from, pivot, lo, mid);
-            right_child = new node(pivot, to, mid + 1, hi);
+template <class T>
+struct wavelet_matrix {
+    using size_type = uint32_t;
+    struct bit_vector {
+        static constexpr size_type wsize = 64;
+        static size_type rank64(uint64_t x, size_type i) {
+            return __builtin_popcountll(x & ((1ULL << i) - 1));
         }
-
-        // kth smallest element in [l, r]
-        T kth_smallest(int l, int r, int k) {
-            if (l > r)
-                return 0;
-            if (lo == hi)
-                return lo;
-            // how many in the first (l-1) numbers that go left
-            int lb = b[l - 1];
-            // how many in first (r) numbers that go left
-            int rb = b[r];
-            int inLeft = rb - lb;
-            if (k <= inLeft)
-                return this->left_child->kth_smallest(lb + 1, rb, k);
-            return this->right_child->kth_smallest(l - lb, r - rb, k - inLeft);
+#pragma pack(4)
+        struct block_t {
+            uint64_t bit;
+            size_type sum;
+        };
+#pragma pack()
+        size_type n, zeros;
+        std::vector<block_t> block;
+        bit_vector(size_type _n = 0) : n(_n), block(n / wsize + 1) {}
+        int operator[](size_type i) const {
+            return block[i / wsize].bit >> i % wsize & 1;
         }
-
-        // count of numbers in [l, r] less than or equal to k
-        // TODO: implement with range [k1, k2] instead of k
-        int count_less_equal(int l, int r, T k) {
-            if (l > r or k < lo)
-                return 0;
-            if (hi <= k)
-                return r - l + 1;
-            int lb = b[l - 1], rb = b[r];
-            return this->left_child->count_less_equal(lb + 1, rb, k) +
-                   this->right_child->count_less_equal(l - lb, r - rb, k);
+        void set(size_type i) {
+            block[i / wsize].bit |= (uint64_t)1 << i % wsize;
         }
-
-        // count of numbers in [l, r] equal to k
-        int count_equal(int l, int r, T k) {
-            if (l > r || k < lo || k > hi)
-                return 0;
-            if (lo == hi)
-                return r - l + 1;
-            int lb = b[l - 1], rb = b[r], mid = lo + (hi - lo) / 2;
-            if (k <= mid)
-                return this->left_child->count_equal(lb + 1, rb, k);
-            return this->right_child->count_equal(l - lb, r - rb, k);
+        void build() {
+            for (size_type j = 0; j < n / wsize; ++j)
+                block[j + 1].sum =
+                    block[j].sum + __builtin_popcountll(block[j].bit);
+            zeros = rank0(n);
         }
-        ~node() {
-            delete left_child;
-            delete right_child;
+        size_type rank0(size_type i) const { return i - rank1(i); }
+        size_type rank1(size_type i) const {
+            auto&& e = block[i / wsize];
+            return e.sum + rank64(e.bit, i % wsize);
         }
     };
-    vector<T> a;
-    node *nd;
-    wavelet_tree(vector<T> &A) {
-        this->a = A;
-        auto minmax_iterators =
-            minmax_element(std::begin(this->a), std::end(this->a));
-        this->nd =
-            new node(std::begin(this->a), std::end(this->a),
-                     *(minmax_iterators.first), *(minmax_iterators.second));
+    size_type n, lg;
+    std::vector<T> a;
+    std::vector<bit_vector> bv;
+    wavelet_matrix(size_type _n = 0) : n(_n), a(n) {}
+    wavelet_matrix(const std::vector<T>& _a) : n(_a.size()), a(_a) { build(); }
+    T& operator[](size_type i) { return a[i]; }
+    void build() {
+        lg = std::__lg(std::max<T>(
+                 *std::max_element(std::begin(a), std::end(a)), 1)) +
+             1;
+        bv.assign(lg, n);
+        std::vector<T> cur = a, nxt(n);
+        for (auto h = lg; h--;) {
+            for (size_type i = 0; i < n; ++i)
+                if (cur[i] >> h & 1) bv[h].set(i);
+            bv[h].build();
+            std::array<decltype(std::begin(nxt)), 2> it{
+                std::begin(nxt), std::begin(nxt) + bv[h].zeros};
+            for (size_type i = 0; i < n; ++i) *it[bv[h][i]]++ = cur[i];
+            std::swap(cur, nxt);
+        }
     }
-    T kth_smallest(int l, int r, int k) {
-        ++l, ++r;
-        return nd->kth_smallest(l, r, k);
+    // find kth element in [l, r), 0 indexed
+    T kth(size_type l, size_type r, size_type k) const {
+        T res = 0;
+        for (auto h = lg; h--;) {
+            auto l0 = bv[h].rank0(l), r0 = bv[h].rank0(r);
+            if (k < r0 - l0)
+                l = l0, r = r0;
+            else {
+                k -= r0 - l0;
+                res |= (T)1 << h;
+                l += bv[h].zeros - l0;
+                r += bv[h].zeros - r0;
+            }
+        }
+        return res;
     }
-    int count_less_equal(int l, int r, T k) {
-        ++l, ++r;
-        return nd->count_less_equal(l, r, k);
+    // count i in [l..r) satisfying a[i] < ub
+    size_type count(size_type l, size_type r, T ub) const {
+        if (ub >= (T)1 << lg) return r - l;
+        if (ub <= 0) return 0;
+        size_type res = 0;
+        for (auto h = lg; h--;) {
+            auto l0 = bv[h].rank0(l), r0 = bv[h].rank0(r);
+            if (~ub >> h & 1)
+                l = l0, r = r0;
+            else {
+                res += r0 - l0;
+                l += bv[h].zeros - l0;
+                r += bv[h].zeros - r0;
+            }
+        }
+        return res;
     }
-    int count_equal(int l, int r, T k) {
-        ++l, ++r;
-        return nd->count_equal(l, r, k);
+    // count i in [l..r) satisfying a[i] in [lb, ub)
+    size_type count(size_type l, size_type r, T lb, T ub) const {
+        return count(l, r, ub) - count(l, r, lb);
     }
-    ~wavelet_tree() { delete this->nd; }
 };
 
+template <class T>
+auto zip(const std::vector<T>& a) {
+    int n = size(a);
+    std::vector<std::pair<T, int>> p(n);
+    for (int i = 0; i < n; ++i) p[i] = {a[i], i};
+    std::sort(std::begin(p), std::end(p));
+    std::vector<int> na(n);
+    std::vector<T> v;
+    for (int k = 0, rnk = -1; k < n; ++k) {
+        if (k == 0 or p[k - 1].first < p[k].first)
+            v.push_back(p[k].first), ++rnk;
+        na[p[k].second] = rnk;
+    }
+    return std::make_pair(na, v);
+}
+
+/*
+
+usage sample
+
+using namespace std;
+
+int main() {
+    int n, q;
+    cin >> n >> q;
+    vector<int> a(n);
+    for (auto& x : a) cin >> x;
+    auto [na, v] = zip(a);
+    wavelet_matrix wm(na);
+    while (q--) {
+        int l, r, k;
+        cin >> l >> r >> k;
+        cout << v[wm.kth(l, r, k)] << '\n';
+    }
+}
+
+*/
