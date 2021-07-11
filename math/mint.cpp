@@ -1,82 +1,111 @@
 constexpr int mod = int(1e9) + 7;
 constexpr int nttmod = 998'244'353;
 
-template <uint32_t mod>
-struct LazyMontgomeryModInt {
-    using mint = LazyMontgomeryModInt;
-    using i32 = int32_t;
-    using u32 = uint32_t;
-    using u64 = uint64_t;
+template <std::uint32_t P>
+struct ModInt32 {
+   public:
+    using i32 = std::int32_t;
+    using u32 = std::uint32_t;
+    using i64 = std::int64_t;
+    using u64 = std::uint64_t;
+    using m32 = ModInt32;
+
+   private:
+    u32 v;
     static constexpr u32 get_r() {
-        u32 ret = mod;
-        for (i32 i = 0; i < 4; ++i) ret *= 2 - mod * ret;
-        return ret;
+        u32 iv = P;
+        for (u32 i = 0; i != 4; ++i) iv *= 2U - P * iv;
+        return -iv;
     }
-    static constexpr u32 r = get_r();
-    static constexpr u32 n2 = -u64(mod) % mod;
-    static_assert(r * mod == 1, "invalid, r * mod != 1");
-    static_assert(mod < (1 << 30), "invalid, mod >= 2 ^ 30");
-    static_assert((mod & 1) == 1, "invalid, mod % 2 == 0");
-    u32 a;
-    constexpr LazyMontgomeryModInt() : a(0) {}
-    constexpr LazyMontgomeryModInt(const int64_t& b)
-        : a(reduce(u64(b % mod + mod) * n2)){};
-    static constexpr u32 reduce(const u64& b) {
-        return (b + u64(u32(b) * u32(-r)) * mod) >> 32;
+    static constexpr u32 r = get_r(), r2 = -u64(P) % P;
+    static_assert((P & 1) == 1);
+    static_assert(-r * P == 1);
+    static_assert(P < (1 << 30));
+    static constexpr u32 pow_mod(u32 x, u64 y) {
+        u32 res = 1;
+        for (; y != 0; y >>= 1, x = u64(x) * x % P)
+            if (y & 1) res = u64(res) * x % P;
+        return res;
     }
-    constexpr mint& operator+=(const mint& b) {
-        if (i32(a += b.a - 2 * mod) < 0) a += 2 * mod;
-        return *this;
-    }
-    constexpr mint& operator-=(const mint& b) {
-        if (i32(a -= b.a) < 0) a += 2 * mod;
-        return *this;
-    }
-    constexpr mint& operator*=(const mint& b) {
-        a = reduce(u64(a) * b.a);
-        return *this;
-    }
-    constexpr mint& operator/=(const mint& b) {
-        *this *= b.inverse();
-        return *this;
-    }
-    constexpr mint operator+(const mint& b) const { return mint(*this) += b; }
-    constexpr mint operator-(const mint& b) const { return mint(*this) -= b; }
-    constexpr mint operator*(const mint& b) const { return mint(*this) *= b; }
-    constexpr mint operator/(const mint& b) const { return mint(*this) /= b; }
-    constexpr bool operator==(const mint& b) const {
-        return (a >= mod ? a - mod : a) == (b.a >= mod ? b.a - mod : b.a);
-    }
-    constexpr bool operator!=(const mint& b) const {
-        return (a >= mod ? a - mod : a) != (b.a >= mod ? b.a - mod : b.a);
-    }
-    constexpr mint operator-() const { return mint() - mint(*this); }
-    constexpr mint pow(u64 n) const {
-        mint ret(1), mul(*this);
-        while (n > 0) {
-            if (n & 1) ret *= mul;
-            mul *= mul;
-            n >>= 1;
+    static constexpr u32 reduce(u64 x) { return x + u64(u32(x) * r) * P >> 32; }
+    static constexpr u32 norm(u32 x) { return x - (P & -(x >= P)); }
+
+   public:
+    static constexpr u32 get_pr() {
+        u32 tmp[32] = {}, cnt = 0;
+        const u64 phi = P - 1;
+        u64 m = phi;
+        for (u64 i = 2; i * i <= m; ++i)
+            if (m % i == 0) {
+                tmp[cnt++] = i;
+                while (m % i == 0) m /= i;
+            }
+        if (m != 1) tmp[cnt++] = m;
+        for (u64 res = 2; res != P; ++res) {
+            bool flag = true;
+            for (u32 i = 0; i != cnt && flag; ++i)
+                flag &= pow_mod(res, phi / tmp[i]) != 1;
+            if (flag) return res;
         }
-        return ret;
+        return 0;
     }
-    constexpr mint inverse() const { return pow(mod - 2); }
-    template <class T>
-    friend T& operator<<(T& os, const mint& b) {
-        return os << b.get();
+    constexpr ModInt32() : v(0){};
+    ~ModInt32() = default;
+    constexpr ModInt32(u32 v) : v(reduce(u64(v) * r2)) {}
+    constexpr ModInt32(const m32& rhs) : v(rhs.v) {}
+    constexpr u32 get() const { return norm(reduce(v)); }
+    explicit constexpr operator u32() const { return get(); }
+    explicit constexpr operator i32() const { return i32(get()); }
+    constexpr m32& operator=(const m32& rhs) { return v = rhs.v, *this; }
+    constexpr m32 operator-() const {
+        m32 res;
+        return res.v = (P << 1 & -(v != 0)) - v, res;
     }
-    template <class T>
-    friend T& operator>>(T& is, mint& b) {
-        int64_t t;
-        is >> t;
-        b = LazyMontgomeryModInt<mod>(t);
-        return (is);
+    constexpr m32 inv() const { return pow(-1); }
+    constexpr m32& operator+=(const m32& rhs) {
+        return v += rhs.v - (P << 1), v += P << 1 & -(v >> 31), *this;
     }
-    constexpr u32 get() const {
-        u32 ret = reduce(a);
-        return ret >= mod ? ret - mod : ret;
+    constexpr m32& operator-=(const m32& rhs) {
+        return v -= rhs.v, v += P << 1 & -(v >> 31), *this;
     }
-    static constexpr u32 get_mod() { return mod; }
+    constexpr m32& operator*=(const m32& rhs) {
+        return v = reduce(u64(v) * rhs.v), *this;
+    }
+    constexpr m32& operator/=(const m32& rhs) {
+        return this->operator*=(rhs.inv());
+    }
+    friend m32 operator+(const m32& lhs, const m32& rhs) {
+        return m32(lhs) += rhs;
+    }
+    friend m32 operator-(const m32& lhs, const m32& rhs) {
+        return m32(lhs) -= rhs;
+    }
+    friend m32 operator*(const m32& lhs, const m32& rhs) {
+        return m32(lhs) *= rhs;
+    }
+    friend m32 operator/(const m32& lhs, const m32& rhs) {
+        return m32(lhs) /= rhs;
+    }
+    friend bool operator==(const m32& lhs, const m32& rhs) {
+        return norm(lhs.v) == norm(rhs.v);
+    }
+    friend bool operator!=(const m32& lhs, const m32& rhs) {
+        return norm(lhs.v) != norm(rhs.v);
+    }
+    friend std::istream& operator>>(std::istream& is, m32& rhs) {
+        return is >> rhs.v, rhs.v = reduce(u64(rhs.v) * r2), is;
+    }
+    friend std::ostream& operator<<(std::ostream& os, const m32& rhs) {
+        return os << rhs.get();
+    }
+    constexpr m32 pow(i64 y) const {
+        if ((y %= P - 1) < 0)
+            y += P - 1;  // phi(P) = P - 1, assume P is a prime number
+        m32 res(1), x(*this);
+        for (; y != 0; y >>= 1, x *= x)
+            if (y & 1) res *= x;
+        return res;
+    }
 };
 
 template <uint32_t Modulus>
@@ -136,6 +165,5 @@ class Modular {
     uint32_t v_;
 };
 
-// using mint = LazyMontgomeryModInt<nttmod>;
-using mint = Modular<mod>;
-
+// using mint = ModInt32<nttmod>;
+using mint = ModInt32<mod>;
