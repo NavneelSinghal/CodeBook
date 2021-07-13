@@ -44,35 +44,3 @@ constexpr uint32_t lg(T a) {
     }
 }
 
-// split [l, r]
-template <class Integer, class Predicate, bool type>
-// __attribute__((target("bmi")))
-Integer find_bin_split(Integer l, Integer r, const Predicate &pred) {
-    if (l > r) {
-        if constexpr (type)
-            return r;
-        else
-            return r + 1;
-    }
-    ++r;
-    Integer w = Integer(1) << lg<Integer, true>(r - l);
-    --l;
-    if (pred(l + w)) l = r - w;
-    for (w >>= 1; w >= Integer(1); w >>= 1)
-        if (pred(l + w)) l += w;
-    if constexpr (type)
-        return l;
-    else
-        return l + 1;
-}
-
-template <class Integer, class Predicate>
-Integer find_first_false(Integer l, Integer r, const Predicate &pred) {
-    return find_bin_split<Integer, Predicate, false>(l, r, pred);
-}
-
-template <class Integer, class Predicate>
-Integer find_last_true(Integer l, Integer r, const Predicate &pred) {
-    return find_bin_split<Integer, Predicate, true>(l, r, pred);
-}
-
