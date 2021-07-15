@@ -74,7 +74,7 @@ struct lazy_segtree {
         }
         return combine(sml, smr);
     }
-    Node all_query() { return d[1]; }
+    Node all_query() const { return d[1]; }
     void update(int p, Update f) {
         p += size;
         if constexpr (is_lazy)
@@ -172,12 +172,12 @@ struct lazy_segtree {
     int _n, size, log;
     std::vector<Node> d;
     std::vector<Update> lz;
-    const MakeNode make_node;
-    const CombineNodes combine;
-    const Node id_node;
-    const ApplyUpdate apply_update;
-    const Update id_update;
-    const ComposeUpdates compose_updates;
+    MakeNode make_node;
+    CombineNodes combine;
+    Node id_node;
+    ApplyUpdate apply_update;
+    Update id_update;
+    ComposeUpdates compose_updates;
 
     void update(int k) { d[k] = combine(d[2 * k], d[2 * k + 1]); }
     void all_apply(int k, Update f) {
