@@ -60,9 +60,9 @@ struct lazy_segtree {
     Node query(int l, int r) {
         if (l == r) return id_node;
         l += size, r += size;
-        int l_ctz = __builtin_ctz(l);
-        int r_ctz = __builtin_ctz(r);
         if constexpr (is_lazy) {
+            int l_ctz = __builtin_ctz(l);
+            int r_ctz = __builtin_ctz(r);
             for (int i = log; i > l_ctz; --i) push(l >> i);
             for (int i = log; i > r_ctz; --i) push((r - 1) >> i);
         }
@@ -74,7 +74,9 @@ struct lazy_segtree {
         }
         return combine(sml, smr);
     }
+    
     Node all_query() const { return d[1]; }
+    
     void update(int p, Update f) {
         p += size;
         if constexpr (is_lazy)
@@ -82,17 +84,18 @@ struct lazy_segtree {
         d[p] = apply_update(f, d[p]);
         for (int i = 1; i <= log; ++i) update(p >> i);
     }
+    
     void update(int l, int r, Update f) {
         if (l == r) return;
         l += size, r += size;
-        int l_ctz = __builtin_ctz(l);
-        int r_ctz = __builtin_ctz(r);
+        const int l_ctz = __builtin_ctz(l);
+        const int r_ctz = __builtin_ctz(r);
         if constexpr (is_lazy) {
             for (int i = log; i > l_ctz; --i) push(l >> i);
             for (int i = log; i > r_ctz; --i) push((r - 1) >> i);
         }
         {
-            int l2 = l, r2 = r;
+            const int l2 = l, r2 = r;
             while (l < r) {
                 if (l & 1) all_apply(l++, f);
                 if (r & 1) all_apply(--r, f);
@@ -104,10 +107,6 @@ struct lazy_segtree {
         for (int i = r_ctz + 1; i <= log; ++i) update((r - 1) >> i);
     }
 
-    template <bool (*g)(Node)>
-    int max_right(int l) {
-        return max_right(l, [](Node x) { return g(x); });
-    }
     template <class G>
     int max_right(int l, G g) {
         // assert(0 <= l && l <= _n);
@@ -136,10 +135,6 @@ struct lazy_segtree {
         return _n;
     }
 
-    template <bool (*g)(Node)>
-    int min_left(int r) {
-        return min_left(r, [](Node x) { return g(x); });
-    }
     template <class G>
     int min_left(int r, G g) {
         // assert(0 <= r && r <= _n);
