@@ -1,4 +1,6 @@
 /*
+Try randomization if stuff doesn't work
+    Works in the case of majority element
 Recursion
 Divide and conquer
 	Finding interesting points in N log N
