@@ -1,9 +1,5 @@
 // doesn't need idempotence, only associativity, like a segtree
 // doesn't need identity either
-template <typename T>
-T combine(const T &a, const T &b) {
-    return a + b;
-}
 
 template <class T, class Combine>
 struct sparse_table {
@@ -47,6 +43,6 @@ struct sparse_table {
    private:
     int n;
     std::vector<T> s;
-    const Combine combine;
+    Combine combine;
 };
 

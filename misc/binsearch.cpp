@@ -1,4 +1,5 @@
 template <class T, bool unsafe = false>
+__attribute__((target("bmi,bmi2,popcnt,lzcnt")))
 constexpr uint32_t ctz(T a) {
     if constexpr (!unsafe) {
         if (!a) return sizeof(T) * 8;
@@ -17,6 +18,7 @@ constexpr uint32_t ctz(T a) {
 }
 
 template <class T, bool unsafe = false>
+__attribute__((target("bmi,bmi2,popcnt,lzcnt")))
 constexpr uint32_t clz(T a) {
     if constexpr (!unsafe) {
         if (!a) return sizeof(T) * 8;
@@ -34,6 +36,7 @@ constexpr uint32_t clz(T a) {
 
 // -1 for 0
 template <class T, bool unsafe = false>
+__attribute__((target("bmi,bmi2,popcnt,lzcnt")))
 constexpr uint32_t lg(T a) {
     if constexpr (sizeof(T) <= sizeof(uint32_t)) {
         return sizeof(uint32_t) * 8 - 1 - clz<T, unsafe>(a);
@@ -46,7 +49,7 @@ constexpr uint32_t lg(T a) {
 
 // split [l, r]
 template <class Integer, class Predicate, bool type>
-// __attribute__((target("bmi")))
+__attribute__((target("bmi,bmi2,popcnt,lzcnt")))
 Integer find_bin_split(Integer l, Integer r, const Predicate &pred) {
     if (l > r) {
         if constexpr (type)
@@ -75,4 +78,3 @@ template <class Integer, class Predicate>
 Integer find_last_true(Integer l, Integer r, const Predicate &pred) {
     return find_bin_split<Integer, Predicate, true>(l, r, pred);
 }
-
