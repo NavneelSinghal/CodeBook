@@ -1,3 +1,6 @@
+template <class T>
+using min_heap = priority_queue<T, vector<T>, greater<T>>;
+
 template <class T, class U = T>
 bool ckmin(T &a, U &&b) {
     return b < a ? a = std::forward<U>(b), true : false;
