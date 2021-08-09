@@ -39,6 +39,7 @@ namespace IO {
         inline FastInput& operator>>(char& c) {
             skip_blanks();
             c = cur;
+            get_char();
             return *this;
         }
         inline FastInput& operator>>(std::string& s) {
