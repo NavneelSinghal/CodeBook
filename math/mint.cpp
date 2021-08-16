@@ -51,7 +51,10 @@ struct ModInt32 {
     }
     constexpr ModInt32() : v(0){};
     ~ModInt32() = default;
-    constexpr ModInt32(u32 v) : v(reduce(u64(v) * r2)) {}
+    constexpr ModInt32(u32 _v) : v(reduce(u64(_v) * r2)) {}
+    constexpr ModInt32(i32 _v) : v(reduce(u64(_v % P + P) * r2)) {}
+    constexpr ModInt32(u64 _v) : v(reduce((_v % P) * r2)) {}
+    constexpr ModInt32(i64 _v) : v(reduce(u64(_v % P + P) * r2)) {}
     constexpr ModInt32(const m32& rhs) : v(rhs.v) {}
     constexpr u32 get() const { return norm(reduce(v)); }
     explicit constexpr operator u32() const { return get(); }
@@ -61,7 +64,7 @@ struct ModInt32 {
         m32 res;
         return res.v = (P << 1 & -(v != 0)) - v, res;
     }
-    constexpr m32 inv() const { return pow(-1); }
+    constexpr m32 inv() const { return pow(P - 1); }
     constexpr m32& operator+=(const m32& rhs) {
         return v += rhs.v - (P << 1), v += P << 1 & -(v >> 31), *this;
     }
@@ -99,70 +102,17 @@ struct ModInt32 {
         return os << rhs.get();
     }
     constexpr m32 pow(i64 y) const {
-        if ((y %= P - 1) < 0)
-            y += P - 1;  // phi(P) = P - 1, assume P is a prime number
+        // assumes P is a prime
+        i64 rem = y % (P - 1);
+        if (y > 0 && rem == 0)
+            y = P - 1;
+        else
+            y = rem;
         m32 res(1), x(*this);
         for (; y != 0; y >>= 1, x *= x)
             if (y & 1) res *= x;
         return res;
     }
-};
-
-template <uint32_t Modulus>
-class Modular {
-    using M = Modular;
-
-   public:
-    static_assert(int(Modulus) >= 1, "Modulus must be in the range [1, 2^31)");
-    static constexpr int modulus() { return Modulus; }
-    static M raw(uint32_t v) { return *reinterpret_cast<M*>(&v); }
-    Modular() : v_(0) {}
-    Modular(int64_t v) : v_((v %= Modulus) < 0 ? v + Modulus : v) {}
-    template <class T>
-    explicit operator T() const {
-        return v_;
-    }
-    M& operator++() { return v_ = ++v_ == Modulus ? 0 : v_, *this; }
-    M& operator--() { return --(v_ ? v_ : v_ = Modulus), *this; }
-    M& operator*=(M o) { return v_ = uint64_t(v_) * o.v_ % Modulus, *this; }
-    M& operator/=(M o) {
-        auto [inv, gcd] = extgcd(o.v_, Modulus);
-        assert(gcd == 1);
-        return *this *= inv;
-    }
-    M& operator+=(M o) {
-        return v_ = int(v_ += o.v_ - Modulus) < 0 ? v_ + Modulus : v_, *this;
-    }
-    M& operator-=(M o) {
-        return v_ = int(v_ -= o.v_) < 0 ? v_ + Modulus : v_, *this;
-    }
-    friend M operator++(M& a, int) { return std::exchange(a, ++M(a)); }
-    friend M operator--(M& a, int) { return std::exchange(a, --M(a)); }
-    friend M operator+(M a) { return a; }
-    friend M operator-(M a) { return a.v_ = a.v_ ? Modulus - a.v_ : 0, a; }
-    friend M operator*(M a, M b) { return a *= b; }
-    friend M operator/(M a, M b) { return a /= b; }
-    friend M operator+(M a, M b) { return a += b; }
-    friend M operator-(M a, M b) { return a -= b; }
-    template <class T>
-    friend T& operator>>(T& is, M& x) {
-        int64_t v;
-        return is >> v, x = v, is;
-    }
-    template <class T>
-    friend T& operator<<(T& os, M x) {
-        return os << x.v_;
-    }
-    friend bool operator==(M a, M b) { return a.v_ == b.v_; }
-    friend bool operator!=(M a, M b) { return a.v_ != b.v_; }
-
-   private:
-    static std::pair<int, int> extgcd(int a, int b) {
-        std::array<int, 2> x{1, 0};
-        while (b) std::swap(x[0] -= a / b * x[1], x[1]), std::swap(a %= b, b);
-        return {x[0], a};
-    }
-    uint32_t v_;
 };
 
 // using mint = ModInt32<nttmod>;

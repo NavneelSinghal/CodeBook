@@ -1,0 +1,16 @@
+-O2
+-std=c++17
+-Wall
+-Wextra
+-pedantic
+-Wshadow
+-Wformat=2
+-Wfloat-equal
+-Wconversion
+-Wlogical-op
+-Wshift-overflow=2
+-Wduplicated-cond
+-Wcast-qual
+-Wcast-align
+-Wno-sign-conversion
+-Wno-unknown-pragmas
