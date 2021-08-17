@@ -1,7 +1,7 @@
 namespace CPPDS {
 
 #ifdef PB_DS_ASSOC_CNTNR_HPP
-    #define unordered_map gp_hash_table
+    #define unordered_map __gnu_pbds::gp_hash_table
 #endif
 
 #ifdef PB_DS_TREE_POLICY_HPP
