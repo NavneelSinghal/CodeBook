@@ -64,7 +64,7 @@ struct ModInt32 {
         m32 res;
         return res.v = (P << 1 & -(v != 0)) - v, res;
     }
-    constexpr m32 inv() const { return pow(P - 1); }
+    constexpr m32 inv() const { return pow(P - 2); }
     constexpr m32& operator+=(const m32& rhs) {
         return v += rhs.v - (P << 1), v += P << 1 & -(v >> 31), *this;
     }
