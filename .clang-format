@@ -3,7 +3,8 @@ BasedOnStyle: google
 IndentWidth: 4
 IndentPPDirectives: BeforeHash
 AlignTrailingComments: true
-PointerAlignment: Right
+DerivePointerAlignment: false
+PointerAlignment: Left
 AllowShortFunctionsOnASingleLine: Inline
 #AllowShortIfStatementsOnASingleLine: Always
 AllowShortLambdasOnASingleLine: Inline
