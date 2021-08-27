@@ -1,6 +1,6 @@
 template <class T>
 auto compress(const vector<T>& a) {
-    int n = size(a);
+    int n = int(size(a));
     vector<pair<T, int>> p(n);
     for (int i = 0; i < n; ++i) p[i] = {a[i], i};
     sort(begin(p), end(p));

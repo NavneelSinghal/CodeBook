@@ -1,20 +1,12 @@
 struct dsu {
     int n;
-    vector<int32_t> par, siz;
+    vector<int32_t> par;
 
-    dsu(int n) : n(n), par(n), siz(n) {
-        for (int i = 0; i < n; ++i) {
-            make_set(i);
-        }
-    };
-
-    inline void make_set(int32_t v) {
-        par[v] = v;
-        siz[v] = 1;
-    }
+    // negative - size
+    dsu(int n) : n(n), par(n, -1) {}
 
     int32_t find_set(int32_t v) {
-        if (v == par[v]) return v;
+        if (par[v] < 0) return v;
         return par[v] = find_set(par[v]);
     }
 
@@ -22,9 +14,9 @@ struct dsu {
         a = find_set(a);
         b = find_set(b);
         if (a != b) {
-            if (siz[a] < siz[b]) swap(a, b);
+            if (par[b] < par[a]) swap(a, b);
+            par[a] += par[b];
             par[b] = a;
-            siz[a] += siz[b];
             return true;
         }
         return false;
