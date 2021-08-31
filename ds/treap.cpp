@@ -9,14 +9,15 @@ namespace treap {
         bool is_reversed;
         treap_node *left_child, *right_child;
         treap_node(int v)
-            : value(v),
+            : priority(std::uniform_int_distribution<int>(0, INF)(rng)),
+              value(v),
               cnt(1),
+              is_reversed(false),
               left_child(nullptr),
-              right_child(nullptr),
-              priority(std::uniform_int_distribution<int>(0, INF)(rng)) {}
+              right_child(nullptr) {}
     };
 
-    using treap_node_ptr = treap_node *;
+    using treap_node_ptr = treap_node*;
 
     int cnt(treap_node_ptr t) { return t ? t->cnt : 0; }
 
@@ -30,14 +31,12 @@ namespace treap {
         if (t && t->is_reversed) {
             t->is_reversed = false;
             std::swap(t->left_child, t->right_child);
-            if (t->left_child)
-                t->left_child->is_reversed ^= true;
-            if (t->right_child)
-                t->right_child->is_reversed ^= true;
+            if (t->left_child) t->left_child->is_reversed ^= true;
+            if (t->right_child) t->right_child->is_reversed ^= true;
         }
     }
 
-    void merge(treap_node_ptr &t, treap_node_ptr l, treap_node_ptr r) {
+    void merge(treap_node_ptr& t, treap_node_ptr l, treap_node_ptr r) {
         push(l);
         push(r);
         if (!l || !r) {
@@ -52,10 +51,7 @@ namespace treap {
         update_cnt(t);
     }
 
-    void split(treap_node_ptr t,
-               treap_node_ptr &l,
-               treap_node_ptr &r,
-               int key,
+    void split(treap_node_ptr t, treap_node_ptr& l, treap_node_ptr& r, int key,
                int add = 0) {
         if (!t) {
             l = r = 0;
@@ -74,14 +70,14 @@ namespace treap {
         update_cnt(t);
     }
 
-    void insert(treap_node_ptr &t, int pos, int v) {
+    void insert(treap_node_ptr& t, int pos, int v) {
         treap_node_ptr t1, t2;
         split(t, t1, t2, pos - 1);
         merge(t1, t1, new treap_node(v));
         merge(t, t1, t2);
     }
 
-    void erase(treap_node_ptr &t, int pos) {
+    void erase(treap_node_ptr& t, int pos) {
         treap_node_ptr t1, t2, t3;
         split(t, t1, t2, pos - 1);
         split(t2, t2, t3, 1);
@@ -97,9 +93,8 @@ namespace treap {
         merge(t, t, t3);
     }
 
-    void inorder_traversal(treap_node_ptr t, std::vector<int> &a) {
-        if (!t)
-            return;
+    void inorder_traversal(treap_node_ptr t, std::vector<int>& a) {
+        if (!t) return;
         push(t);
         inorder_traversal(t->left_child, a);
         a.push_back(t->value);
@@ -109,8 +104,7 @@ namespace treap {
     void print_treap(treap_node_ptr t) {
         std::vector<int> v;
         inorder_traversal(t, v);
-        for (auto x : v)
-            std::cerr << x << ' ';
+        for (auto x : v) std::cerr << x << ' ';
         std::cerr << '\n';
     }
 
