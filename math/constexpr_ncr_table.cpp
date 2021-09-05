@@ -120,3 +120,18 @@ struct ModInt32 {
 
 // using mint = ModInt32<nttmod>;
 using mint = ModInt32<mod>;
+
+template <int N = 300>
+struct C {
+    mint c[N + 2][N + 2];
+    constexpr C() {
+        for (int i = 0; i <= N; ++i) {
+            c[i][0] = 1;
+            c[i][i] = 1;
+            for (int j = 1; j < i; ++j) c[i][j] = c[i - 1][j - 1] + c[i - 1][j];
+        }
+    }
+    constexpr auto operator[](int i) const { return c[i]; }
+};
+
+

@@ -24,6 +24,7 @@ struct Fenwick {
     }
     // if next = true, returns index of first element that is > or >=
     // if next = false, returns index of last element that is < or <=
+    // returns -1 if not found
     template <bool next, bool strict>
     int search(T v) {
         if (v == 0) {
