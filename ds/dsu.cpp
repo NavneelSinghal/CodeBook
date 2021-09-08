@@ -1,16 +1,16 @@
 struct dsu {
     int n;
-    vector<int32_t> par;
+    vector<int> par;
 
     // negative - size
     dsu(int n) : n(n), par(n, -1) {}
 
-    int32_t find_set(int32_t v) {
+    int find_set(int v) {
         if (par[v] < 0) return v;
         return par[v] = find_set(par[v]);
     }
 
-    bool union_sets(int32_t a, int32_t b) {
+    bool union_sets(int a, int b) {
         a = find_set(a);
         b = find_set(b);
         if (a != b) {
@@ -22,20 +22,19 @@ struct dsu {
         return false;
     }
 
-    vector<vector<int>> components() {
-        vector<int> representative(n), component_size(n);
+    auto components() {
+        vector<int> root(n), size(n);
         for (int i = 0; i < n; ++i) {
-            representative[i] = find_set(i);
-            component_size[representative[i]]++;
+            root[i] = find_set(i);
+            size[root[i]]++;
         }
-        vector<vector<int>> components(n);
-        for (int i = 0; i < n; ++i) components[i].reserve(component_size[i]);
-        for (int i = 0; i < n; ++i) components[representative[i]].push_back(i);
-        components.erase(
-            remove_if(components.begin(), components.end(),
-                      [](const vector<int>& v) { return v.empty(); }),
-            components.end());
-        return components;
+        vector<vector<int>> ans(n);
+        for (int i = 0; i < n; ++i) ans[i].reserve(size[i]);
+        for (int i = 0; i < n; ++i) ans[root[i]].push_back(i);
+        ans.erase(remove_if(ans.begin(), ans.end(),
+                            [](const auto& v) { return v.empty(); }),
+                  ans.end());
+        return ans;
     }
 };
 
