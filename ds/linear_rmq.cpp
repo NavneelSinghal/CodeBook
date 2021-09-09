@@ -53,7 +53,8 @@ namespace RMQ {
                 }
                 if (!found) continue;  // not a majorizable sequence
                 int id = 0;
-                const auto dfs = [&](const auto& self, int u) -> void {
+                const auto dfs = [&order, &id, &left, &right](const auto& self,
+                                                              int u) -> void {
                     order[u] = id++;
                     if (left[u] != -1) self(self, left[u]);
                     if (right[u] != -1) self(self, right[u]);
@@ -80,75 +81,45 @@ namespace RMQ {
         }
     };
 
-    template <class T, class Combine>
+    template <class T>
     struct sparse_table {
-        sparse_table(const std::vector<T>& a, const Combine& _combine)
-            : combine(_combine) {
-            build(a);
-        }
-        sparse_table(const Combine& _combine) : combine(_combine) {}
-        void build(std::vector<T> a) {
-            n = (int)a.size();
-            s = std::move(a);
-            if (n == 1) return;
-            int log_n = std::__lg(n - 1) + 1;
-            s.resize(n * log_n, s[0]);
-            int current_offset = n;
-            for (int j = 2; j < n; j <<= 1, current_offset += n) {
-                int stride = 2 * j;
-                for (int k = 0; k < n; k += stride) {
-                    int middle = k + j;
-                    int next_k = std::min(k + stride, n);
-                    if (middle - 1 < n) {
-                        s[current_offset + middle - 1] = s[middle - 1];
-                        for (int l = middle - 2; l >= k; --l)
-                            s[current_offset + l] =
-                                combine(s[l], s[current_offset + l + 1]);
-                    }
-                    if (middle < n) {
-                        s[current_offset + middle] = s[middle];
-                        for (int l = middle + 1; l < next_k; ++l)
-                            s[current_offset + l] =
-                                combine(s[current_offset + l - 1], s[l]);
-                    }
-                }
+        std::vector<std::vector<T>> jmp;
+        void build (const std::vector<T>& V) {
+            jmp = std::vector(1, std::vector<T>(V));
+            for (int pw = 1, k = 1; pw * 2 <= (int)V.size(); pw *= 2, ++k) {
+                jmp.emplace_back(V.size() - pw * 2 + 1);
+                for (int j = 0; j < (int)jmp[k].size(); ++j)
+                    jmp[k][j] = std::min(jmp[k - 1][j], jmp[k - 1][j + pw]);
             }
         }
-        // [l, r)
-        T query(int l, int r) {
-            --r;
-            if (l == r) return s[l];
-            int base = std::__lg(l ^ r) * n;
-            return combine(s[base + l], s[base + r]);
+        T query(int a, int b) {
+            int dep = 31 - __builtin_clz(b - a);
+            return std::min(jmp[dep][a], jmp[dep][b - (1 << dep)]);
         }
-
-       private:
-        int n;
-        std::vector<T> s;
-        Combine combine;
     };
 
     template <class T>
     struct rmq {
-        static constexpr int block_size = 8;
+        // 8 works too
+        static constexpr int block_size = 6;
         static constexpr rmq_helper<int, block_size> r{};
         static constexpr auto combine = [](const T& a, const T& b) {
             return a < b ? a : b;
         };
-        sparse_table<T, decltype(combine)> st{combine};
-        rmq(const std::vector<T>& a) : full(a) {
-            int n = (int)a.size();
+        sparse_table<T> st;
+        rmq(int n) {
+            full.resize(((n + block_size - 1) / block_size) * block_size);
+        }
+        void build() {
+            int n = (int)full.size();
             int compressed_size = (n + block_size - 1) / block_size;
             block_type.resize(compressed_size);
             n = compressed_size * block_size;
-            full.resize(n, a[0]);
-            debug(full);
-            std::vector<T> compressed(compressed_size, a[0]);
+            std::vector<T> compressed(compressed_size);
             // if heavy, replace a[0] by something else
             for (int i = 0; i < n; i += block_size)
                 compressed[i / block_size] = *min_element(
                     full.begin() + i, full.begin() + i + block_size);
-            debug(compressed);
             st.build(compressed);
             simple_stack<int, block_size> stk;
             for (int i = 0; i < n; i += block_size) {
@@ -163,7 +134,6 @@ namespace RMQ {
                     }
                     stk.push(j);
                     mask ^= p;
-                    debug(bitset<64>(mask).to_string());
                     p <<= 1;
                 }
                 block_type[i / block_size] = mask;
@@ -204,7 +174,6 @@ namespace RMQ {
             }
         }
 
-       private:
         std::vector<T> full;
         std::vector<int> block_type;
     };
