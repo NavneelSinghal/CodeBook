@@ -1,4 +1,5 @@
 // min(x, y) returns the smaller index
+// https://judge.yosupo.jp/submission/60396
 template <class Min>
 struct rmq {
     static constexpr int b = 31;
