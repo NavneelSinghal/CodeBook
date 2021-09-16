@@ -1,3 +1,53 @@
+// min(x, y) returns the smaller index
+template <class Min>
+struct rmq {
+    static constexpr int b = 31;
+    static constexpr int all_mask = int((1U << b) - 1);
+    int n;
+    std::vector<int> mask;
+    Min min;
+    std::vector<std::vector<int>> jmp;
+    int lsb(int x) { return x & -x; }
+    int msb_index(int x) { return 31 ^ __builtin_clz(x); }
+    int small(int r, int size = b) {
+        int dist_from_r = msb_index(mask[r] & ((1 << size) - 1));
+        return r - dist_from_r;
+    }
+    rmq(int _n, Min _min) : n(_n), mask(n), min(_min) {
+        int curr_mask = 0;
+        for (int i = 0; i < n; i++) {
+            curr_mask = (curr_mask << 1) & all_mask;
+            while (curr_mask > 0 and min(i, i - msb_index(lsb(curr_mask))) == i)
+                curr_mask ^= lsb(curr_mask);
+            curr_mask |= 1;
+            mask[i] = curr_mask;
+        }
+        auto f = [this](int i) {
+            return small(b * i + b - 1);
+        };
+        jmp = std::vector(1, std::vector<int>(n / b));
+        int t = 0;
+        std::generate(jmp[0].begin(), jmp[0].end(),
+                      [&f, &t] { return f(t++); });
+        for (int pw = 1, k = 1; pw * 2 <= n / b; pw *= 2, ++k) {
+            jmp.emplace_back(n / b - pw * 2 + 1);
+            for (int j = 0; j < (int)jmp[k].size(); ++j)
+                jmp[k][j] = min(jmp[k - 1][j], jmp[k - 1][j + pw]);
+        }
+    }
+    int query(int l, int r) {
+        --r;
+        if (r - l + 1 <= b) return small(r, r - l + 1);
+        int ans = min(small(l + b - 1), small(r));
+        int x = l / b + 1, y = r / b;
+        if (x < y) {
+            int dep = msb_index(y - x);
+            ans = min(ans, min(jmp[dep][x], jmp[dep][y - (1 << dep)]));
+        }
+        return ans;
+    }
+};
+
 namespace RMQ {
     template <class T, int N>
     struct simple_stack {
