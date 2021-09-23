@@ -1,25 +1,30 @@
 // min(x, y) returns the smaller index
-// https://judge.yosupo.jp/submission/60396
+// https://judge.yosupo.jp/submission/60419
 template <class Min>
 struct rmq {
     static constexpr int b = 31;
-    static constexpr int all_mask = int((1U << b) - 1);
+    static constexpr uint32_t all_mask = (1U << b) - 1;
     int n;
-    std::vector<int> mask;
+    std::vector<uint32_t> mask;
     Min min;
     std::vector<std::vector<int>> jmp;
-    int lsb(int x) { return x & -x; }
-    int msb_index(int x) { return 31 ^ __builtin_clz(x); }
+    uint32_t lsb(uint32_t x) { return x & -x; }
+    int msb_index(uint32_t x) { return 31 ^ __builtin_clz(x); }
     int small(int r, int size = b) {
-        int dist_from_r = msb_index(mask[r] & ((1 << size) - 1));
+        int dist_from_r = msb_index(mask[r] & ((1U << size) - 1));
         return r - dist_from_r;
     }
     rmq(int _n, Min _min) : n(_n), mask(n), min(_min) {
-        int curr_mask = 0;
+        uint32_t curr_mask = 0;
         for (int i = 0; i < n; i++) {
             curr_mask = (curr_mask << 1) & all_mask;
-            while (curr_mask > 0 and min(i, i - msb_index(lsb(curr_mask))) == i)
-                curr_mask ^= lsb(curr_mask);
+            while (curr_mask) {
+                uint32_t l = lsb(curr_mask);
+                if (min(i, i - msb_index(l)) == i)
+                    curr_mask ^= lsb(curr_mask);
+                else
+                    break;
+            }
             curr_mask |= 1;
             mask[i] = curr_mask;
         }
