@@ -5,6 +5,17 @@
 // MergeInto : Aggregate * Value * Vertex(int) * EdgeIndex(int) -> Aggregate
 // MergeInto is an accumulator used for fold_left
 // This function assumes order-invariance
+template <class Aggregate, class Value, class MergeInto, class MergeInverse>
+auto exclusive_with_inverse(const std::vector<Value>& a, const Aggregate& base,
+                            const MergeInto& merge_into,
+                            const MergeInverse& merge_inv, int vertex) {
+    int n = (int)std::size(a);
+    Aggregate all = base;
+    for (int i = 0; i < n; ++i) all = merge_into(all, a[i], vertex, i);
+    std::vector<Aggregate> b(n, all);
+    for (int i = 0; i < n; ++i) b[i] = merge_inv(b[i], a[i], vertex, i);
+    return b;
+}
 template <class Aggregate, class Value, class MergeInto>
 auto exclusive(const std::vector<Value>& a, const Aggregate& base,
                const MergeInto& merge_into, int vertex) {
@@ -28,15 +39,15 @@ auto exclusive(const std::vector<Value>& a, const Aggregate& base,
 // MergeInto -> merge the value corresponding to a child into the aggregate
 // FinalizeMerge -> finalize the merge (update the vertex with child aggregates)
 template <class Aggregate, class Value, class MergeInto, class FinalizeMerge,
-          class Base>
+          class Base, class MergeInverse = std::nullptr_t>
 auto rerooter(const std::vector<std::vector<int>>& g, const Value& default_val,
               const Aggregate&, const Base& base, const MergeInto& merge_into,
-              const FinalizeMerge& finalize_merge) {
+              const FinalizeMerge& finalize_merge,
+              const MergeInverse& merge_inv = nullptr) {
     int n = (int)std::size(g);
 
     std::vector<Value> root_dp(n, default_val);
     std::vector<std::vector<Value>> edge_dp(n);
-
     std::vector<Value> dp(n, default_val);
 
     std::vector<int> bfs(n), parent(n, -1);
@@ -68,7 +79,13 @@ auto rerooter(const std::vector<std::vector<int>>& g, const Value& default_val,
         dp[parent[u]] = dp[u];
         edge_dp[u].reserve(g[u].size());
         for (auto v : g[u]) edge_dp[u].push_back(dp[v]);
-        auto dp_exclusive = exclusive(edge_dp[u], base(u), merge_into, u);
+        std::vector<Aggregate> dp_exclusive;
+        if constexpr (std::is_same_v<MergeInverse, std::nullptr_t>) {
+            dp_exclusive = exclusive(edge_dp[u], base(u), merge_into, u);
+        } else {
+            dp_exclusive = exclusive_with_inverse(edge_dp[u], base(u),
+                                                  merge_into, merge_inv, u);
+        }
         for (int i = 0; i < (int)dp_exclusive.size(); ++i) {
             auto v = g[u][i];
             dp[v] = finalize_merge(dp_exclusive[i], u);
@@ -80,7 +97,9 @@ auto rerooter(const std::vector<std::vector<int>>& g, const Value& default_val,
     return make_pair(root_dp, edge_dp);
 }
 
-/* sample usage
+/*
+usage example
+
 int main() {
     cin.tie(nullptr)->sync_with_stdio(false);
     int n;
@@ -105,8 +124,13 @@ int main() {
     auto base = [](int) {
         return 0;
     };
+    auto merge_inv = [](int vertex_dp, int neighbor_dp, int vertex,
+                        int edge_index) {
+        return vertex_dp - max(0, neighbor_dp);
+    };
+    // note that merge_inv is optional
     auto [root_dp, edge_dp] =
-        rerooter(g, 0, 0, base, merge_into, finalize_merge);
+        rerooter(g, 0, 0, base, merge_into, finalize_merge, merge_inv);
     for (auto& x : root_dp) cout << x << ' ';
     cout << '\n';
 }
