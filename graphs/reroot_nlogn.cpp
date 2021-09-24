@@ -1,5 +1,6 @@
 // this template will break for n = 1
 // to speed up, use basic_string
+// tested on: https://codeforces.com/contest/1324/problem/F
 
 // MergeInto : Aggregate * Value * Vertex(int) * EdgeIndex(int) -> Aggregate
 // MergeInto is an accumulator used for fold_left
