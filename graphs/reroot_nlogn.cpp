@@ -86,12 +86,11 @@ auto rerooter(const std::vector<std::vector<int>>& g, const Value& default_val,
             dp_exclusive = exclusive_with_inverse(edge_dp[u], base(u),
                                                   merge_into, merge_inv, u);
         }
-        for (int i = 0; i < (int)dp_exclusive.size(); ++i) {
-            auto v = g[u][i];
-            dp[v] = finalize_merge(dp_exclusive[i], u);
-        }
-        root_dp[u] =
-            finalize_merge(merge_into(dp_exclusive[0], edge_dp[u][0], u, 0), u);
+        int sz = (int)g[u].size();
+        auto& gu = g[u];
+        for (int i = 0; i < sz; ++i)
+            dp[gu[i]] = finalize_merge(dp_exclusive[i], u);
+        root_dp[u] = finalize_merge(merge_into(dp_exclusive[0], edge_dp[0]), u);
     }
 
     return make_pair(root_dp, edge_dp);
