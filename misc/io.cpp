@@ -68,8 +68,9 @@ struct IO {
 
     template <class T>
     struct is_default {
-        static constexpr bool value =
-            is_char<T>::value || is_string<T>::value || std::is_integral_v<T>;
+        static constexpr bool value = is_char<T>::value || is_bool<T>::value ||
+                                      is_string<T>::value ||
+                                      std::is_integral_v<T>;
     };
 
     template <class T, class D = void>
@@ -238,7 +239,9 @@ struct IO {
         if constexpr (is_custom<T>::value) {
             write_int(x.get());
         } else if constexpr (is_default<T>::value) {
-            if constexpr (is_string<T>::value) {
+            if constexpr (is_bool<T>::value) {
+                write_bool(x);
+            } else if constexpr (is_string<T>::value) {
                 write_string(x);
             } else if constexpr (is_char<T>::value) {
                 write_char(x);
@@ -275,6 +278,7 @@ struct IO {
     IO& operator>>(T& x) {
         static_assert(is_custom<T>::value or is_default<T>::value or
                       is_iterable<T>::value or is_applyable<T>::value);
+        static_assert(!is_bool<T>::value);
         if constexpr (is_custom<T>::value) {
             typename T::internal_value_type y;
             read_int(y);

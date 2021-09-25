@@ -9,6 +9,7 @@ struct ModInt32 {
     using i64 = std::int64_t;
     using u64 = std::uint64_t;
     using m32 = ModInt32;
+    using internal_value_type = u32;
 
    private:
     u32 v;
@@ -79,29 +80,28 @@ struct ModInt32 {
     constexpr m32& operator/=(const m32& rhs) {
         return this->operator*=(rhs.inv());
     }
-    friend constexpr m32 operator+(const m32& lhs, const m32& rhs) {
+    friend m32 operator+(const m32& lhs, const m32& rhs) {
         return m32(lhs) += rhs;
     }
-    friend constexpr m32 operator-(const m32& lhs, const m32& rhs) {
+    friend m32 operator-(const m32& lhs, const m32& rhs) {
         return m32(lhs) -= rhs;
     }
-    friend constexpr m32 operator*(const m32& lhs, const m32& rhs) {
+    friend m32 operator*(const m32& lhs, const m32& rhs) {
         return m32(lhs) *= rhs;
     }
-    friend constexpr m32 operator/(const m32& lhs, const m32& rhs) {
+    friend m32 operator/(const m32& lhs, const m32& rhs) {
         return m32(lhs) /= rhs;
     }
-    friend constexpr bool operator==(const m32& lhs, const m32& rhs) {
+    friend bool operator==(const m32& lhs, const m32& rhs) {
         return norm(lhs.v) == norm(rhs.v);
     }
-    friend constexpr bool operator!=(const m32& lhs, const m32& rhs) {
+    friend bool operator!=(const m32& lhs, const m32& rhs) {
         return norm(lhs.v) != norm(rhs.v);
     }
-    friend constexpr std::istream& operator>>(std::istream& is, m32& rhs) {
+    friend std::istream& operator>>(std::istream& is, m32& rhs) {
         return is >> rhs.v, rhs.v = reduce(u64(rhs.v) * r2), is;
     }
-    friend constexpr std::ostream& operator<<(std::ostream& os,
-                                              const m32& rhs) {
+    friend std::ostream& operator<<(std::ostream& os, const m32& rhs) {
         return os << rhs.get();
     }
     constexpr m32 pow(i64 y) const {
@@ -118,5 +118,5 @@ struct ModInt32 {
     }
 };
 
-// using mint = ModInt32<nttmod>;
 using mint = ModInt32<mod>;
+
