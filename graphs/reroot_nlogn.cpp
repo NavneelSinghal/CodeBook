@@ -90,7 +90,7 @@ auto rerooter(const std::vector<std::vector<int>>& g, const Value& default_val,
         auto& gu = g[u];
         for (int i = 0; i < sz; ++i)
             dp[gu[i]] = finalize_merge(dp_exclusive[i], u);
-        root_dp[u] = finalize_merge(merge_into(dp_exclusive[0], edge_dp[0], u, 0), u);
+        root_dp[u] = finalize_merge(merge_into(dp_exclusive[0], edge_dp[u][0], u, 0), u);
     }
 
     return make_pair(root_dp, edge_dp);
