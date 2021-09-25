@@ -123,9 +123,9 @@ struct IO {
             if (x < TEN) {
                 output_buffer[output_ptr_right++] = static_cast<char>('0' + x);
             } else {
-                uint32_t q =
-                    (static_cast<uint32_t>(x) * MAGIC_MULTIPLY) >> MAGIC_SHIFT;
-                uint32_t r = static_cast<uint32_t>(x) - q * TEN;
+                std::uint32_t q =
+                    (static_cast<std::uint32_t>(x) * MAGIC_MULTIPLY) >> MAGIC_SHIFT;
+                std::uint32_t r = static_cast<std::uint32_t>(x) - q * TEN;
                 output_buffer[output_ptr_right] = static_cast<char>('0' + q);
                 output_buffer[output_ptr_right + 1] =
                     static_cast<char>('0' + r);
