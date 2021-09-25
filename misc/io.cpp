@@ -12,6 +12,12 @@ struct IOPre {
     }
 };
 struct IO {
+#if !HAVE_DECL_FREAD_UNLOCKED
+    #define fread_unlocked fread
+#endif
+#if !HAVE_DECL_FWRITE_UNLOCKED
+    #define fwrite_unlocked fwrite
+#endif
     static constexpr int SZ = 1 << 17, LEN = 32, TEN = 10, HUNDRED = TEN * TEN,
                          THOUSAND = HUNDRED * TEN, TENTHOUSAND = THOUSAND * TEN,
                          MAGIC_MULTIPLY = 205, MAGIC_SHIFT = 11, MASK = 15,
@@ -33,14 +39,79 @@ struct IO {
 
     ~IO() { flush(); }
 
+    template <class T>
+    struct is_char {
+        static constexpr bool value = std::is_same_v<T, char>;
+    };
+
+    template <class T>
+    struct is_bool {
+        static constexpr bool value = std::is_same_v<T, bool>;
+    };
+
+    template <class T>
+    struct is_string {
+        static constexpr bool value = std::is_same_v<T, std::string> ||
+                                      std::is_same_v<T, const char*> ||
+                                      std::is_same_v<T, char*>;
+    };
+
+    template <class T, class D = void>
+    struct is_custom {
+        static constexpr bool value = false;
+    };
+
+    template <class T>
+    struct is_custom<T, std::void_t<typename T::internal_value_type>> {
+        static constexpr bool value = true;
+    };
+
+    template <class T>
+    struct is_default {
+        static constexpr bool value =
+            is_char<T>::value || is_string<T>::value || std::is_integral_v<T>;
+    };
+
     template <class T, class D = void>
     struct is_iterable {
         static constexpr bool value = false;
     };
+
     template <class T>
-    struct is_iterable<T,
-                       std::void_t<decltype(std::begin(std::declval<T>()))>> {
+    struct is_iterable<
+        T, typename std::void_t<decltype(std::begin(std::declval<T>()))>> {
         static constexpr bool value = true;
+    };
+
+    template <class T, class D = void, class E = void>
+    struct is_applyable {
+        static constexpr bool value = false;
+    };
+
+    template <class T>
+    struct is_applyable<T, std::void_t<typename std::tuple_size<T>::type>,
+                        std::void_t<decltype(std::get<0>(std::declval<T>()))>> {
+        static constexpr bool value = true;
+    };
+
+    template <class T>
+    static constexpr bool needs_newline = (is_iterable<T>::value ||
+                                           is_applyable<T>::value) &&
+                                          (!is_default<T>::value);
+
+    template <typename T, typename U>
+    struct any_needs_newline {
+        static constexpr bool value = false;
+    };
+    template <typename T>
+    struct any_needs_newline<T, std::index_sequence<>> {
+        static constexpr bool value = false;
+    };
+    template <typename T, std::size_t I, std::size_t... Is>
+    struct any_needs_newline<T, std::index_sequence<I, Is...>> {
+        static constexpr bool value =
+            needs_newline<decltype(std::get<I>(std::declval<T>()))> ||
+            any_needs_newline<T, std::index_sequence<Is...>>::value;
     };
 
     inline void load() {
@@ -54,12 +125,19 @@ struct IO {
                 SZ - input_ptr_right + input_ptr_left, stdin));
         input_ptr_left = 0;
     }
-    inline void read_token(char& c) {
+
+    inline void read_char(char& c) {
         if (input_ptr_left + LEN > input_ptr_right) load();
         c = input_buffer[input_ptr_left++];
     }
+    inline void read_string(std::string& x) {
+        char c;
+        while (read_char(c), c < '!') continue;
+        x = c;
+        while (read_char(c), c >= '!') x += c;
+    }
     template <class T>
-    inline std::enable_if_t<std::is_integral_v<T>, void> read_token(T& x) {
+    inline std::enable_if_t<std::is_integral_v<T>, void> read_int(T& x) {
         if (input_ptr_left + LEN > input_ptr_right) load();
         char c = 0;
         do c = input_buffer[input_ptr_left++];
@@ -73,37 +151,41 @@ struct IO {
         if constexpr (std::is_signed<T>::value == true)
             if (minus) x = -x;
     }
-    inline void read_token() {}
-    template <class T>
-    inline std::enable_if_t<is_iterable<T>::value, void> read_token(T& a) {
-        for (auto& x : a) read_token(x);
-    }
-    template <typename... T>
-    inline void read_token(std::tuple<T...>& a) {
-        std::apply([this](T&... args) { ((read_token(args)), ...); }, a);
-    }
-    template <class T, class U>
-    inline void read_token(const std::pair<T, U>& a) {
-        read_token(a.first), read_token(a.second);
-    }
+
     inline void skip_space() {
         if (input_ptr_left + LEN > input_ptr_right) load();
         while (input_buffer[input_ptr_left] <= ' ') input_ptr_left++;
     }
+
     inline void flush() {
         fwrite_unlocked(std::begin(output_buffer), 1, output_ptr_right, stdout);
         output_ptr_right = 0;
     }
-    inline void write_token(char c) {
+
+    inline void write_char(char c) {
         if (output_ptr_right > SZ - LEN) flush();
         output_buffer[output_ptr_right++] = c;
     }
-    inline void write_token(bool b) {
+
+    inline void write_bool(bool b) {
         if (output_ptr_right > SZ - LEN) flush();
         output_buffer[output_ptr_right++] = b ? '1' : '0';
     }
+
+    inline void write_string(const std::string& s) {
+        for (auto x : s) write_char(x);
+    }
+
+    inline void write_string(const char* s) {
+        while (*s) write_char(*s++);
+    }
+
+    inline void write_string(char* s) {
+        while (*s) write_char(*s++);
+    }
+
     template <typename T>
-    inline void write_token(T x) {
+    inline std::enable_if_t<std::is_integral_v<T>, void> write_int(T x) {
         if (output_ptr_right > SZ - LEN) flush();
         if (!x) {
             output_buffer[output_ptr_right++] = '0';
@@ -124,7 +206,8 @@ struct IO {
                 output_buffer[output_ptr_right++] = static_cast<char>('0' + x);
             } else {
                 std::uint32_t q =
-                    (static_cast<std::uint32_t>(x) * MAGIC_MULTIPLY) >> MAGIC_SHIFT;
+                    (static_cast<std::uint32_t>(x) * MAGIC_MULTIPLY) >>
+                    MAGIC_SHIFT;
                 std::uint32_t r = static_cast<std::uint32_t>(x) - q * TEN;
                 output_buffer[output_ptr_right] = static_cast<char>('0' + q);
                 output_buffer[output_ptr_right + 1] =
@@ -146,48 +229,72 @@ struct IO {
                std::begin(buf) + i + 4, TWELVE - i);
         output_ptr_right += TWELVE - i;
     }
-
-    inline void write_token() {}
-    template <class T>
-    inline std::enable_if_t<is_iterable<T>::value, void> write_token(
-        const T& a) {
-        for (const auto& x : a) write_token(x), write_token(' ');
-        write_token('\n');
-    }
-    template <typename... T>
-    inline void write_token(const std::tuple<T...>& a) {
-        std::apply(
-            [this](T const&... args) {
-                ((write_token(args), write_token(' ')), ...);
-            },
-            a);
-        write_token('\n');
-    }
-    template <class T, class U>
-    inline void write_token(const std::pair<T, U>& a) {
-        write_token(a.first);
-        write_token(' ');
-        write_token(a.second);
-        write_token('\n');
-    }
-    template <typename Head, typename... Tail>
-    inline void write_token(Head&& head, Tail&&... tail) {
-        write_token(head), write_token(std::forward<Tail>(tail)...);
-    }
-    template <typename... Args>
-    inline void write_token_newline(Args&&... x) {
-        write_token(std::forward<Args>(x)...), write_token('\n');
-    }
-    template <typename T>
-    IO& operator<<(T&& x) {
-        write_token(x);
+    template <typename T_>
+    IO& operator<<(T_&& x) {
+        using T = typename std::remove_cv<
+            typename std::remove_reference<T_>::type>::type;
+        static_assert(is_custom<T>::value or is_default<T>::value or
+                      is_iterable<T>::value or is_applyable<T>::value);
+        if constexpr (is_custom<T>::value) {
+            write_int(x.get());
+        } else if constexpr (is_default<T>::value) {
+            if constexpr (is_string<T>::value) {
+                write_string(x);
+            } else if constexpr (is_char<T>::value) {
+                write_char(x);
+            } else if constexpr (std::is_integral_v<T>) {
+                write_int(x);
+            }
+        } else if constexpr (is_iterable<T>::value) {
+            // strings are immune
+            using E = decltype(*std::begin(x));
+            constexpr char sep = needs_newline<E> ? '\n' : ' ';
+            int i = 0;
+            for (const auto& y : x) {
+                if (i++) write_char(sep);
+                operator<<(y);
+            }
+        } else if constexpr (is_applyable<T>::value) {
+            // strings are immune
+            constexpr char sep =
+                (any_needs_newline<
+                    T, std::make_index_sequence<std::tuple_size_v<T>>>::value)
+                    ? '\n'
+                    : ' ';
+            int i = 0;
+            std::apply(
+                [this, &sep, &i](auto const&... y) {
+                    (((i++ ? write_char(sep) : void()), this->operator<<(y)),
+                     ...);
+                },
+                x);
+        }
         return *this;
     }
     template <typename T>
     IO& operator>>(T& x) {
-        read_token(x);
+        static_assert(is_custom<T>::value or is_default<T>::value or
+                      is_iterable<T>::value or is_applyable<T>::value);
+        if constexpr (is_custom<T>::value) {
+            typename T::internal_value_type y;
+            read_int(y);
+            x = y;
+        } else if constexpr (is_default<T>::value) {
+            if constexpr (is_string<T>::value) {
+                read_string(x);
+            } else if constexpr (is_char<T>::value) {
+                read_char(x);
+            } else if constexpr (std::is_integral_v<T>) {
+                read_int(x);
+            }
+        } else if constexpr (is_iterable<T>::value) {
+            for (auto& y : x) operator>>(y);
+        } else if constexpr (is_applyable<T>::value) {
+            std::apply([this](auto&... y) { ((this->operator>>(y)), ...); }, x);
+        }
         return *this;
     }
+
     IO* tie(std::nullptr_t) { return this; }
     void sync_with_stdio(bool) {}
 };
