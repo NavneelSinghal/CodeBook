@@ -18,85 +18,69 @@ void setIO(string name = "") {
 
 struct edge {
     int a, b, id;
-    long long w;
-
-    bool operator<(const edge &o) const {
+    ll w;
+    bool operator<(const edge& o) const {
         if (w != o.w) return w < o.w;
         return id < o.id;
     }
 };
 
-vector<bool> boruvka(int n, vector<edge> edges) {
+auto boruvka(int n, vector<edge> edges) {
     vector<bool> res(edges.size());
-
     while (!edges.empty()) {
         // find local minimal edges
-
-        vector<int> minEdge(n, -1);
-
-        for (int i = 0; i < edges.size(); i++) {
-            if (minEdge[edges[i].a] < 0 ||
-                edges[i] < edges[minEdge[edges[i].a]])
-                minEdge[edges[i].a] = i;
-            if (minEdge[edges[i].b] < 0 ||
-                edges[i] < edges[minEdge[edges[i].b]])
-                minEdge[edges[i].b] = i;
+        vector<int> min_edge(n, -1);
+        int m = (int)edges.size();
+        for (int i = 0; i < m; ++i) {
+            auto [u, v, _, __] = edges[i];
+            auto& e_u = min_edge[u];
+            auto& e_v = min_edge[v];
+            if (e_u < 0 || edges[i] < edges[e_u]) e_u = i;
+            if (e_v < 0 || edges[i] < edges[e_v]) e_v = i;
         }
-
         // build graph with local minimal edges
-
-        vector<vector<int>> adj(n);
-
-        for (int x : minEdge) {
-            if (x < 0) continue;
-            res[edges[x].id] = true;
-            adj[edges[x].a].push_back(edges[x].b);
-            adj[edges[x].b].push_back(edges[x].a);
+        vector<basic_string<int>> g(n);
+        for (int x : min_edge) {
+            if (x == -1) continue;
+            auto [u, v, id, _] = edges[x];
+            if (res[id]) continue;
+            res[id] = true;
+            g[u].push_back(v);
+            g[v].push_back(u);
         }
-
         // find components
-
         vector<int> component(n, -1);
-
         int components = 0;
-
-        for (int i = 0; i < n; i++) {
-            if (component[i] >= 0) continue;
-
-            // dfs
-            vector<int> s = {i};
+        basic_string<int> s;
+        for (int i = 0; i < n; ++i) {
+            if (component[i] != -1) continue;
+            s.push_back(i);
             component[i] = components;
-
             while (!s.empty()) {
-                int x = s.back();
+                int u = s.back();
                 s.pop_back();
-                for (int y : adj[x]) {
-                    if (component[y] >= 0) continue;
-                    component[y] = components;
-                    s.push_back(y);
+                for (int v : g[u]) {
+                    if (component[v] != -1) continue;
+                    component[v] = components;
+                    s.push_back(v);
                 }
             }
-
-            components++;
+            ++components;
         }
-
         // update
-
         n = components;
-
-        for (int i = 0; i < edges.size();) {
-            edges[i].a = component[edges[i].a];
-            edges[i].b = component[edges[i].b];
-
-            if (edges[i].a == edges[i].b) {
+        for (int i = 0; i < (int)edges.size();) {
+            auto& [a, b, _, __] = edges[i];
+            a = component[a];
+            b = component[b];
+            if (a == b) {
                 swap(edges[i], edges.back());
                 edges.pop_back();
             } else {
-                i++;
+                ++i;
             }
         }
     }
-
     return res;
 }
 

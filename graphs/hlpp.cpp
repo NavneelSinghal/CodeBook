@@ -40,14 +40,14 @@ struct HLPP {
         while (!q.empty()) {
             int v = q.front();
             q.pop();
-            for (auto &e : adj[v])
+            for (auto& e : adj[v])
                 if (height[e.to] == MAXN && adj[e.to][e.rev].f > 0)
                     q.push(e.to), updHeight(e.to, height[v] + 1);
             highest = height[v];
         }
     }
 
-    void push(int v, edge &e) {
+    void push(int v, edge& e) {
         if (excess[e.to] == 0) lst[height[e.to]].push_back(e.to);
         T df = min(excess[v], e.f);
         e.f -= df, adj[e.to][e.rev].f += df;
@@ -56,7 +56,7 @@ struct HLPP {
 
     void discharge(int v) {
         int nh = MAXN;
-        for (auto &e : adj[v]) {
+        for (auto& e : adj[v]) {
             if (e.f > 0) {
                 if (height[v] == height[e.to] + 1) {
                     push(v, e);
@@ -79,7 +79,7 @@ struct HLPP {
         fill(all(excess), 0);
         excess[s] = INF, excess[t] = -INF;
         globalRelabel();
-        for (auto &e : adj[s]) push(s, e);
+        for (auto& e : adj[s]) push(s, e);
         for (; highest >= 0; highest--) {
             while (!lst[highest].empty()) {
                 int v = lst[highest].back();
