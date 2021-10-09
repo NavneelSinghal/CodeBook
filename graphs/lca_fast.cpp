@@ -16,7 +16,7 @@ struct HLD_LCA {
     }
 
     bool is_anc(int u, int v) {
-        return in_time[u] <= in_time[v] && in_time[u] + sz[u] >= in_time[v];
+        return in_time[u] <= in_time[v] && in_time[u] + sz[u] > in_time[v];
     }
 
     void dfs_sz(int u) {
