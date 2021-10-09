@@ -1,112 +1,71 @@
-#pragma GCC optimize("Ofast")
-#pragma GCC target("avx")
-#pragma GCC optimize("unroll-loops")
-
-#include <bits/stdc++.h>
-
-using namespace std;
-
-void setIO(string name = "") {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0);
-    cout.tie(0);
-    if (name.size() == 0) return;
-    FILE *fin = freopen((name + ".in").c_str(), "r", stdin);
-    FILE *fout = freopen((name + ".out").c_str(), "w", stdout);
-    cout << setprecision(10) << fixed;
-}
-
-// 1-indexed vertex and edge numbering
-
-const int N = (int)1e5 + 7;
-const int M = N;
-
-struct edge {
-    int u, v, cost;
+struct dsu {
+    int n;
+    vector<int> par;
+    dsu(int _n) : n(_n), par(n, -1) {}
+    int find_set(int v) {
+        if (par[v] < 0) return v;
+        return par[v] = find_set(par[v]);
+    }
+    bool union_sets(int a, int b) {
+        a = find_set(a);
+        b = find_set(b);
+        if (a != b) {
+            if (par[b] < par[a]) swap(a, b);
+            par[a] += par[b];
+            par[b] = a;
+            return true;
+        }
+        return false;
+    }
 };
 
-int n, m;
+struct edge {
+    int a, b;
+    ll w;
+};
 
-int par[N], siz[N];
-
-int min_edge[N];
-edge g[M];
-
-void init_dsu() {
-    for (int i = 1; i <= n; ++i) {
-        par[i] = i;
-        siz[i] = 1;
-    }
-}
-
-int root(int v) {
-    if (par[v] == v) return v;
-    return par[v] = root(par[v]);
-}
-
-bool merge(int v, int u) {
-    v = root(v);
-    u = root(u);
-    if (v == u) return false;
-    if (siz[u] < siz[v]) swap(u, v);
-    par[v] = u;
-    siz[u] += siz[v];
-    return true;
-}
-
-void solve(int case_no) {
-    cin >> n >> m;
-
-    for (int i = 1; i <= m; ++i) {
-        cin >> g[i].u >> g[i].v >> g[i].cost;
-    }
-
-    init_dsu();
-
-    int current_components = n;
-    long long ans = 0;
-
-    while (current_components > 1) {
-        for (int i = 1; i <= n; ++i) {
-            min_edge[i] = -1;
-        }
-
-        for (int i = 1; i <= m; ++i) {
-            int r_v = root(g[i].v);
-            int r_u = root(g[i].u);
-
-            if (r_v == r_u) continue;
-
-            if (min_edge[r_u] == -1 || g[i].cost < g[min_edge[r_u]].cost) {
-                min_edge[r_u] = i;
-            }
-
-            if (min_edge[r_v] == -1 || g[i].cost < g[min_edge[r_v]].cost) {
-                min_edge[r_v] = i;
+auto boruvka(const int n, const vector<edge>& edges) {
+    vector<bool> res(edges.size());
+    ll ans = 0;
+    if (n == 1) return make_pair(res, ans);
+    vector<int> min_edge(n, -1);
+    dsu dsu(n);
+    int n_components = n;
+    while (true) {
+        {
+            int i = 0;
+            for (auto [u, v, w] : edges) {
+                if (res[i]) {
+                    ++i;
+                    continue;
+                }
+                int ru = dsu.find_set(u);
+                int rv = dsu.find_set(v);
+                if (ru == rv) {
+                    ++i;
+                    continue;
+                }
+                auto& eu = min_edge[ru];
+                auto& ev = min_edge[rv];
+                if (eu == -1 || w < edges[eu].w) eu = i;
+                if (ev == -1 || w < edges[ev].w) ev = i;
+                ++i;
             }
         }
-
-        for (int i = 1; i <= n; ++i) {
-            if (min_edge[i] == -1) continue;
-
-            if (merge(g[min_edge[i]].v, g[min_edge[i]].u)) {
-                ans += g[min_edge[i]].cost;
-                --current_components;
-                // add g[min_edge[i]] to the final list of edges to be returned
-                // by this
+        for (int i = 0; i < n; ++i) {
+            auto e = min_edge[i];
+            if (e == -1 || res[e]) continue;
+            auto [u, v, w] = edges[e];
+            if (dsu.union_sets(u, v)) {
+                ans += w;
+                --n_components;
+                res[e] = true;
             }
         }
+        if (n_components > 1)
+            fill(begin(min_edge), end(min_edge), -1);
+        else
+            break;
     }
-
-    cout << ans << '\n';
-}
-
-signed main() {
-    setIO();
-    int t = 1;
-    // cin >> t;
-    for (int _t = 1; _t <= t; _t++) {
-        solve(_t);
-    }
-    return 0;
+    return make_pair(res, ans);
 }
