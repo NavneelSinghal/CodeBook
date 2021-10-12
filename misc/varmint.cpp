@@ -12,7 +12,7 @@ struct bigger_type<T, std::enable_if_t<4 < sizeof(T) && sizeof(T) <= 8, void>> {
 template <class T>
 class Mint {
     using M = Mint;
-    using Base = typename T::type;
+    using Base = typename decay<decltype(T::value)>::type;
     using Bigger = typename bigger_type<Base>::type;
     static constexpr Base Zero = Base{0};
     static constexpr Base One = Base{1};
@@ -46,7 +46,7 @@ class Mint {
     friend M operator+(M a, M b) { return a += b; }
     friend M operator-(M a, M b) { return a -= b; }
     friend std::istream& operator>>(std::istream& is, M& x) {
-        std::int64_t v;
+        int64_t v;
         return is >> v, x = v, is;
     }
     friend std::ostream& operator<<(std::ostream& os, M x) {
@@ -68,7 +68,7 @@ constexpr int md = static_cast<int>(1e9 + 7);
 using mint_constant =
     Mint<std::integral_constant<decay<decltype(md)>::type, md>>;
 
-constexpr std::int64_t md64 = static_cast<std::int64_t>(1e9 + 7);
+constexpr int64_t md64 = static_cast<int64_t>(1e9 + 7);
 using mint_constant_64 =
     Mint<std::integral_constant<decay<decltype(md64)>::type, md64>>;
 
@@ -81,7 +81,7 @@ ModType VarMod::value;
 ModType& mod_var = VarMod::value;
 using mint_variable = Mint<VarMod>;
 
-using ModType64 = std::int64_t;
+using ModType64 = int64_t;
 struct VarMod64 {
     static ModType64 value;
     using type = ModType64;
