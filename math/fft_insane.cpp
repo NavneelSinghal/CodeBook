@@ -1,13 +1,13 @@
-#include <immintrin.h>
 #include <bits/stdc++.h>
+#include <immintrin.h>
 using namespace std;
 
 __attribute__((target("sse4.2"))) __attribute__((always_inline)) __m128i
-my128_mullo_epu32(const __m128i &a, const __m128i &b) {
+my128_mullo_epu32(const __m128i& a, const __m128i& b) {
     return _mm_mullo_epi32(a, b);
 }
 __attribute__((target("sse4.2"))) __attribute__((always_inline)) __m128i
-my128_mulhi_epu32(const __m128i &a, const __m128i &b) {
+my128_mulhi_epu32(const __m128i& a, const __m128i& b) {
     __m128i a13 = _mm_shuffle_epi32(a, 0xF5);
     __m128i b13 = _mm_shuffle_epi32(b, 0xF5);
     __m128i prod02 = _mm_mul_epu32(a, b);
@@ -17,30 +17,30 @@ my128_mulhi_epu32(const __m128i &a, const __m128i &b) {
     return prod;
 }
 __attribute__((target("sse4.2"))) __attribute__((always_inline)) __m128i
-montgomery_mul_128(const __m128i &a, const __m128i &b, const __m128i &r,
-                   const __m128i &m1) {
+montgomery_mul_128(const __m128i& a, const __m128i& b, const __m128i& r,
+                   const __m128i& m1) {
     return _mm_sub_epi32(
         _mm_add_epi32(my128_mulhi_epu32(a, b), m1),
         my128_mulhi_epu32(my128_mullo_epu32(my128_mullo_epu32(a, b), r), m1));
 }
 __attribute__((target("sse4.2"))) __attribute__((always_inline)) __m128i
-montgomery_add_128(const __m128i &a, const __m128i &b, const __m128i &m2,
-                   const __m128i &m0) {
+montgomery_add_128(const __m128i& a, const __m128i& b, const __m128i& m2,
+                   const __m128i& m0) {
     __m128i ret = _mm_sub_epi32(_mm_add_epi32(a, b), m2);
     return _mm_add_epi32(_mm_and_si128(_mm_cmpgt_epi32(m0, ret), m2), ret);
 }
 __attribute__((target("sse4.2"))) __attribute__((always_inline)) __m128i
-montgomery_sub_128(const __m128i &a, const __m128i &b, const __m128i &m2,
-                   const __m128i &m0) {
+montgomery_sub_128(const __m128i& a, const __m128i& b, const __m128i& m2,
+                   const __m128i& m0) {
     __m128i ret = _mm_sub_epi32(a, b);
     return _mm_add_epi32(_mm_and_si128(_mm_cmpgt_epi32(m0, ret), m2), ret);
 }
 __attribute__((target("avx2"))) __attribute__((always_inline)) __m256i
-my256_mullo_epu32(const __m256i &a, const __m256i &b) {
+my256_mullo_epu32(const __m256i& a, const __m256i& b) {
     return _mm256_mullo_epi32(a, b);
 }
 __attribute__((target("avx2"))) __attribute__((always_inline)) __m256i
-my256_mulhi_epu32(const __m256i &a, const __m256i &b) {
+my256_mulhi_epu32(const __m256i& a, const __m256i& b) {
     __m256i a13 = _mm256_shuffle_epi32(a, 0xF5);
     __m256i b13 = _mm256_shuffle_epi32(b, 0xF5);
     __m256i prod02 = _mm256_mul_epu32(a, b);
@@ -50,22 +50,22 @@ my256_mulhi_epu32(const __m256i &a, const __m256i &b) {
     return prod;
 }
 __attribute__((target("avx2"))) __attribute__((always_inline)) __m256i
-montgomery_mul_256(const __m256i &a, const __m256i &b, const __m256i &r,
-                   const __m256i &m1) {
+montgomery_mul_256(const __m256i& a, const __m256i& b, const __m256i& r,
+                   const __m256i& m1) {
     return _mm256_sub_epi32(
         _mm256_add_epi32(my256_mulhi_epu32(a, b), m1),
         my256_mulhi_epu32(my256_mullo_epu32(my256_mullo_epu32(a, b), r), m1));
 }
 __attribute__((target("avx2"))) __attribute__((always_inline)) __m256i
-montgomery_add_256(const __m256i &a, const __m256i &b, const __m256i &m2,
-                   const __m256i &m0) {
+montgomery_add_256(const __m256i& a, const __m256i& b, const __m256i& m2,
+                   const __m256i& m0) {
     __m256i ret = _mm256_sub_epi32(_mm256_add_epi32(a, b), m2);
     return _mm256_add_epi32(_mm256_and_si256(_mm256_cmpgt_epi32(m0, ret), m2),
                             ret);
 }
 __attribute__((target("avx2"))) __attribute__((always_inline)) __m256i
-montgomery_sub_256(const __m256i &a, const __m256i &b, const __m256i &m2,
-                   const __m256i &m0) {
+montgomery_sub_256(const __m256i& a, const __m256i& b, const __m256i& m2,
+                   const __m256i& m0) {
     __m256i ret = _mm256_sub_epi32(a, b);
     return _mm256_add_epi32(_mm256_and_si256(_mm256_cmpgt_epi32(m0, ret), m2),
                             ret);
@@ -115,8 +115,8 @@ struct NTT {
     mint *buf1, *buf2;
     constexpr NTT() {
         setwy(level);
-        buf1 = reinterpret_cast<mint *>(::buf1_);
-        buf2 = reinterpret_cast<mint *>(::buf2_);
+        buf1 = reinterpret_cast<mint*>(::buf1_);
+        buf2 = reinterpret_cast<mint*>(::buf2_);
     }
     constexpr void setwy(int k) {
         mint w[level], y[level];
@@ -131,7 +131,7 @@ struct NTT {
             dy[i] = dy[i - 1] * w[i - 2] * y[i];
         }
     }
-    __attribute__((target("avx2"))) void ntt(mint *a, int n) {
+    __attribute__((target("avx2"))) void ntt(mint* a, int n) {
         int k = n ? __builtin_ctz(n) : 0;
         if (k == 0) return;
         if (k == 1) {
@@ -154,12 +154,12 @@ struct NTT {
                 int j0 = 0;
                 int j1 = v;
                 for (; j0 < v; j0 += 8, j1 += 8) {
-                    __m256i T0 = _mm256_loadu_si256((__m256i *)(a + j0));
-                    __m256i T1 = _mm256_loadu_si256((__m256i *)(a + j1));
+                    __m256i T0 = _mm256_loadu_si256((__m256i*)(a + j0));
+                    __m256i T1 = _mm256_loadu_si256((__m256i*)(a + j1));
                     __m256i naj = montgomery_add_256(T0, T1, m2, m0);
                     __m256i najv = montgomery_sub_256(T0, T1, m2, m0);
-                    _mm256_storeu_si256((__m256i *)(a + j0), naj);
-                    _mm256_storeu_si256((__m256i *)(a + j1), najv);
+                    _mm256_storeu_si256((__m256i*)(a + j0), naj);
+                    _mm256_storeu_si256((__m256i*)(a + j1), najv);
                 }
             }
         }
@@ -196,13 +196,13 @@ struct NTT {
                         int je = v;
                         for (; j0 < je; j0 += 4, j1 += 4, j2 += 4, j3 += 4) {
                             const __m128i T0 =
-                                _mm_loadu_si128((__m128i *)(a + j0));
+                                _mm_loadu_si128((__m128i*)(a + j0));
                             const __m128i T1 =
-                                _mm_loadu_si128((__m128i *)(a + j1));
+                                _mm_loadu_si128((__m128i*)(a + j1));
                             const __m128i T2 =
-                                _mm_loadu_si128((__m128i *)(a + j2));
+                                _mm_loadu_si128((__m128i*)(a + j2));
                             const __m128i T3 =
-                                _mm_loadu_si128((__m128i *)(a + j3));
+                                _mm_loadu_si128((__m128i*)(a + j3));
                             const __m128i T0P2 =
                                 montgomery_add_128(T0, T2, m2, m0);
                             const __m128i T1P3 =
@@ -213,16 +213,16 @@ struct NTT {
                                 montgomery_sub_128(T1, T3, m2, m0), Imag, r,
                                 m1);
                             _mm_storeu_si128(
-                                (__m128i *)(a + j0),
+                                (__m128i*)(a + j0),
                                 montgomery_add_128(T0P2, T1P3, m2, m0));
                             _mm_storeu_si128(
-                                (__m128i *)(a + j1),
+                                (__m128i*)(a + j1),
                                 montgomery_sub_128(T0P2, T1P3, m2, m0));
                             _mm_storeu_si128(
-                                (__m128i *)(a + j2),
+                                (__m128i*)(a + j2),
                                 montgomery_add_128(T0M2, T1M3, m2, m0));
                             _mm_storeu_si128(
-                                (__m128i *)(a + j3),
+                                (__m128i*)(a + j3),
                                 montgomery_sub_128(T0M2, T1M3, m2, m0));
                         }
                     } else {
@@ -237,13 +237,13 @@ struct NTT {
                         int je = j1;
                         for (; j0 < je; j0 += 4, j1 += 4, j2 += 4, j3 += 4) {
                             const __m128i T0 =
-                                _mm_loadu_si128((__m128i *)(a + j0));
+                                _mm_loadu_si128((__m128i*)(a + j0));
                             const __m128i T1 =
-                                _mm_loadu_si128((__m128i *)(a + j1));
+                                _mm_loadu_si128((__m128i*)(a + j1));
                             const __m128i T2 =
-                                _mm_loadu_si128((__m128i *)(a + j2));
+                                _mm_loadu_si128((__m128i*)(a + j2));
                             const __m128i T3 =
-                                _mm_loadu_si128((__m128i *)(a + j3));
+                                _mm_loadu_si128((__m128i*)(a + j3));
                             const __m128i MT1 =
                                 montgomery_mul_128(T1, XX, r, m1);
                             const __m128i MT2 =
@@ -260,16 +260,16 @@ struct NTT {
                                 montgomery_sub_128(MT1, MT3, m2, m0), Imag, r,
                                 m1);
                             _mm_storeu_si128(
-                                (__m128i *)(a + j0),
+                                (__m128i*)(a + j0),
                                 montgomery_add_128(T0P2, T1P3, m2, m0));
                             _mm_storeu_si128(
-                                (__m128i *)(a + j1),
+                                (__m128i*)(a + j1),
                                 montgomery_sub_128(T0P2, T1P3, m2, m0));
                             _mm_storeu_si128(
-                                (__m128i *)(a + j2),
+                                (__m128i*)(a + j2),
                                 montgomery_add_128(T0M2, T1M3, m2, m0));
                             _mm_storeu_si128(
-                                (__m128i *)(a + j3),
+                                (__m128i*)(a + j3),
                                 montgomery_sub_128(T0M2, T1M3, m2, m0));
                         }
                     }
@@ -291,13 +291,13 @@ struct NTT {
                         int je = v;
                         for (; j0 < je; j0 += 8, j1 += 8, j2 += 8, j3 += 8) {
                             const __m256i T0 =
-                                _mm256_loadu_si256((__m256i *)(a + j0));
+                                _mm256_loadu_si256((__m256i*)(a + j0));
                             const __m256i T1 =
-                                _mm256_loadu_si256((__m256i *)(a + j1));
+                                _mm256_loadu_si256((__m256i*)(a + j1));
                             const __m256i T2 =
-                                _mm256_loadu_si256((__m256i *)(a + j2));
+                                _mm256_loadu_si256((__m256i*)(a + j2));
                             const __m256i T3 =
-                                _mm256_loadu_si256((__m256i *)(a + j3));
+                                _mm256_loadu_si256((__m256i*)(a + j3));
                             const __m256i T0P2 =
                                 montgomery_add_256(T0, T2, m2, m0);
                             const __m256i T1P3 =
@@ -308,16 +308,16 @@ struct NTT {
                                 montgomery_sub_256(T1, T3, m2, m0), Imag, r,
                                 m1);
                             _mm256_storeu_si256(
-                                (__m256i *)(a + j0),
+                                (__m256i*)(a + j0),
                                 montgomery_add_256(T0P2, T1P3, m2, m0));
                             _mm256_storeu_si256(
-                                (__m256i *)(a + j1),
+                                (__m256i*)(a + j1),
                                 montgomery_sub_256(T0P2, T1P3, m2, m0));
                             _mm256_storeu_si256(
-                                (__m256i *)(a + j2),
+                                (__m256i*)(a + j2),
                                 montgomery_add_256(T0M2, T1M3, m2, m0));
                             _mm256_storeu_si256(
-                                (__m256i *)(a + j3),
+                                (__m256i*)(a + j3),
                                 montgomery_sub_256(T0M2, T1M3, m2, m0));
                         }
                     } else {
@@ -332,13 +332,13 @@ struct NTT {
                         int je = j1;
                         for (; j0 < je; j0 += 8, j1 += 8, j2 += 8, j3 += 8) {
                             const __m256i T0 =
-                                _mm256_loadu_si256((__m256i *)(a + j0));
+                                _mm256_loadu_si256((__m256i*)(a + j0));
                             const __m256i T1 =
-                                _mm256_loadu_si256((__m256i *)(a + j1));
+                                _mm256_loadu_si256((__m256i*)(a + j1));
                             const __m256i T2 =
-                                _mm256_loadu_si256((__m256i *)(a + j2));
+                                _mm256_loadu_si256((__m256i*)(a + j2));
                             const __m256i T3 =
-                                _mm256_loadu_si256((__m256i *)(a + j3));
+                                _mm256_loadu_si256((__m256i*)(a + j3));
                             const __m256i MT1 =
                                 montgomery_mul_256(T1, XX, r, m1);
                             const __m256i MT2 =
@@ -355,16 +355,16 @@ struct NTT {
                                 montgomery_sub_256(MT1, MT3, m2, m0), Imag, r,
                                 m1);
                             _mm256_storeu_si256(
-                                (__m256i *)(a + j0),
+                                (__m256i*)(a + j0),
                                 montgomery_add_256(T0P2, T1P3, m2, m0));
                             _mm256_storeu_si256(
-                                (__m256i *)(a + j1),
+                                (__m256i*)(a + j1),
                                 montgomery_sub_256(T0P2, T1P3, m2, m0));
                             _mm256_storeu_si256(
-                                (__m256i *)(a + j2),
+                                (__m256i*)(a + j2),
                                 montgomery_add_256(T0M2, T1M3, m2, m0));
                             _mm256_storeu_si256(
-                                (__m256i *)(a + j3),
+                                (__m256i*)(a + j3),
                                 montgomery_sub_256(T0M2, T1M3, m2, m0));
                         }
                     }
@@ -375,7 +375,7 @@ struct NTT {
             v >>= 2;
         }
     }
-    __attribute__((target("avx2"))) void intt(mint *a, int n,
+    __attribute__((target("avx2"))) void intt(mint* a, int n,
                                               int normalize = true) {
         int k = n ? __builtin_ctz(n) : 0;
         if (k == 0) return;
@@ -423,13 +423,13 @@ struct NTT {
                         int j3 = j2 + v;
                         for (; j0 < v; j0 += 4, j1 += 4, j2 += 4, j3 += 4) {
                             const __m128i T0 =
-                                _mm_loadu_si128((__m128i *)(a + j0));
+                                _mm_loadu_si128((__m128i*)(a + j0));
                             const __m128i T1 =
-                                _mm_loadu_si128((__m128i *)(a + j1));
+                                _mm_loadu_si128((__m128i*)(a + j1));
                             const __m128i T2 =
-                                _mm_loadu_si128((__m128i *)(a + j2));
+                                _mm_loadu_si128((__m128i*)(a + j2));
                             const __m128i T3 =
-                                _mm_loadu_si128((__m128i *)(a + j3));
+                                _mm_loadu_si128((__m128i*)(a + j3));
                             const __m128i T0P1 =
                                 montgomery_add_128(T0, T1, m2, m0);
                             const __m128i T2P3 =
@@ -440,16 +440,16 @@ struct NTT {
                                 montgomery_sub_128(T2, T3, m2, m0), Imag, r,
                                 m1);
                             _mm_storeu_si128(
-                                (__m128i *)(a + j0),
+                                (__m128i*)(a + j0),
                                 montgomery_add_128(T0P1, T2P3, m2, m0));
                             _mm_storeu_si128(
-                                (__m128i *)(a + j2),
+                                (__m128i*)(a + j2),
                                 montgomery_sub_128(T0P1, T2P3, m2, m0));
                             _mm_storeu_si128(
-                                (__m128i *)(a + j1),
+                                (__m128i*)(a + j1),
                                 montgomery_add_128(T0M1, T2M3, m2, m0));
                             _mm_storeu_si128(
-                                (__m128i *)(a + j3),
+                                (__m128i*)(a + j3),
                                 montgomery_sub_128(T0M1, T2M3, m2, m0));
                         }
                     } else {
@@ -464,13 +464,13 @@ struct NTT {
                         int je = j1;
                         for (; j0 < je; j0 += 4, j1 += 4, j2 += 4, j3 += 4) {
                             const __m128i T0 =
-                                _mm_loadu_si128((__m128i *)(a + j0));
+                                _mm_loadu_si128((__m128i*)(a + j0));
                             const __m128i T1 =
-                                _mm_loadu_si128((__m128i *)(a + j1));
+                                _mm_loadu_si128((__m128i*)(a + j1));
                             const __m128i T2 =
-                                _mm_loadu_si128((__m128i *)(a + j2));
+                                _mm_loadu_si128((__m128i*)(a + j2));
                             const __m128i T3 =
-                                _mm_loadu_si128((__m128i *)(a + j3));
+                                _mm_loadu_si128((__m128i*)(a + j3));
                             const __m128i T0P1 =
                                 montgomery_add_128(T0, T1, m2, m0);
                             const __m128i T2P3 =
@@ -480,18 +480,18 @@ struct NTT {
                             __m128i T2M3 = montgomery_mul_128(
                                 montgomery_sub_128(T2, T3, m2, m0), YY, r, m1);
                             _mm_storeu_si128(
-                                (__m128i *)(a + j0),
+                                (__m128i*)(a + j0),
                                 montgomery_add_128(T0P1, T2P3, m2, m0));
                             _mm_storeu_si128(
-                                (__m128i *)(a + j2),
+                                (__m128i*)(a + j2),
                                 montgomery_mul_128(
                                     montgomery_sub_128(T0P1, T2P3, m2, m0), WW,
                                     r, m1));
                             _mm_storeu_si128(
-                                (__m128i *)(a + j1),
+                                (__m128i*)(a + j1),
                                 montgomery_add_128(T0M1, T2M3, m2, m0));
                             _mm_storeu_si128(
-                                (__m128i *)(a + j3),
+                                (__m128i*)(a + j3),
                                 montgomery_mul_128(
                                     montgomery_sub_128(T0M1, T2M3, m2, m0), WW,
                                     r, m1));
@@ -515,13 +515,13 @@ struct NTT {
                         int j3 = j2 + v;
                         for (; j0 < v; j0 += 8, j1 += 8, j2 += 8, j3 += 8) {
                             const __m256i T0 =
-                                _mm256_loadu_si256((__m256i *)(a + j0));
+                                _mm256_loadu_si256((__m256i*)(a + j0));
                             const __m256i T1 =
-                                _mm256_loadu_si256((__m256i *)(a + j1));
+                                _mm256_loadu_si256((__m256i*)(a + j1));
                             const __m256i T2 =
-                                _mm256_loadu_si256((__m256i *)(a + j2));
+                                _mm256_loadu_si256((__m256i*)(a + j2));
                             const __m256i T3 =
-                                _mm256_loadu_si256((__m256i *)(a + j3));
+                                _mm256_loadu_si256((__m256i*)(a + j3));
                             const __m256i T0P1 =
                                 montgomery_add_256(T0, T1, m2, m0);
                             const __m256i T2P3 =
@@ -532,16 +532,16 @@ struct NTT {
                                 montgomery_sub_256(T2, T3, m2, m0), Imag, r,
                                 m1);
                             _mm256_storeu_si256(
-                                (__m256i *)(a + j0),
+                                (__m256i*)(a + j0),
                                 montgomery_add_256(T0P1, T2P3, m2, m0));
                             _mm256_storeu_si256(
-                                (__m256i *)(a + j2),
+                                (__m256i*)(a + j2),
                                 montgomery_sub_256(T0P1, T2P3, m2, m0));
                             _mm256_storeu_si256(
-                                (__m256i *)(a + j1),
+                                (__m256i*)(a + j1),
                                 montgomery_add_256(T0M1, T2M3, m2, m0));
                             _mm256_storeu_si256(
-                                (__m256i *)(a + j3),
+                                (__m256i*)(a + j3),
                                 montgomery_sub_256(T0M1, T2M3, m2, m0));
                         }
                     } else {
@@ -556,13 +556,13 @@ struct NTT {
                         int je = j1;
                         for (; j0 < je; j0 += 8, j1 += 8, j2 += 8, j3 += 8) {
                             const __m256i T0 =
-                                _mm256_loadu_si256((__m256i *)(a + j0));
+                                _mm256_loadu_si256((__m256i*)(a + j0));
                             const __m256i T1 =
-                                _mm256_loadu_si256((__m256i *)(a + j1));
+                                _mm256_loadu_si256((__m256i*)(a + j1));
                             const __m256i T2 =
-                                _mm256_loadu_si256((__m256i *)(a + j2));
+                                _mm256_loadu_si256((__m256i*)(a + j2));
                             const __m256i T3 =
-                                _mm256_loadu_si256((__m256i *)(a + j3));
+                                _mm256_loadu_si256((__m256i*)(a + j3));
                             const __m256i T0P1 =
                                 montgomery_add_256(T0, T1, m2, m0);
                             const __m256i T2P3 =
@@ -572,18 +572,18 @@ struct NTT {
                             const __m256i T2M3 = montgomery_mul_256(
                                 montgomery_sub_256(T2, T3, m2, m0), YY, r, m1);
                             _mm256_storeu_si256(
-                                (__m256i *)(a + j0),
+                                (__m256i*)(a + j0),
                                 montgomery_add_256(T0P1, T2P3, m2, m0));
                             _mm256_storeu_si256(
-                                (__m256i *)(a + j2),
+                                (__m256i*)(a + j2),
                                 montgomery_mul_256(
                                     montgomery_sub_256(T0P1, T2P3, m2, m0), WW,
                                     r, m1));
                             _mm256_storeu_si256(
-                                (__m256i *)(a + j1),
+                                (__m256i*)(a + j1),
                                 montgomery_add_256(T0M1, T2M3, m2, m0));
                             _mm256_storeu_si256(
-                                (__m256i *)(a + j3),
+                                (__m256i*)(a + j3),
                                 montgomery_mul_256(
                                     montgomery_sub_256(T0M1, T2M3, m2, m0), WW,
                                     r, m1));
@@ -609,12 +609,12 @@ struct NTT {
                 int j0 = 0;
                 int j1 = v;
                 for (; j0 < v; j0 += 8, j1 += 8) {
-                    const __m256i T0 = _mm256_loadu_si256((__m256i *)(a + j0));
-                    const __m256i T1 = _mm256_loadu_si256((__m256i *)(a + j1));
+                    const __m256i T0 = _mm256_loadu_si256((__m256i*)(a + j0));
+                    const __m256i T1 = _mm256_loadu_si256((__m256i*)(a + j1));
                     __m256i naj = montgomery_add_256(T0, T1, m2, m0);
                     __m256i najv = montgomery_sub_256(T0, T1, m2, m0);
-                    _mm256_storeu_si256((__m256i *)(a + j0), naj);
-                    _mm256_storeu_si256((__m256i *)(a + j1), najv);
+                    _mm256_storeu_si256((__m256i*)(a + j0), naj);
+                    _mm256_storeu_si256((__m256i*)(a + j1), najv);
                 }
             }
         }
@@ -637,47 +637,47 @@ struct NTT {
         const __m256i r = _mm256_set1_epi32(mint::r);
         const __m256i N2 = _mm256_set1_epi32(mint::n2);
         for (int i = 0; i < l1; i += 8) {
-            __m256i a = _mm256_loadu_si256((__m256i *)(buf1_ + i));
+            __m256i a = _mm256_loadu_si256((__m256i*)(buf1_ + i));
             __m256i b = montgomery_mul_256(a, N2, r, m1);
-            _mm256_storeu_si256((__m256i *)(buf1_ + i), b);
+            _mm256_storeu_si256((__m256i*)(buf1_ + i), b);
         }
         for (int i = 0; i < l2; i += 8) {
-            __m256i a = _mm256_loadu_si256((__m256i *)(buf2_ + i));
+            __m256i a = _mm256_loadu_si256((__m256i*)(buf2_ + i));
             __m256i b = montgomery_mul_256(a, N2, r, m1);
-            _mm256_storeu_si256((__m256i *)(buf2_ + i), b);
+            _mm256_storeu_si256((__m256i*)(buf2_ + i), b);
         }
         ntt(buf1, M);
         ntt(buf2, M);
         for (int i = 0; i < M; i += 8) {
-            __m256i a = _mm256_loadu_si256((__m256i *)(buf1_ + i));
-            __m256i b = _mm256_loadu_si256((__m256i *)(buf2_ + i));
+            __m256i a = _mm256_loadu_si256((__m256i*)(buf1_ + i));
+            __m256i b = _mm256_loadu_si256((__m256i*)(buf2_ + i));
             __m256i c = montgomery_mul_256(a, b, r, m1);
-            _mm256_storeu_si256((__m256i *)(buf1_ + i), c);
+            _mm256_storeu_si256((__m256i*)(buf1_ + i), c);
         }
         intt(buf1, M, false);
         const __m256i INVM = _mm256_set1_epi32((mint(M).inverse()).a);
         for (int i = 0; i < l; i += 8) {
-            __m256i a = _mm256_loadu_si256((__m256i *)(buf1_ + i));
+            __m256i a = _mm256_loadu_si256((__m256i*)(buf1_ + i));
             __m256i b = montgomery_mul_256(a, INVM, r, m1);
             __m256i c = my256_mulhi_epu32(my256_mullo_epu32(b, r), m1);
             __m256i d = _mm256_and_si256(_mm256_cmpgt_epi32(c, m0), m1);
             __m256i e = _mm256_sub_epi32(d, c);
-            _mm256_storeu_si256((__m256i *)(buf1_ + i), e);
+            _mm256_storeu_si256((__m256i*)(buf1_ + i), e);
         }
     }
-    void ntt(vector<mint> &a) {
+    void ntt(vector<mint>& a) {
         int M = (int)a.size();
         for (int i = 0; i < M; i++) buf1[i].a = a[i].a;
         ntt(buf1, M);
         for (int i = 0; i < M; i++) a[i].a = buf1[i].a;
     }
-    void intt(vector<mint> &a) {
+    void intt(vector<mint>& a) {
         int M = (int)a.size();
         for (int i = 0; i < M; i++) buf1[i].a = a[i].a;
         intt(buf1, M, true);
         for (int i = 0; i < M; i++) a[i].a = buf1[i].a;
     }
-    vector<mint> multiply(const vector<mint> &a, const vector<mint> &b) {
+    vector<mint> multiply(const vector<mint>& a, const vector<mint>& b) {
         if (a.size() == 0 && b.size() == 0) return vector<mint>{};
         int l = a.size() + b.size() - 1;
         if (min<int>(a.size(), b.size()) <= 40) {
@@ -702,7 +702,7 @@ struct NTT {
         for (int i = 0; i < l; ++i) s[i] = buf1[i] * invm;
         return s;
     }
-    void ntt_doubling(vector<mint> &a) {
+    void ntt_doubling(vector<mint>& a) {
         int M = (int)a.size();
         for (int i = 0; i < M; i++) buf1[i].a = a[i].a;
         intt(buf1, M);
@@ -718,31 +718,31 @@ template <typename mint>
 struct FormalPowerSeries : vector<mint> {
     using vector<mint>::vector;
     using FPS = FormalPowerSeries;
-    FPS &operator+=(const FPS &r) {
+    FPS& operator+=(const FPS& r) {
         if (r.size() > this->size()) this->resize(r.size());
         for (int i = 0; i < (int)r.size(); i++) (*this)[i] += r[i];
         return *this;
     }
-    FPS &operator+=(const mint &r) {
+    FPS& operator+=(const mint& r) {
         if (this->empty()) this->resize(1);
         (*this)[0] += r;
         return *this;
     }
-    FPS &operator-=(const FPS &r) {
+    FPS& operator-=(const FPS& r) {
         if (r.size() > this->size()) this->resize(r.size());
         for (int i = 0; i < (int)r.size(); i++) (*this)[i] -= r[i];
         return *this;
     }
-    FPS &operator-=(const mint &r) {
+    FPS& operator-=(const mint& r) {
         if (this->empty()) this->resize(1);
         (*this)[0] -= r;
         return *this;
     }
-    FPS &operator*=(const mint &v) {
+    FPS& operator*=(const mint& v) {
         for (int k = 0; k < (int)this->size(); k++) (*this)[k] *= v;
         return *this;
     }
-    FPS &operator/=(const FPS &r) {
+    FPS& operator/=(const FPS& r) {
         if (this->size() < r.size()) {
             this->clear();
             return *this;
@@ -750,19 +750,19 @@ struct FormalPowerSeries : vector<mint> {
         int n = this->size() - r.size() + 1;
         return *this = ((*this).rev().pre(n) * r.rev().inv(n)).pre(n).rev();
     }
-    FPS &operator%=(const FPS &r) {
+    FPS& operator%=(const FPS& r) {
         *this -= *this / r * r;
         shrink();
         return *this;
     }
-    FPS operator+(const FPS &r) const { return FPS(*this) += r; }
-    FPS operator+(const mint &v) const { return FPS(*this) += v; }
-    FPS operator-(const FPS &r) const { return FPS(*this) -= r; }
-    FPS operator-(const mint &v) const { return FPS(*this) -= v; }
-    FPS operator*(const FPS &r) const { return FPS(*this) *= r; }
-    FPS operator*(const mint &v) const { return FPS(*this) *= v; }
-    FPS operator/(const FPS &r) const { return FPS(*this) /= r; }
-    FPS operator%(const FPS &r) const { return FPS(*this) %= r; }
+    FPS operator+(const FPS& r) const { return FPS(*this) += r; }
+    FPS operator+(const mint& v) const { return FPS(*this) += v; }
+    FPS operator-(const FPS& r) const { return FPS(*this) -= r; }
+    FPS operator-(const mint& v) const { return FPS(*this) -= v; }
+    FPS operator*(const FPS& r) const { return FPS(*this) *= r; }
+    FPS operator*(const mint& v) const { return FPS(*this) *= v; }
+    FPS operator/(const FPS& r) const { return FPS(*this) /= r; }
+    FPS operator%(const FPS& r) const { return FPS(*this) %= r; }
     FPS operator-() const {
         FPS ret(this->size());
         for (int i = 0; i < (int)this->size(); i++) ret[i] = -(*this)[i];
@@ -810,7 +810,7 @@ struct FormalPowerSeries : vector<mint> {
     }
     mint eval(mint x) const {
         mint r = 0, w = 1;
-        for (auto &v : *this) r += w * v, w *= x;
+        for (auto& v : *this) r += w * v, w *= x;
         return r;
     }
     FPS log(int deg = -1) const {
@@ -834,9 +834,9 @@ struct FormalPowerSeries : vector<mint> {
         }
         return FPS(deg, mint(0));
     }
-    static void *ntt_ptr;
+    static void* ntt_ptr;
     static void set_fft();
-    FPS &operator*=(const FPS &r);
+    FPS& operator*=(const FPS& r);
     void ntt();
     void intt();
     void ntt_doubling();
@@ -845,7 +845,7 @@ struct FormalPowerSeries : vector<mint> {
     FPS exp(int deg = -1) const;
 };
 template <typename mint>
-void *FormalPowerSeries<mint>::ntt_ptr = nullptr;
+void* FormalPowerSeries<mint>::ntt_ptr = nullptr;
 /**
  * @brief 多項式/形式的冪級数ライブラリ
  * @docs docs/fps/formal-power-series.md
@@ -855,35 +855,35 @@ void FormalPowerSeries<mint>::set_fft() {
     if (!ntt_ptr) ntt_ptr = new NTT<mint>;
 }
 template <typename mint>
-FormalPowerSeries<mint> &FormalPowerSeries<mint>::operator*=(
-    const FormalPowerSeries<mint> &r) {
+FormalPowerSeries<mint>& FormalPowerSeries<mint>::operator*=(
+    const FormalPowerSeries<mint>& r) {
     if (this->empty() || r.empty()) {
         this->clear();
         return *this;
     }
     set_fft();
-    auto ret = static_cast<NTT<mint> *>(ntt_ptr)->multiply(*this, r);
+    auto ret = static_cast<NTT<mint>*>(ntt_ptr)->multiply(*this, r);
     return *this = FormalPowerSeries<mint>(ret.begin(), ret.end());
 }
 template <typename mint>
 void FormalPowerSeries<mint>::ntt() {
     set_fft();
-    static_cast<NTT<mint> *>(ntt_ptr)->ntt(*this);
+    static_cast<NTT<mint>*>(ntt_ptr)->ntt(*this);
 }
 template <typename mint>
 void FormalPowerSeries<mint>::intt() {
     set_fft();
-    static_cast<NTT<mint> *>(ntt_ptr)->intt(*this);
+    static_cast<NTT<mint>*>(ntt_ptr)->intt(*this);
 }
 template <typename mint>
 void FormalPowerSeries<mint>::ntt_doubling() {
     set_fft();
-    static_cast<NTT<mint> *>(ntt_ptr)->ntt_doubling(*this);
+    static_cast<NTT<mint>*>(ntt_ptr)->ntt_doubling(*this);
 }
 template <typename mint>
 int FormalPowerSeries<mint>::ntt_pr() {
     set_fft();
-    return static_cast<NTT<mint> *>(ntt_ptr)->pr;
+    return static_cast<NTT<mint>*>(ntt_ptr)->pr;
 }
 template <typename mint>
 FormalPowerSeries<mint> FormalPowerSeries<mint>::inv(int deg) const {
@@ -917,7 +917,7 @@ FormalPowerSeries<mint> FormalPowerSeries<mint>::exp(int deg) const {
     inv.reserve(deg + 1);
     inv.push_back(mint(0));
     inv.push_back(mint(1));
-    auto inplace_integral = [&](fps &F) -> void {
+    auto inplace_integral = [&](fps& F) -> void {
         const int n = (int)F.size();
         auto mod = mint::get_mod();
         while ((int)inv.size() <= n) {
@@ -927,7 +927,7 @@ FormalPowerSeries<mint> FormalPowerSeries<mint>::exp(int deg) const {
         F.insert(begin(F), mint(0));
         for (int i = 1; i <= n; i++) F[i] *= inv[i];
     };
-    auto inplace_diff = [](fps &F) -> void {
+    auto inplace_diff = [](fps& F) -> void {
         if (F.empty()) return;
         F.erase(begin(F));
         mint coeff = 1, one = 1;
@@ -996,35 +996,35 @@ struct LazyMontgomeryModInt {
     static_assert((mod & 1) == 1, "invalid, mod % 2 == 0");
     u32 a;
     constexpr LazyMontgomeryModInt() : a(0) {}
-    constexpr LazyMontgomeryModInt(const int64_t &b)
+    constexpr LazyMontgomeryModInt(const int64_t& b)
         : a(reduce(u64(b % mod + mod) * n2)){};
-    static constexpr u32 reduce(const u64 &b) {
+    static constexpr u32 reduce(const u64& b) {
         return (b + u64(u32(b) * u32(-r)) * mod) >> 32;
     }
-    constexpr mint &operator+=(const mint &b) {
+    constexpr mint& operator+=(const mint& b) {
         if (i32(a += b.a - 2 * mod) < 0) a += 2 * mod;
         return *this;
     }
-    constexpr mint &operator-=(const mint &b) {
+    constexpr mint& operator-=(const mint& b) {
         if (i32(a -= b.a) < 0) a += 2 * mod;
         return *this;
     }
-    constexpr mint &operator*=(const mint &b) {
+    constexpr mint& operator*=(const mint& b) {
         a = reduce(u64(a) * b.a);
         return *this;
     }
-    constexpr mint &operator/=(const mint &b) {
+    constexpr mint& operator/=(const mint& b) {
         *this *= b.inverse();
         return *this;
     }
-    constexpr mint operator+(const mint &b) const { return mint(*this) += b; }
-    constexpr mint operator-(const mint &b) const { return mint(*this) -= b; }
-    constexpr mint operator*(const mint &b) const { return mint(*this) *= b; }
-    constexpr mint operator/(const mint &b) const { return mint(*this) /= b; }
-    constexpr bool operator==(const mint &b) const {
+    constexpr mint operator+(const mint& b) const { return mint(*this) += b; }
+    constexpr mint operator-(const mint& b) const { return mint(*this) -= b; }
+    constexpr mint operator*(const mint& b) const { return mint(*this) *= b; }
+    constexpr mint operator/(const mint& b) const { return mint(*this) /= b; }
+    constexpr bool operator==(const mint& b) const {
         return (a >= mod ? a - mod : a) == (b.a >= mod ? b.a - mod : b.a);
     }
-    constexpr bool operator!=(const mint &b) const {
+    constexpr bool operator!=(const mint& b) const {
         return (a >= mod ? a - mod : a) != (b.a >= mod ? b.a - mod : b.a);
     }
     constexpr mint operator-() const { return mint() - mint(*this); }
@@ -1038,10 +1038,10 @@ struct LazyMontgomeryModInt {
         return ret;
     }
     constexpr mint inverse() const { return pow(mod - 2); }
-    friend ostream &operator<<(ostream &os, const mint &b) {
+    friend ostream& operator<<(ostream& os, const mint& b) {
         return os << b.get();
     }
-    friend istream &operator>>(istream &is, mint &b) {
+    friend istream& operator>>(istream& is, mint& b) {
         int64_t t;
         is >> t;
         b = LazyMontgomeryModInt<mod>(t);
