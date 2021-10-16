@@ -51,9 +51,10 @@ struct IO {
 
     template <class T>
     struct is_string {
-        static constexpr bool value = std::is_same_v<T, std::string> ||
-                                      std::is_same_v<T, const char*> ||
-                                      std::is_same_v<T, char*>;
+        static constexpr bool value =
+            std::is_same_v<T, std::string> || std::is_same_v<T, const char*> ||
+            std::is_same_v<T, char*> || std::is_same_v<std::decay_t<T>, char*>;
+        ;
     };
 
     template <class T, class D = void>
