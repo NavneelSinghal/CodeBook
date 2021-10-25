@@ -5,10 +5,12 @@ template <class Base,
           class MakeNode,
           class CombineNodes,
           class ApplyUpdate,
-          class ComposeUpdates = std::nullptr_t>
+          class ComposeUpdates = std::nullptr_t,
+          class CheckLazy = std::nullptr_t>
 struct lazy_segtree {
     static constexpr bool is_lazy =
         !std::is_same<ComposeUpdates, std::nullptr_t>::value;
+    static constexpr bool is_check_lazy = !std::is_same<CheckLazy, std::nullptr_t>::value;
 
    public:
     template <typename... T>
@@ -20,14 +22,16 @@ struct lazy_segtree {
                           const CombineNodes& _combine,
                           const Update& _id_update,
                           const ApplyUpdate& _apply_update,
-                          const ComposeUpdates& _compose_updates = nullptr)
+                          const ComposeUpdates& _compose_updates = nullptr,
+                          const CheckLazy& _check_lazy = nullptr)
         : _n(int(v.size())),
           make_node(_make_node),
           combine(_combine),
           id_node(_id_node),
           apply_update(_apply_update),
           id_update(_id_update),
-          compose_updates(_compose_updates) {
+          compose_updates(_compose_updates),
+          check_lazy(_check_lazy) {
         build(v);
     }
 
@@ -173,6 +177,7 @@ struct lazy_segtree {
     ApplyUpdate apply_update;
     Update id_update;
     ComposeUpdates compose_updates;
+    CheckLazy check_lazy;
 
     void update(int k) { d[k] = combine(d[2 * k], d[2 * k + 1]); }
     void all_apply(int k, Update f) {
@@ -181,6 +186,9 @@ struct lazy_segtree {
             if (k < size) lz[k] = compose_updates(f, lz[k]);
     }
     void push(int k) {
+        if constexpr (is_check_lazy) {
+            if (!check_lazy(lz[k])) return;
+        }
         all_apply(2 * k, lz[k]);
         all_apply(2 * k + 1, lz[k]);
         lz[k] = id_update;
