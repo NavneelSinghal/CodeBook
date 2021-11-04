@@ -34,7 +34,8 @@ namespace hashing {
     template <class T>
     struct custom_hash<
         T, typename std::enable_if<std::is_integral<T>::value>::type> {
-        ull operator()(T x) const {
+        ull operator()(T _x) const {
+            ull x = _x;
 #if USE_AES
             // implementation defined till C++17, defined from C++20
             __m128i m{ll(ull(x) * 0xbf58476d1ce4e5b9ULL), (ll)FIXED_RANDOM};
@@ -42,7 +43,7 @@ namespace hashing {
             __m128i z = _mm_aesenc_si128(y, KEY2);
             return z[0];
 #else
-            ull x = v + 0x9e3779b97f4a7c15 + FIXED_RANDOM;
+            x += 0x9e3779b97f4a7c15 + FIXED_RANDOM;
             x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
             x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
             return x ^ (x >> 31);
