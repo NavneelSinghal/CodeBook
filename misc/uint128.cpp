@@ -72,7 +72,7 @@ struct u128 {
         static constexpr u64 b = 1ULL << 32;
 
         /*
-           v[N], r[N], u[M], q[M], vn[N], un[M]
+           v[N], r[N], u[M], q[M], vn[N], un[M + 1]
            N = sizeof(dividend) / 4
            M = sizeof(divisor) / 4
 
