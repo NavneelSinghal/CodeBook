@@ -1,3 +1,4 @@
+// https://codeforces.com/gym/103399/submission/134789787 for faster remainder
 struct u128 {
     using u32 = uint32_t;
     using u64 = uint64_t;
