@@ -22,7 +22,7 @@ struct ptr {
 
 /*
 template <class T>
-using ptr<T> = T*;
+using ptr = T*;
    */
 
 template <class Node, class Update, class CombineNodes, class ApplyUpdate,
