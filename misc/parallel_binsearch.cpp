@@ -1,3 +1,11 @@
+// problems:
+// meteors
+// https://atcoder.jp/contests/agc002/tasks/agc002_d
+// https://atcoder.jp/contests/abc233/tasks/abc233_h
+// coci 2020 index
+// some uoi 2019 or 2020 3rd stage problem
+// https://training.olinfo.it/#/task/preoii_permutazione2/statement
+
 #ifndef LOCAL
     #pragma GCC optimize("O3,unroll-loops")
 // #pragma GCC target("avx,avx2,sse,sse2,sse3,sse4,popcnt,bmi,bmi2,lzcnt")
