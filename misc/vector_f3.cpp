@@ -1,3 +1,4 @@
+// before using int operations, ensure they're >= 0 and < 3
 template <std::size_t N>
 struct VectorF3 {
     using B = std::bitset<N>;
