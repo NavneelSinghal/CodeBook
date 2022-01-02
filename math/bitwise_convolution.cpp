@@ -1,3 +1,23 @@
+/*
+   let S_k be the set of (i, j) such that i OP j = k, where i, j, k are bits
+
+   for finding transformation matrix, say ((w, x), (y, z)), do the following:
+
+   consider P = (w * a0 + x * a1) * (w * b0 + x * b1)
+
+   w = coefficient of all ai * bj in P for (i, j) in S_0
+
+   x = coefficient of all ai * bj in P for (i, j) in S_1
+
+   solving these 4 equations, you get a set of solutions (w, x) = {(), (), ...}.
+   you will get the same set of solutions for (y, z). take any such solution so
+   that the matrix is invertible.
+
+   detailed explanation:
+   http://www.serbanology.com/article/A%20Bitwise%20Convolution%20Tutorial
+   (note that the code is slightly wrong)
+*/
+
 enum convolution_type { AND, OR, XOR };
 
 template <class T>
