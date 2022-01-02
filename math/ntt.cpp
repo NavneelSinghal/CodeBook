@@ -1,7 +1,7 @@
 namespace algebra {
 
     // source: modified from https://github.com/ei1333/library
-    
+
     template <std::uint32_t P>
     struct ModInt32 {
        public:
@@ -10,6 +10,7 @@ namespace algebra {
         using i64 = std::int64_t;
         using u64 = std::uint64_t;
         using m32 = ModInt32;
+        using internal_value_type = u32;
 
        private:
         u32 v;
@@ -29,7 +30,7 @@ namespace algebra {
             return res;
         }
         static constexpr u32 reduce(u64 x) {
-            return x + u64(u32(x) * r) * P >> 32;
+            return (x + u64(u32(x) * r) * P) >> 32;
         }
         static constexpr u32 norm(u32 x) { return x - (P & -(x >= P)); }
 
@@ -40,72 +41,81 @@ namespace algebra {
             u64 m = phi;
             for (u64 i = 2; i * i <= m; ++i)
                 if (m % i == 0) {
-                    tmp[cnt++] = i;
+                    tmp[cnt++] = u32(i);
                     while (m % i == 0) m /= i;
                 }
-            if (m != 1) tmp[cnt++] = m;
+            if (m != 1) tmp[cnt++] = u32(m);
             for (u64 res = 2; res != P; ++res) {
                 bool flag = true;
                 for (u32 i = 0; i != cnt && flag; ++i)
                     flag &= pow_mod(res, phi / tmp[i]) != 1;
-                if (flag) return res;
+                if (flag) return u32(res);
             }
             return 0;
         }
-        constexpr ModInt32() : v(0) {};
+        constexpr ModInt32() : v(0){};
         ~ModInt32() = default;
-        constexpr ModInt32(u32 v) : v(reduce(u64(v) * r2)) {}
-        constexpr ModInt32(const m32 &rhs) : v(rhs.v) {}
+        constexpr ModInt32(u32 _v) : v(reduce(u64(_v) * r2)) {}
+        constexpr ModInt32(i32 _v)
+            : v(reduce(u64(_v % i64(P) + i64(P)) * r2)) {}
+        constexpr ModInt32(u64 _v) : v(reduce((_v % P) * r2)) {}
+        constexpr ModInt32(i64 _v)
+            : v(reduce(u64(_v % i64(P) + i64(P)) * r2)) {}
+        constexpr ModInt32(const m32& rhs) : v(rhs.v) {}
         constexpr u32 get() const { return norm(reduce(v)); }
         explicit constexpr operator u32() const { return get(); }
         explicit constexpr operator i32() const { return i32(get()); }
-        constexpr m32 &operator=(const m32 &rhs) { return v = rhs.v, *this; }
+        constexpr m32& operator=(const m32& rhs) { return v = rhs.v, *this; }
         constexpr m32 operator-() const {
             m32 res;
             return res.v = (P << 1 & -(v != 0)) - v, res;
         }
         constexpr m32 inv() const { return pow(-1); }
-        constexpr m32 &operator+=(const m32 &rhs) {
+        constexpr m32& operator+=(const m32& rhs) {
             return v += rhs.v - (P << 1), v += P << 1 & -(v >> 31), *this;
         }
-        constexpr m32 &operator-=(const m32 &rhs) {
+        constexpr m32& operator-=(const m32& rhs) {
             return v -= rhs.v, v += P << 1 & -(v >> 31), *this;
         }
-        constexpr m32 &operator*=(const m32 &rhs) {
+        constexpr m32& operator*=(const m32& rhs) {
             return v = reduce(u64(v) * rhs.v), *this;
         }
-        constexpr m32 &operator/=(const m32 &rhs) {
+        constexpr m32& operator/=(const m32& rhs) {
             return this->operator*=(rhs.inv());
         }
-        friend m32 operator+(const m32 &lhs, const m32 &rhs) {
+        friend m32 operator+(const m32& lhs, const m32& rhs) {
             return m32(lhs) += rhs;
         }
-        friend m32 operator-(const m32 &lhs, const m32 &rhs) {
+        friend m32 operator-(const m32& lhs, const m32& rhs) {
             return m32(lhs) -= rhs;
         }
-        friend m32 operator*(const m32 &lhs, const m32 &rhs) {
+        friend m32 operator*(const m32& lhs, const m32& rhs) {
             return m32(lhs) *= rhs;
         }
-        friend m32 operator/(const m32 &lhs, const m32 &rhs) {
+        friend m32 operator/(const m32& lhs, const m32& rhs) {
             return m32(lhs) /= rhs;
         }
-        friend bool operator==(const m32 &lhs, const m32 &rhs) {
+        friend bool operator==(const m32& lhs, const m32& rhs) {
             return norm(lhs.v) == norm(rhs.v);
         }
-        friend bool operator!=(const m32 &lhs, const m32 &rhs) {
+        friend bool operator!=(const m32& lhs, const m32& rhs) {
             return norm(lhs.v) != norm(rhs.v);
         }
         template <class T>
-        friend T &operator>>(std::istream &is, m32 &rhs) {
+        friend T& operator>>(T& is, m32& rhs) {
             return is >> rhs.v, rhs.v = reduce(u64(rhs.v) * r2), is;
         }
         template <class T>
-        friend T &operator<<(std::ostream &os, const m32 &rhs) {
+        friend T& operator<<(T& os, const m32& rhs) {
             return os << rhs.get();
         }
         constexpr m32 pow(i64 y) const {
-            if ((y %= P - 1) < 0)
-                y += P - 1;  // phi(P) = P - 1, assume P is a prime number
+            i64 rem = y % (P - 1);
+            if (y > 0 && rem == 0)
+                y = P - 1;
+            else
+                y = rem;
+            if (y < 0) y += P - 1;
             m32 res(1), x(*this);
             for (; y != 0; y >>= 1, x *= x)
                 if (y & 1) res *= x;
@@ -113,11 +123,11 @@ namespace algebra {
         }
     };
     template <std::uint32_t P>
-    ModInt32<P> sqrt(const ModInt32<P> &x) {
+    ModInt32<P> sqrt(const ModInt32<P>& x) {
         using value_type = ModInt32<P>;
         static constexpr value_type negative_one(P - 1), ZERO(0);
-        if (x == ZERO || x.pow(P - 1 >> 1) == negative_one) return ZERO;
-        if ((P & 3) == 3) return x.pow(P + 1 >> 2);
+        if (x == ZERO || x.pow((P - 1) >> 1) == negative_one) return ZERO;
+        if ((P & 3) == 3) return x.pow((P + 1) >> 2);
         static value_type w2, ax;
         ax = x;
         static std::random_device rd;
@@ -125,15 +135,14 @@ namespace algebra {
         static std::uniform_int_distribution<std::uint32_t> dis(1, P - 1);
         const value_type four(value_type(4) * x);
         static value_type t;
-        do
-            t = value_type(dis(gen)), w2 = t * t - four;
-        while (w2.pow(P - 1 >> 1) != negative_one);
+        do t = value_type(dis(gen)), w2 = t * t - four;
+        while (w2.pow((P - 1) >> 1) != negative_one);
         struct Field_P2 {  // (A + Bx)(C+Dx)=(AC-BDa)+(AD+BC+BDt)x
            public:
             value_type a, b;
-            Field_P2(const value_type &a, const value_type &b) : a(a), b(b) {}
+            Field_P2(const value_type& a, const value_type& b) : a(a), b(b) {}
             ~Field_P2() = default;
-            Field_P2 &operator*=(const Field_P2 &rhs) {
+            Field_P2& operator*=(const Field_P2& rhs) {
                 value_type tmp1(b * rhs.b), tmp2(a * rhs.a - tmp1 * ax),
                     tmp3(a * rhs.b + b * rhs.a + tmp1 * t);
                 return a = tmp2, b = tmp3, *this;
@@ -145,7 +154,7 @@ namespace algebra {
                 return res;
             }
         } res(ZERO, value_type(1));
-        return res.pow(P + 1 >> 1).a;
+        return res.pow((P + 1) >> 1).a;
     }
     std::uint64_t get_len(std::uint64_t n) {  // if n=0, boom
         return --n, n |= n >> 1, n |= n >> 2, n |= n >> 4, n |= n >> 8,
@@ -191,12 +200,12 @@ namespace algebra {
             static_assert(pr != 0);
             static constexpr value_type G(pr);
             if (lim == 0) {
-                ROOT[1 << 19] = G.pow(P - 1 >> 21),
-                          IROOT[1 << 19] = G.pow(-i32(P - 1 >> 21));
+                ROOT[1 << 19] = G.pow((P - 1) >> 21),
+                          IROOT[1 << 19] = G.pow(P - 1 - i32((P - 1) >> 21));
                 for (i32 i = 18; i != -1; --i)
-                    ROOT[1 << i] = ROOT[1 << i + 1] * ROOT[1 << i + 1],
+                    ROOT[1 << i] = ROOT[1 << (i + 1)] * ROOT[1 << (i + 1)],
                               IROOT[1 << i] =
-                                  IROOT[1 << i + 1] * IROOT[1 << i + 1];
+                                  IROOT[1 << (i + 1)] * IROOT[1 << (i + 1)];
                 lim = 1;
             }
             while ((lim << 1) < n) {
@@ -233,7 +242,7 @@ namespace algebra {
         NTT<P>::idft(n, x);
     }
     template <std::uint32_t P>
-    std::int32_t deg(const std::vector<ModInt32<P>> &x) {
+    std::int32_t deg(const std::vector<ModInt32<P>>& x) {
         // return -1 if x is 0
         std::int32_t n = std::int32_t(x.size()) - 1;
         static constexpr ModInt32<P> ZERO(0);
@@ -241,16 +250,16 @@ namespace algebra {
         return n;
     }
     template <std::uint32_t P>
-    std::vector<ModInt32<P>> &norm(std::vector<ModInt32<P>> &x) {
+    std::vector<ModInt32<P>>& norm(std::vector<ModInt32<P>>& x) {
         return x.resize(std::max(deg(x) + 1, 1)), x;
     }
     template <std::uint32_t P>
-    std::vector<ModInt32<P>> norm(std::vector<ModInt32<P>> &&x) {
+    std::vector<ModInt32<P>> norm(std::vector<ModInt32<P>>&& x) {
         return x.resize(std::max(deg(x) + 1, 1)), x;
     }
     template <std::uint32_t P>
-    std::vector<ModInt32<P>> add(const std::vector<ModInt32<P>> &x,
-                                 const std::vector<ModInt32<P>> &y) {
+    std::vector<ModInt32<P>> add(const std::vector<ModInt32<P>>& x,
+                                 const std::vector<ModInt32<P>>& y) {
         using i32 = std::int32_t;
         using value_type = ModInt32<P>;
         std::vector<value_type> res(std::max(x.size(), y.size()));
@@ -263,8 +272,8 @@ namespace algebra {
         return norm(res);
     }
     template <std::uint32_t P>
-    std::vector<ModInt32<P>> sub(const std::vector<ModInt32<P>> &x,
-                                 const std::vector<ModInt32<P>> &y) {
+    std::vector<ModInt32<P>> sub(const std::vector<ModInt32<P>>& x,
+                                 const std::vector<ModInt32<P>>& y) {
         using i32 = std::int32_t;
         using value_type = ModInt32<P>;
         std::vector<value_type> res(std::max(x.size(), y.size()));
@@ -293,7 +302,7 @@ namespace algebra {
         } else {
             std::copy(x.begin(), x.end(), a);
             std::copy(y.begin(), y.end(), b);
-            i32 old_size = res.size(), len = get_len(old_size);
+            i32 old_size = res.size(), len = (i32)get_len(old_size);
             std::fill(a + x.size(), a + len, 0);
             std::fill(b + y.size(), b + len, 0);
             dft(len, a), dft(len, b);
@@ -310,7 +319,7 @@ namespace algebra {
         using value_type = ModInt32<P>;
         using i32 = std::int32_t;
         static value_type a[1 << 21], b[1 << 21];
-        i32 n = x.size(), len = get_len(n);
+        i32 n = x.size(), len = (i32)get_len(n);
         x.resize(len);
         std::vector<value_type> res(len, 0);
         res[0] = x[0].inv();
@@ -342,7 +351,7 @@ namespace algebra {
         using value_type = ModInt32<P>;
         using i32 = std::int32_t;
         static value_type a[1 << 21], b[1 << 21], c[1 << 21];
-        i32 n = x.size(), len = get_len(n);
+        i32 n = x.size(), len = (i32)get_len(n);
         x.resize(len), y.resize(len, 0);
         std::vector<value_type> g0 = inv(std::vector<value_type>(
                                     y.begin(), y.begin() + (len >> 1))),
@@ -385,7 +394,7 @@ namespace algebra {
     }
     template <std::uint32_t P>
     std::pair<std::vector<ModInt32<P>>, std::vector<ModInt32<P>>> quo_with_rem(
-        const std::vector<ModInt32<P>> &x, const std::vector<ModInt32<P>> &y) {
+        const std::vector<ModInt32<P>>& x, const std::vector<ModInt32<P>>& y) {
         using i32 = std::int32_t;
         using value_type = ModInt32<P>;
         static value_type a[1 << 21], b[1 << 21];
@@ -409,12 +418,12 @@ namespace algebra {
         return {q, norm(rem)};
     }
     template <std::uint32_t P>
-    std::vector<ModInt32<P>> rem(const std::vector<ModInt32<P>> &x,
-                                 const std::vector<ModInt32<P>> &y) {
+    std::vector<ModInt32<P>> rem(const std::vector<ModInt32<P>>& x,
+                                 const std::vector<ModInt32<P>>& y) {
         return quo_with_rem(x, y).second;
     }
     template <std::uint32_t P>
-    std::vector<ModInt32<P>> deriv(const std::vector<ModInt32<P>> &x) {
+    std::vector<ModInt32<P>> deriv(const std::vector<ModInt32<P>>& x) {
         using i32 = std::int32_t;
         using value_type = ModInt32<P>;
         if (x.size() == 1) return {0};
@@ -424,7 +433,7 @@ namespace algebra {
         return res;
     }
     template <std::uint32_t P>
-    std::vector<ModInt32<P>> integr(const std::vector<ModInt32<P>> &x) {
+    std::vector<ModInt32<P>> integr(const std::vector<ModInt32<P>>& x) {
         using i32 = std::int32_t;
         using value_type = ModInt32<P>;
         static i32 lim = 0;
@@ -442,7 +451,7 @@ namespace algebra {
         return res;
     }
     template <std::uint32_t P>
-    std::vector<ModInt32<P>> log(const std::vector<ModInt32<P>> &x) {
+    std::vector<ModInt32<P>> log(const std::vector<ModInt32<P>>& x) {
         return x.size() == 1 ? std::vector<ModInt32<P>>{0}
                              : integr(quo(deriv(x), x));
     }
@@ -451,7 +460,7 @@ namespace algebra {
         assert(x[0] == 0);
         using i32 = std::int32_t;
         using value_type = ModInt32<P>;
-        i32 n = x.size(), len = get_len(n);
+        i32 n = x.size(), len = (i32)get_len(n);
         if (n == 1) return {1};
         static value_type a[1 << 21], b[1 << 21], c[1 << 21], d[1 << 21],
             e[1 << 21], f[1 << 21], INV[1 << 21];
@@ -516,8 +525,8 @@ namespace algebra {
         using i32 = std::int32_t;
         using value_type = ModInt32<P>;
         static value_type a[1 << 21], b[1 << 21], c[1 << 21], d[1 << 21];
-        static constexpr value_type iv2(P - (P - 1 >> 1)), ZERO(0);
-        i32 n = x.size(), len = get_len(n);
+        static constexpr value_type iv2(P - ((P - 1) >> 1)), ZERO(0);
+        i32 n = x.size(), len = (i32)get_len(n);
         x.resize(len);
         std::vector<value_type> res(len);
         std::uint32_t k = std::uint32_t(sqrt(x[0]));
@@ -574,14 +583,14 @@ namespace algebra {
         return res;
     }
     template <std::uint32_t P>
-    std::vector<ModInt32<P>> taylor_shift(const std::vector<ModInt32<P>> &x,
-                                          const ModInt32<P> &c) {
+    std::vector<ModInt32<P>> taylor_shift(const std::vector<ModInt32<P>>& x,
+                                          const ModInt32<P>& c) {
         if (deg(x) < 1) return x;
         using i32 = std::int32_t;
         using value_type = ModInt32<P>;
         static i32 lim = 0;
         static value_type fac[1 << 21], ifac[1 << 21], a[1 << 21], b[1 << 21];
-        i32 n = x.size(), len = get_len((n << 1) - 1);
+        i32 n = x.size(), len = (i32)get_len((n << 1) - 1);
         if (lim < n) {
             if (lim == 0) fac[0] = ifac[0] = lim = 1;
             for (i32 i = lim; i != n; ++i) fac[i] = fac[i - 1] * value_type(i);
@@ -604,7 +613,7 @@ namespace algebra {
         return res;
     }
     template <std::uint32_t P>
-    std::vector<ModInt32<P>> operator-(const std::vector<ModInt32<P>> &x) {
+    std::vector<ModInt32<P>> operator-(const std::vector<ModInt32<P>>& x) {
         using i32 = std::int32_t;
         i32 n = x.size();
         std::vector<ModInt32<P>> res(n);
@@ -612,28 +621,28 @@ namespace algebra {
         return res;
     }
     template <std::uint32_t P>
-    std::vector<ModInt32<P>> operator+(const std::vector<ModInt32<P>> &x,
-                                       const std::vector<ModInt32<P>> &y) {
+    std::vector<ModInt32<P>> operator+(const std::vector<ModInt32<P>>& x,
+                                       const std::vector<ModInt32<P>>& y) {
         return add(x, y);
     }
     template <std::uint32_t P>
-    std::vector<ModInt32<P>> operator-(const std::vector<ModInt32<P>> &x,
-                                       const std::vector<ModInt32<P>> &y) {
+    std::vector<ModInt32<P>> operator-(const std::vector<ModInt32<P>>& x,
+                                       const std::vector<ModInt32<P>>& y) {
         return sub(x, y);
     }
     template <std::uint32_t P>
-    std::vector<ModInt32<P>> operator*(const std::vector<ModInt32<P>> &x,
-                                       const std::vector<ModInt32<P>> &y) {
+    std::vector<ModInt32<P>> operator*(const std::vector<ModInt32<P>>& x,
+                                       const std::vector<ModInt32<P>>& y) {
         return mul(x, y);
     }
     template <std::uint32_t P>
-    std::vector<ModInt32<P>> operator/(const std::vector<ModInt32<P>> &x,
-                                       const std::vector<ModInt32<P>> &y) {
+    std::vector<ModInt32<P>> operator/(const std::vector<ModInt32<P>>& x,
+                                       const std::vector<ModInt32<P>>& y) {
         return quorem(x, y);
     }
     template <std::uint32_t P>
-    std::vector<ModInt32<P>> operator%(const std::vector<ModInt32<P>> &x,
-                                       const std::vector<ModInt32<P>> &y) {
+    std::vector<ModInt32<P>> operator%(const std::vector<ModInt32<P>>& x,
+                                       const std::vector<ModInt32<P>>& y) {
         return rem(x, y);
     }
     template <std::uint32_t P>
@@ -643,9 +652,9 @@ namespace algebra {
         /* a0 a1
            b0 b1 */
         poly a0, a1, b0, b1;
-        PolyMat(const poly &a0, const poly &a1, const poly &b0, const poly &b1)
+        PolyMat(const poly& a0, const poly& a1, const poly& b0, const poly& b1)
             : a0(a0), a1(a1), b0(b0), b1(b1) {}
-        PolyMat(const PolyMat &rhs)
+        PolyMat(const PolyMat& rhs)
             : a0(rhs.a0), a1(rhs.a1), b0(rhs.b0), b1(rhs.b1) {}
         ~PolyMat() = default;
         bool is_identity_matrix() const {
@@ -653,7 +662,7 @@ namespace algebra {
             return deg(a1) == -1 && deg(b0) == -1 && deg(a0) == 0 &&
                    a0[0] == ONE && deg(b1) == 0 && b1[0] == ONE;
         }
-        PolyMat &operator=(const PolyMat &rhs) {
+        PolyMat& operator=(const PolyMat& rhs) {
             return a0 = rhs.a0, a1 = rhs.a1, b0 = rhs.b0, b1 = rhs.b1, *this;
         }
     };
@@ -664,15 +673,15 @@ namespace algebra {
         /* a
            b */
         poly a, b;
-        PolyVec(const poly &a, const poly &b) : a(a), b(b) {}
-        PolyVec(const PolyVec &rhs) : a(rhs.a), b(rhs.b) {}
+        PolyVec(const poly& a, const poly& b) : a(a), b(b) {}
+        PolyVec(const PolyVec& rhs) : a(rhs.a), b(rhs.b) {}
         ~PolyVec() = default;
-        PolyVec &operator=(const PolyVec &rhs) {
+        PolyVec& operator=(const PolyVec& rhs) {
             return a = rhs.a, b = rhs.b, *this;
         }
     };
     template <std::uint32_t P>
-    PolyMat<P> operator*(const PolyMat<P> &lhs, const PolyMat<P> &rhs) {
+    PolyMat<P> operator*(const PolyMat<P>& lhs, const PolyMat<P>& rhs) {
         if (lhs.is_identity_matrix()) return rhs;
         if (rhs.is_identity_matrix()) return lhs;
         return PolyMat<P>(lhs.a0 * rhs.a0 + lhs.a1 * rhs.b0,
@@ -681,14 +690,14 @@ namespace algebra {
                           lhs.b0 * rhs.a1 + lhs.b1 * rhs.b1);
     }
     template <std::uint32_t P>
-    PolyVec<P> operator*(const PolyMat<P> &lhs, const PolyVec<P> &rhs) {
+    PolyVec<P> operator*(const PolyMat<P>& lhs, const PolyVec<P>& rhs) {
         if (lhs.is_identity_matrix()) return rhs;
         return PolyVec<P>(lhs.a0 * rhs.a + lhs.a1 * rhs.b,
                           lhs.b0 * rhs.a + lhs.b1 * rhs.b);
     }
     template <std::uint32_t P>
-    PolyMat<P> hgcd(const std::vector<ModInt32<P>> &p0,
-                    const std::vector<ModInt32<P>> &p1) {
+    PolyMat<P> hgcd(const std::vector<ModInt32<P>>& p0,
+                    const std::vector<ModInt32<P>>& p1) {
         using poly = std::vector<ModInt32<P>>;
         assert(deg(p0) > deg(p1));
         std::int32_t m = (deg(p0) - 1 >> 1) + 1, n = deg(p1);
@@ -706,8 +715,8 @@ namespace algebra {
                Q * R;
     }
     template <std::uint32_t P>
-    PolyMat<P> cogcd(const std::vector<ModInt32<P>> &p0,
-                     const std::vector<ModInt32<P>> &p1) {
+    PolyMat<P> cogcd(const std::vector<ModInt32<P>>& p0,
+                     const std::vector<ModInt32<P>>& p1) {
         using poly = std::vector<ModInt32<P>>;
         assert(deg(p0) > deg(p1));
         PolyMat<P> M(hgcd(p0, p1));
@@ -721,8 +730,8 @@ namespace algebra {
     template <std::uint32_t P>
     std::vector<ModInt32<P>> exgcd(
         std::vector<ModInt32<P>> a, std::vector<ModInt32<P>> b,
-        std::vector<ModInt32<P>> &x,
-        std::vector<ModInt32<P>> &y) {  // ax + by = gcd(a, b)
+        std::vector<ModInt32<P>>& x,
+        std::vector<ModInt32<P>>& y) {  // ax + by = gcd(a, b)
         assert(deg(a) >= 0);
         assert(deg(b) >= 0);
         using poly = std::vector<ModInt32<P>>;
@@ -739,4 +748,5 @@ namespace algebra {
 
 constexpr int mod = 998'244'353;
 using mint = algebra::ModInt32<mod>;
+
 
