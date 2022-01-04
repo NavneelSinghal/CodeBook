@@ -232,9 +232,9 @@ namespace arbitrary_convolution {
             }
             r = other;
             sz *= 2;
-            while (r.size() > sz) r.pop_back();
+            while ((int)r.size() > sz) r.pop_back();
         }
-        while (r.size() > n) r.pop_back();
+        while ((int)r.size() > n) r.pop_back();
         return r;
     }
 
