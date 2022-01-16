@@ -1,6 +1,6 @@
 std::tuple<std::vector<std::vector<int>>, std::vector<std::vector<int>>,
            std::vector<int>>
-find_scc(const std::vector<std::vector<int>>& g, int const Base = 0) {
+find_scc(const std::vector<std::vector<int>>& g) {
     std::vector<int> val, z, component;
     std::vector<std::vector<int>> scc;
     int timer = 0, total_components = 0;
@@ -23,7 +23,7 @@ find_scc(const std::vector<std::vector<int>>& g, int const Base = 0) {
         }
         return val[u] = low;
     };
-    int n = g.size();
+    int n = (int)g.size();
     val.assign(n, 0);
     component.assign(n, -1);
     timer = total_components = 0;
