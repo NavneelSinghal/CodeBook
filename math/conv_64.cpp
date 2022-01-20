@@ -42,6 +42,8 @@ static constexpr u64_omega one_minus_omega2{1 - omega2};
 static constexpr u64_omega omega2_minus_omega{omega2 - omega};
 static constexpr u64_omega inv_3{12297829382473034411ull, 0};
 
+// MAXN = max size of polynomials whose convolution will be found
+template <std::size_t MAXN>
 class Conv64 {
    public:
     Conv64() = delete;
@@ -59,23 +61,32 @@ class Conv64 {
     }
 
    private:
+    static constexpr std::size_t BUF_SIZE = [] {
+        u64 n = 1;
+        while (n < 2 * MAXN - 1) n *= 3;
+        u64 m = 1;
+        while (m * m <= n) m *= 3;
+        m /= 3;
+        return 3 * n + 6 * m;
+    }();
+
     using R = u64_omega;
     static R* tmp;
-    static std::vector<R> tmp_v;
+    static std::array<R, BUF_SIZE> tmp_v;
 
     static void multiply_monomial(R* p, u64 m, u64 t, R* to) {
         if (t == 0 || t == 3 * m) {
             std::copy_n(p, m, to);
             return;
         }
-        u64 tt = t;
-        R mult = 1;
-        if (t < m)
-            ;
-        else if (t < 2 * m)
-            tt = t - m, mult = omega;
-        else
-            tt = t - 2 * m, mult = omega2;
+        const auto [tt, mult] = [&] {
+            if (t < m)
+                return std::pair{t, R(1)};
+            else if (t < 2 * m)
+                return std::pair{t - m, omega};
+            else
+                return std::pair{t - 2 * m, omega2};
+        }();
         R mult_omega = mult * omega;
         for (u64 j = 0; j < tt; j++) to[j] = p[m - tt + j] * mult_omega;
         for (u64 j = tt; j < m; j++) to[j] = p[j - tt] * mult;
@@ -216,7 +227,6 @@ class Conv64 {
         R inv = 1;
         for (u64 i = 1; i < r; i *= 3) inv *= inv_3;
 
-        if (tmp_v.size() < 3 * n + 6 * m) tmp_v.resize(3 * n + 6 * m);
         R* buf = tmp_v.data();
         R* pp = buf;
         R* qq = buf + n;
@@ -253,5 +263,10 @@ class Conv64 {
         for (u64 i = 0; i < n; ++i) target[i] = (to[i] * inv_3).a;
     }
 };
-u64_omega* Conv64::tmp;
-std::vector<u64_omega> Conv64::tmp_v;
+
+using conv64 = Conv64<524288>;
+template <std::size_t N>
+u64_omega* Conv64<N>::tmp;
+template <std::size_t N>
+std::array<u64_omega, Conv64<N>::BUF_SIZE> Conv64<N>::tmp_v;
+
