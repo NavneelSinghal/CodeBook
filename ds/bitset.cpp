@@ -21,35 +21,39 @@ DONE - last unset bit
 #include <cstdint>
 #include <iostream>
 
-template <int N>
+template <uint32_t N>
 struct Bitset {
+    using u64 = std::uint64_t;
+    using u32 = std::uint32_t;
+    using i32 = std::int32_t;
+
    private:
-    static constexpr uint64_t ONE = 1;
-    static constexpr uint64_t ZERO = 0;
-    static constexpr uint64_t ALL_MASK = ~ZERO;
-    static constexpr int BITS = sizeof(uint64_t) * CHAR_BIT;
-    static constexpr int ALL = BITS - 1;
-    static constexpr int CAPACITY = (N + BITS - 1) / BITS;
-    static constexpr int REMAINING = N & ALL;
-    static constexpr uint64_t CLEANUP_MASK = ~(ALL_MASK << REMAINING);
-    uint64_t a[CAPACITY];
+    static constexpr u64 ONE = 1;
+    static constexpr u64 ZERO = 0;
+    static constexpr u64 ALL_MASK = ~ZERO;
+    static constexpr u32 BITS = sizeof(u64) * CHAR_BIT;
+    static constexpr u32 ALL = BITS - 1;
+    static constexpr u32 CAPACITY = (N + BITS - 1) / BITS;
+    static constexpr u32 REMAINING = N & ALL;
+    static constexpr u64 CLEANUP_MASK = ~(ALL_MASK << REMAINING);
+    u64 a[CAPACITY];
     /**
      * storage:
      * a[0] = bit_63,   ..., bit_0
      * a[1] = bit_127,  ..., bit_64
      * ...
      *
-     * semantics of <<= and >>= : usual <<= and >>= semantics for uint64_t
+     * semantics of <<= and >>= : usual <<= and >>= semantics for u64
      */
 
     // NOTE: range violations are undefined behaviour and are unchecked
     struct reference {
        private:
-        int pos;
-        uint64_t* a;
+        u32 pos;
+        u64* a;
 
        public:
-        reference(int p, uint64_t* aa) : pos(p), a(aa) {}
+        reference(u32 p, u64* aa) : pos(p), a(aa) {}
         reference& operator=(bool x) noexcept {
             if (x)
                 *a |= ONE << pos;
@@ -78,22 +82,22 @@ struct Bitset {
         reset();
     };
 
-    constexpr Bitset(uint64_t x) noexcept : Bitset() { a[0] = x; };
+    constexpr Bitset(u64 x) noexcept : Bitset() { a[0] = x; };
 
     constexpr Bitset(const std::string& x) : Bitset() {
 #ifdef DEBUG
         if (x.size() > N * BITS)
             throw std::out_of_range("String is too large to convert to Bitset");
 #endif
-        int cur_loc = 0;
-        int bit = 0;
+        u32 cur_loc = 0;
+        u32 bit = 0;
         for (const auto c : x) {
 #ifdef DEBUG
             if (c != '0' && c != '1')
                 throw std::invalid_argument(
                     "String should consist of only 0s and 1s");
 #endif
-            a[cur_loc] |= uint64_t(c - '0') << (bit++);
+            a[cur_loc] |= u64(c - '0') << (bit++);
             if (bit == BITS) bit = 0, ++cur_loc;
         }
     }
@@ -108,11 +112,14 @@ struct Bitset {
 
     bool operator!=(const Bitset& b) const { return !(*this == b); }
 
-    constexpr bool operator[](int pos) const {
+    constexpr bool operator[](u32 pos) const {
+#ifdef DEBUG
+        assert(("Bitset index out of range, UB", pos >= 0 && pos < N));
+#endif
         return (a[pos / BITS] >> (pos & ALL)) & 1;
     }
 
-    reference operator[](int pos) {
+    reference operator[](u32 pos) {
 #ifdef DEBUG
         assert(("Bitset index out of range, UB", pos >= 0 && pos < N));
 #endif
@@ -122,21 +129,21 @@ struct Bitset {
     std::string to_string() const {
         std::string s(N, '0');
         auto it = s.data() + N - 1;
-        for (int i = 0; i < N; ++i) *(it--) += (a[i / BITS] >> (i & ALL)) & 1;
+        for (u32 i = 0; i < N; ++i) *(it--) += (a[i / BITS] >> (i & ALL)) & 1;
         return s;
     }
 
-    int count() const noexcept {
-        int ans = 0;
-        for (int i = 0; i < CAPACITY; ++i) ans += __builtin_popcountll(a[i]);
+    u32 count() const noexcept {
+        u32 ans = 0;
+        for (u32 i = 0; i < CAPACITY; ++i) ans += __builtin_popcountll(a[i]);
         return ans;
     }
 
-    int size() const noexcept { return N; }
+    u32 size() const noexcept { return N; }
 
 #define IMPLEMENT(op)                                      \
     Bitset& operator op(const Bitset& b) noexcept {        \
-        for (int i = 0; i < CAPACITY; ++i) a[i] op b.a[i]; \
+        for (u32 i = 0; i < CAPACITY; ++i) a[i] op b.a[i]; \
         return *this;                                      \
     }
     IMPLEMENT(&=)
@@ -144,25 +151,25 @@ struct Bitset {
     IMPLEMENT(^=)
 #undef IMPLEMENT
     Bitset& flip() noexcept {
-        for (int i = 0; i < CAPACITY; ++i) a[i] = ~a[i];
+        for (u32 i = 0; i < CAPACITY; ++i) a[i] = ~a[i];
         cleanup();
         return *this;
     }
     Bitset operator~() const noexcept { return Bitset(*this).flip(); }
 
-    Bitset& operator<<=(int n) noexcept {
+    Bitset& operator<<=(u32 n) noexcept {
         if (n > N) {
             reset();
             return *this;
         }
         if (__builtin_expect(n != 0, 1)) {
-            const int loc = n / BITS;
-            const int pos = n & ALL;
+            const u32 loc = n / BITS;
+            const u32 pos = n & ALL;
             if (pos == 0)
-                for (int i = CAPACITY - 1; i >= loc; --i) a[i] = a[i - loc];
+                for (u32 i = CAPACITY - 1; i != loc - 1; --i) a[i] = a[i - loc];
             else {
-                const int complement = BITS - pos;
-                for (int i = CAPACITY - 1; i > loc; --i)
+                const u32 complement = BITS - pos;
+                for (u32 i = CAPACITY - 1; i != loc - 1; --i)
                     a[i] = (a[i - loc] << pos) | (a[i - loc - 1] >> complement);
                 a[loc] = a[0] << pos;
             }
@@ -173,20 +180,20 @@ struct Bitset {
     }
 
     // 01000 -> 00100
-    Bitset& operator>>=(int n) noexcept {
+    Bitset& operator>>=(u32 n) noexcept {
         if (n > N) {
             reset();
             return *this;
         }
         if (__builtin_expect(n != 0, 1)) {
-            const int loc = n / BITS;
-            const int pos = n & ALL;
-            const int l = CAPACITY - 1 - loc;
+            const u32 loc = n / BITS;
+            const u32 pos = n & ALL;
+            const u32 l = CAPACITY - 1 - loc;
             if (pos == 0)
-                for (int i = 0; i <= l; ++i) a[i] = a[i + loc];
+                for (u32 i = 0; i <= l; ++i) a[i] = a[i + loc];
             else {
-                const int complement = BITS - pos;
-                for (int i = 0; i < l; ++i)
+                const u32 complement = BITS - pos;
+                for (u32 i = 0; i < l; ++i)
                     a[i] = (a[i + loc] >> pos) | (a[i + loc + 1] << complement);
                 a[l] = a[CAPACITY - 1] >> pos;
             }
@@ -196,8 +203,8 @@ struct Bitset {
         return *this;
     }
 
-    Bitset operator<<(int n) const noexcept { return Bitset(*this) <<= n; }
-    Bitset operator>>(int n) const noexcept { return Bitset(*this) >>= n; }
+    Bitset operator<<(u32 n) const noexcept { return Bitset(*this) <<= n; }
+    Bitset operator>>(u32 n) const noexcept { return Bitset(*this) >>= n; }
 
     void reset() noexcept { std::fill(std::begin(a), std::end(a), 0); }
 
@@ -206,27 +213,29 @@ struct Bitset {
         cleanup();
     }
 
-    int find_first_set() const noexcept {
-        for (int i = 0; i < CAPACITY; ++i) {
-            uint64_t w = a[i];
+    // warning: these use ints and not u
+
+    i32 find_first_set() const noexcept {
+        for (i32 i = 0; i < CAPACITY; ++i) {
+            u64 w = a[i];
             if (w) return i * BITS + __builtin_ctzll(w);
         }
         return N;
     }
 
-    int find_first_unset() const noexcept {
-        for (int i = 0; i < CAPACITY; ++i) {
-            uint64_t w = ~a[i];
+    i32 find_first_unset() const noexcept {
+        for (i32 i = 0; i < CAPACITY; ++i) {
+            u64 w = ~a[i];
             if (w) return i * BITS + __builtin_ctzll(w);
         }
         return N;
     }
 
-    int find_next_set(int i) const noexcept {
+    i32 find_next_set(i32 i) const noexcept {
         ++i;
         if (i >= BITS * CAPACITY) return N;
-        int loc = i / BITS;
-        uint64_t w = a[loc] & (ALL_MASK << (i & ALL));
+        i32 loc = i / BITS;
+        u64 w = a[loc] & (ALL_MASK << (i & ALL));
         if (w) return loc * BITS + __builtin_ctzll(w);
         for (++loc; loc < CAPACITY; ++loc) {
             w = a[loc];
@@ -235,11 +244,11 @@ struct Bitset {
         return N;
     }
 
-    int find_next_unset(int i) const noexcept {
+    i32 find_next_unset(i32 i) const noexcept {
         ++i;
         if (i >= BITS * CAPACITY) return N;
-        int loc = i / BITS;
-        uint64_t w = (~a[loc]) & (ALL_MASK << (i & ALL));
+        i32 loc = i / BITS;
+        u64 w = (~a[loc]) & (ALL_MASK << (i & ALL));
         if (w) return loc * BITS + __builtin_ctzll(w);
         for (++loc; loc < CAPACITY; ++loc) {
             w = ~a[loc];
@@ -248,64 +257,142 @@ struct Bitset {
         return N;
     }
 
-    int find_last_set() const noexcept {
-        for (int i = CAPACITY - 1; i >= 0; --i) {
-            uint64_t w = a[i];
+    i32 find_prev_set(i32 i) const noexcept {
+        --i;
+        if (i < 0) return -1;
+        i32 loc = i / BITS;
+        u64 w = a[loc] & (ALL_MASK >> (ALL ^ (i & ALL)));
+        if (w) return loc * BITS + (ALL ^ __builtin_clzll(w));
+        for (--loc; loc >= 0; --loc) {
+            w = a[loc];
+            if (w) return loc * BITS + (ALL ^ __builtin_clzll(w));
+        }
+        return -1;
+    }
+
+    i32 find_prev_unset(i32 i) const noexcept {
+        --i;
+        if (i < 0) return -1;
+        i32 loc = i / BITS;
+        u64 w = (~a[loc]) & (ALL_MASK >> (ALL ^ (i & ALL)));
+        if (w) return loc * BITS + (ALL ^ __builtin_clzll(w));
+        for (--loc; loc >= 0; --loc) {
+            w = ~a[loc];
+            if (w) return loc * BITS + (ALL ^ __builtin_clzll(w));
+        }
+        return -1;
+    }
+
+    i32 find_next_set(i32 i, i32 max_iter) const noexcept {
+        ++i;
+        if (i >= BITS * CAPACITY) return N;
+        i32 loc = i / BITS;
+        u64 w = a[loc] & (ALL_MASK << (i & ALL));
+        if (w) return loc * BITS + __builtin_ctzll(w);
+        int iter = 0;
+        for (++loc; loc < CAPACITY && iter < max_iter; ++loc, ++iter) {
+            w = a[loc];
+            if (w) return loc * BITS + __builtin_ctzll(w);
+        }
+        return N;
+    }
+
+    i32 find_next_unset(i32 i, i32 max_iter) const noexcept {
+        ++i;
+        if (i >= BITS * CAPACITY) return N;
+        i32 loc = i / BITS;
+        u64 w = (~a[loc]) & (ALL_MASK << (i & ALL));
+        if (w) return loc * BITS + __builtin_ctzll(w);
+        int iter = 0;
+        for (++loc; loc < CAPACITY && iter < max_iter; ++loc, ++iter) {
+            w = ~a[loc];
+            if (w) return loc * BITS + __builtin_ctzll(w);
+        }
+        return N;
+    }
+
+    i32 find_prev_set(i32 i, i32 max_iter) const noexcept {
+        --i;
+        if (i < 0) return -1;
+        i32 loc = i / BITS;
+        u64 w = a[loc] & (ALL_MASK >> (ALL ^ (i & ALL)));
+        if (w) return loc * BITS + (ALL ^ __builtin_clzll(w));
+        int iter = 0;
+        for (--loc; loc >= 0 && iter < max_iter; --loc, ++iter) {
+            w = a[loc];
+            if (w) return loc * BITS + (ALL ^ __builtin_clzll(w));
+        }
+        return -1;
+    }
+
+    i32 find_prev_unset(i32 i, i32 max_iter) const noexcept {
+        --i;
+        if (i < 0) return -1;
+        i32 loc = i / BITS;
+        u64 w = (~a[loc]) & (ALL_MASK >> (ALL ^ (i & ALL)));
+        if (w) return loc * BITS + (ALL ^ __builtin_clzll(w));
+        int iter = 0;
+        for (--loc; loc >= 0 && iter < max_iter; --loc, ++iter) {
+            w = ~a[loc];
+            if (w) return loc * BITS + (ALL ^ __builtin_clzll(w));
+        }
+        return -1;
+    }
+
+    i32 find_last_set() const noexcept {
+        for (i32 i = CAPACITY - 1; i >= 0; --i) {
+            u64 w = a[i];
             if (w) return i * BITS + (ALL ^ __builtin_clzll(w));
         }
         return -1;
     }
 
-    int find_last_unset() const noexcept {
-        for (int i = CAPACITY - 1; i >= 0; --i) {
-            uint64_t w = ~a[i];
+    i32 find_last_unset() const noexcept {
+        for (i32 i = CAPACITY - 1; i >= 0; --i) {
+            u64 w = ~a[i];
             if (w) return i * BITS + (ALL ^ __builtin_clzll(w));
         }
         return -1;
     }
 
-    // int find_kth_set(int k) const noexcept {}
+    // i32 find_kth_set(i32 k) const noexcept {}
 
-    // int find_kth_unset(int k) const noexcept {}
+    // i32 find_kth_unset(i32 k) const noexcept {}
 
-    // int find_kth_next_set(int i, int k) const noexcept {}
+    // i32 find_kth_next_set(i32 i, i32 k) const noexcept {}
 
-    // int find_kth_next_unset(int i, int k) const noexcept {}
+    // i32 find_kth_next_unset(i32 i, i32 k) const noexcept {}
 
-    // int find_kth_last_set(int k) const noexcept {}
+    // i32 find_kth_last_set(i32 k) const noexcept {}
 
-    // int find_kth_last_unset(int k) const noexcept {}
+    // i32 find_kth_last_unset(i32 k) const noexcept {}
 
     // return [l, r)
-    // 0 <= l < r <= N
-    uint64_t slice(int l, int r) {
+    u64 slice(const u32 l, const u32 r) const {
 #ifdef DEBUG
-        assert(l >= 0);
-        assert(r >= 0);
         assert(l <= N);
         assert(r <= N);
 #endif
-        uint64_t ans = 0;
-        if (l >= r) return ans;
-        int i1 = l / BITS;
-        int pos1 = l & ALL;
-        int i2 = (r - 1) / BITS;
-        int pos2 = (r - 1) & ALL;
+        if (l >= r) return 0;
+        // 0 <= l < r <= N
+        u32 i1 = l / BITS;
+        u32 pos1 = l & ALL;
+        u32 i2 = (r - 1) / BITS;
+        u32 pos2 = (r - 1) & ALL;
         if (i1 == i2) {
             return (a[i1] & (ALL_MASK >> (ALL - pos2))) >> pos1;
         } else {
 #ifdef DEBUG
             assert(i2 == i1 + 1);
 #endif
-            return (a[i1] << pos1) |
+            return (a[i1] >> pos1) |
                    ((a[i2] & (ALL_MASK >> (ALL - pos2))) << (BITS - pos1));
         }
-        return ans;
     }
 
     std::string to_string_debug() const {
         std::string s(CAPACITY * BITS, '0');
-        for (int i = 0; i < CAPACITY * BITS; ++i)
+        for (i32 i = 0; i < CAPACITY * BITS; ++i)
             s[CAPACITY * BITS - 1 - i] += (a[i / BITS] >> (i & ALL)) & 1;
         return s;
     }
