@@ -146,7 +146,7 @@ struct Bitset {
                 for (u32 i = CAPACITY - 1; i != loc - 1; --i) a[i] = a[i - loc];
             else {
                 const u32 complement = BITS - pos;
-                for (u32 i = CAPACITY - 1; i != loc; --i)
+                for (u32 i = CAPACITY - 1; i != loc - 1; --i)
                     a[i] = (a[i - loc] << pos) | (a[i - loc - 1] >> complement);
                 a[loc] = a[0] << pos;
             }
@@ -232,6 +232,88 @@ struct Bitset {
             if (w) return loc * BITS + __builtin_ctzll(w);
         }
         return N;
+    }
+
+    i32 find_prev_set(i32 i) const noexcept {
+        --i;
+        if (i < 0) return -1;
+        i32 loc = i / BITS;
+        u64 w = a[loc] & (ALL_MASK >> (ALL ^ (i & ALL)));
+        if (w) return loc * BITS + (ALL ^ __builtin_clzll(w));
+        for (--loc; loc >= 0; --loc) {
+            w = a[loc];
+            if (w) return loc * BITS + (ALL ^ __builtin_clzll(w));
+        }
+        return -1;
+    }
+
+    i32 find_prev_unset(i32 i) const noexcept {
+        --i;
+        if (i < 0) return -1;
+        i32 loc = i / BITS;
+        u64 w = (~a[loc]) & (ALL_MASK >> (ALL ^ (i & ALL)));
+        if (w) return loc * BITS + (ALL ^ __builtin_clzll(w));
+        for (--loc; loc >= 0; --loc) {
+            w = ~a[loc];
+            if (w) return loc * BITS + (ALL ^ __builtin_clzll(w));
+        }
+        return -1;
+    }
+
+    i32 find_next_set(i32 i, i32 max_iter) const noexcept {
+        ++i;
+        if (i >= BITS * CAPACITY) return N;
+        i32 loc = i / BITS;
+        u64 w = a[loc] & (ALL_MASK << (i & ALL));
+        if (w) return loc * BITS + __builtin_ctzll(w);
+        int iter = 0;
+        for (++loc; loc < CAPACITY && iter < max_iter; ++loc, ++iter) {
+            w = a[loc];
+            if (w) return loc * BITS + __builtin_ctzll(w);
+        }
+        return N;
+    }
+
+    i32 find_next_unset(i32 i, i32 max_iter) const noexcept {
+        ++i;
+        if (i >= BITS * CAPACITY) return N;
+        i32 loc = i / BITS;
+        u64 w = (~a[loc]) & (ALL_MASK << (i & ALL));
+        if (w) return loc * BITS + __builtin_ctzll(w);
+        int iter = 0;
+        for (++loc; loc < CAPACITY && iter < max_iter; ++loc, ++iter) {
+            w = ~a[loc];
+            if (w) return loc * BITS + __builtin_ctzll(w);
+        }
+        return N;
+    }
+
+    i32 find_prev_set(i32 i, i32 max_iter) const noexcept {
+        --i;
+        if (i < 0) return -1;
+        i32 loc = i / BITS;
+        u64 w = a[loc] & (ALL_MASK >> (ALL ^ (i & ALL)));
+        if (w) return loc * BITS + (ALL ^ __builtin_clzll(w));
+        int iter = 0;
+        for (--loc; loc >= 0 && iter < max_iter; --loc, ++iter) {
+            w = a[loc];
+            if (w) return loc * BITS + (ALL ^ __builtin_clzll(w));
+        }
+        return -1;
+    }
+
+    i32 find_prev_unset(i32 i, i32 max_iter) const noexcept {
+        --i;
+        if (i < 0) return -1;
+        i32 loc = i / BITS;
+        u64 w = (~a[loc]) & (ALL_MASK >> (ALL ^ (i & ALL)));
+        if (w) return loc * BITS + (ALL ^ __builtin_clzll(w));
+        int iter = 0;
+        for (--loc; loc >= 0 && iter < max_iter; --loc, ++iter) {
+            w = ~a[loc];
+            if (w) return loc * BITS + (ALL ^ __builtin_clzll(w));
+        }
+        return -1;
     }
 
     i32 find_last_set() const noexcept {
@@ -321,7 +403,6 @@ struct Bitset {
 
 // vEB tree implementation by mango_lassi
 
-// use for 2^B <= 1e9 and stuff
 // van Emde Boas tree. Maintains a set of integers in range [0, 2^B) and
 // supports operations
 //	findNext(i): returns minimum j >= i in set, or 2^B if none exist
@@ -407,20 +488,32 @@ class VEBTree {
     }
     template <class T>
     void init(const T& bts, int shift = 0, int s0 = 0, int s1 = 0) {
-        while (s0 + s1 < M && !bts[shift + s0]) ++s0;
-        while (s0 + s1 < M && !bts[shift + M - 1 - s1]) ++s1;
-        if (s0 + s1 >= M)
+        s0 = (bts[shift + s0]
+                  ? s0
+                  : bts.find_next_set(shift + s0, 2 + (M - 1 - s1 - s0) / 64) -
+                        shift);
+        if (s0 + s1 >= M) {
             clear();
-        else {
-            act.clear();
-            mi = s0, ma = M - 1 - s1;
-            ++s0;
-            ++s1;
-            for (int j = 0; j < S; ++j) {
-                ch[j].init(bts, shift + (j << R), std::max(0, s0 - (j << R)),
-                           std::max(0, s1 - ((S - 1 - j) << R)));
-                if (!ch[j].empty()) act.insert(j);
-            }
+            return;
+        }
+        // while (s0 + s1 < M && !bts[shift + M - 1 - s1]) ++s1;
+        s1 = (bts[shift + M - 1 - s1]
+                  ? s1
+                  : shift + M - 1 -
+                        bts.find_prev_set(shift + M - 1 - s1,
+                                          2 + (M - 1 - s1 - s0) / 64));
+        if (s0 + s1 >= M) {
+            clear();
+            return;
+        }
+        act.clear();
+        mi = s0, ma = M - 1 - s1;
+        ++s0;
+        ++s1;
+        for (int j = 0; j < S; ++j) {
+            ch[j].init(bts, shift + (j << R), std::max(0, s0 - (j << R)),
+                       std::max(0, s1 - ((S - 1 - j) << R)));
+            if (!ch[j].empty()) act.insert(j);
         }
     }
 };
