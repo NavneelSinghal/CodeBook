@@ -111,11 +111,13 @@ struct Random : RNG {
     template <class Int>
     auto operator()(Int a, Int b)
         -> std::enable_if_t<std::is_integral_v<Int>, Int> {
-        return a + static_cast<Int>(generate_random_n(b - a));
+        // return a + static_cast<Int>(generate_random_n(b - a));
+        return std::uniform_int_distribution<Int>(a, b)(*this);
     }
     template <class Int>
     auto operator()(Int a) -> std::enable_if_t<std::is_integral_v<Int>, Int> {
-        return static_cast<Int>(generate_random_n(a - 1));
+        // return static_cast<Int>(generate_random_n(a - 1));
+        return std::uniform_int_distribution<Int>(0, a - 1)(*this);
     }
     template <class Real>
     auto operator()(Real a, Real b)

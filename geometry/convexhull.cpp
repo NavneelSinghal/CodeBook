@@ -1,71 +1,51 @@
-struct convex_hull {
-    using TYPE = long long;  // use double normally
-    using point = pair<TYPE, TYPE>;
-    vector<point> points;
-    vector<point> hull_up, hull_down, hull_tot;
-
-    convex_hull() { init(); }
-    convex_hull(vector<point> &a) {
-        init();
-        points = a;
-    }
-
-    void init() { points = hull_up = hull_down = hull_tot = vector<point>(); }
-    void add_point(TYPE a, TYPE b) { points.push_back(make_pair(a, b)); }
-    /* sort by x, then y */
-    static bool point_comp(point a, point b) {
-        return a.first < b.first || (a.first == b.first && a.second < b.second);
-    }
-    /*
-    -1 - clockwise
-    0 - collinear
-    1 - counterclockwise
-    */
-    int orient(point a, point b, point c) {
-        TYPE val = a.first * (b.second - c.second) +
-                   b.first * (c.second - a.second) +
-                   c.first * (a.second - b.second);
-
-        if (val < 0)
-            return -1;
-        else if (val > 0)
-            return 1;
-        return 0;
-    }
-    void find_hull() {
-        if (points.size() == 1) {
-            hull_up = hull_down = hull_tot = points;
-            return;
-        }
-        sort(points.begin(), points.end(), point_comp);
-        point p1 = points[0], p2 = points.back();
-        hull_up.push_back(p1);
-        hull_down.push_back(p1);
-        int sz = (int)points.size();
-        for (int i = 1; i < sz; i++) {
-            /* end or clockwise */
-            if (i == points.size() - 1 || orient(p1, points[i], p2) == -1) {
-                /* while not cw */
-                while (hull_up.size() >= 2 &&
-                       orient(hull_up[hull_up.size() - 2], hull_up.back(),
-                              points[i]) != -1)
-                    hull_up.pop_back();
-                hull_up.push_back(points[i]);
-            }
-            /* end or ccw */
-            if (i == points.size() - 1 || orient(p1, points[i], p2) == 1) {
-                /* while not ccw */
-                while (hull_down.size() >= 2 &&
-                       orient(hull_down[hull_down.size() - 2], hull_down.back(),
-                              points[i]) != 1)
-                    hull_down.pop_back();
-                hull_down.push_back(points[i]);
-            }
-        }
-        for (int i = 0; i < (int)hull_up.size(); i++)
-            hull_tot.push_back(hull_up[i]);
-        for (int i = hull_down.size() - 2; i > 0; i--)
-            hull_tot.push_back(hull_down[i]);
-    }
+using TYPE = ll;
+struct pt {
+    TYPE x, y;
 };
+int orientation(pt a, pt b, pt c) {
+    TYPE v = a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y);
+    if (v < 0) return -1;  // clockwise
+    if (v > 0) return +1;  // counter-clockwise
+    return 0;
+}
+bool cw(pt a, pt b, pt c, bool include_collinear) {
+    int o = orientation(a, b, c);
+    return o < 0 || (include_collinear && o == 0);
+}
+bool ccw(pt a, pt b, pt c, bool include_collinear) {
+    int o = orientation(a, b, c);
+    return o > 0 || (include_collinear && o == 0);
+}
+void replace_with_convex_hull(vector<pt>& a, bool include_collinear = false) {
+    if (a.size() == 1) return;
+    sort(a.begin(), a.end(),
+         [](pt a, pt b) { return make_pair(a.x, a.y) < make_pair(b.x, b.y); });
+    pt p1 = a[0], p2 = a.back();
+    vector<pt> up, down;
+    up.push_back(p1);
+    down.push_back(p1);
+    for (int i = 1; i < (int)a.size(); i++) {
+        if (i == (int)a.size() - 1 || cw(p1, a[i], p2, include_collinear)) {
+            while (up.size() >= 2 && !cw(up[up.size() - 2], up[up.size() - 1],
+                                         a[i], include_collinear))
+                up.pop_back();
+            up.push_back(a[i]);
+        }
+        if (i == (int)a.size() - 1 || ccw(p1, a[i], p2, include_collinear)) {
+            while (down.size() >= 2 &&
+                   !ccw(down[down.size() - 2], down[down.size() - 1], a[i],
+                        include_collinear))
+                down.pop_back();
+            down.push_back(a[i]);
+        }
+    }
+
+    if (include_collinear && up.size() == a.size()) {
+        reverse(a.begin(), a.end());
+        return;
+    }
+    a.clear();
+    for (int i = 0; i < (int)up.size(); i++) a.push_back(up[i]);
+    for (int i = (int)down.size() - 2; i > 0; i--) a.push_back(down[i]);
+}
 
