@@ -45,7 +45,6 @@ auto sort_strings(const std::vector<T>& a, U max_value, F&& mapping = {}) {
         }
         int count_unique =
             int(std::unique(pairs.begin(), pairs.end()) - pairs.begin());
-        pairs.resize(count_unique);
         for (int i = 0; i < count_unique; ++i)
             non_empty[pairs[i].first].push_back(pairs[i].second);
     }
