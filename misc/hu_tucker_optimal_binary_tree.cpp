@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/atc002/submissions/30383964
+// https://math.mit.edu/~shor/PAM/hu-tucker_algorithm.html
 template <typename T, typename E, typename F, typename G, typename C, T INF,
           E e>
 struct SkewHeap {
@@ -24,9 +26,9 @@ struct SkewHeap {
 
     T top(Node* a) { return a ? f(a->val, a->add) : INF; }
 
-    T snd(Node* a) {
+    T worse_child(Node* a) {
         eval(a);
-        return a ? std::min(top(a->l), top(a->r)) : INF;
+        return a ? std::min(top(a->l), top(a->r), c) : INF;
     }
 
     Node* add(Node* a, E d) {
@@ -34,12 +36,14 @@ struct SkewHeap {
         return a;
     }
 
-    Node* new_node(T v) { return new Node(v, e); }
+    std::deque<Node> buffer;
+    Node* new_node(T v) { return &buffer.emplace_back(v, e); }
+    void clear_node(Node*) {}
 
     Node* meld(Node* a, Node* b) {
         if (!a) return b;
         if (!b) return a;
-        if (c(top(a), top(b))) std::swap(a, b);
+        if (c(top(b), top(a))) std::swap(a, b);
         eval(a);
         a->r = meld(a->r, b);
         std::swap(a->l, a->r);
@@ -49,7 +53,7 @@ struct SkewHeap {
     Node* pop(Node* a) {
         eval(a);
         auto res = meld(a->l, a->r);
-        delete a;
+        clear_node(a);
         return res;
     }
 };
@@ -64,11 +68,11 @@ T garsia_wachs(std::vector<T> s) {
         return a + b;
     };
     constexpr auto C = [](T a, T b) {
-        return a > b;
+        return a < b;
     };
     using Heap = SkewHeap<T, T, decltype(F), decltype(G), decltype(C), INF, 0>;
     Heap heap(F, G, C);
-    std::vector<typename Heap::Node*> hs(n, NULL);
+    std::vector<typename Heap::Node*> hs(n, nullptr);
     std::vector<int> ls(n - 1), rs(n - 1);
     std::vector<T> cs(n - 1);
 
@@ -96,7 +100,7 @@ T garsia_wachs(std::vector<T> s) {
             ml = true;
         } else if (s[i] + s[rs[i]] == c) {
             ml = mr = true;
-        } else if (heap.top(hs[i]) + heap.snd(hs[i]) == c) {
+        } else if (heap.top(hs[i]) + heap.worse_child(hs[i]) == c) {
             hs[i] = heap.pop(heap.pop(hs[i]));
         } else {
             hs[i] = heap.pop(hs[i]);
@@ -128,11 +132,10 @@ T garsia_wachs(std::vector<T> s) {
 
         cs[i] = std::min({s[i] + s[rs[i]],
                           std::min(s[i], s[rs[i]]) + heap.top(hs[i]),
-                          heap.top(hs[i]) + heap.snd(hs[i])});
+                          heap.top(hs[i]) + heap.worse_child(hs[i])});
 
         pq.emplace(cs[i], i);
     }
     return res;
 }
-
 
