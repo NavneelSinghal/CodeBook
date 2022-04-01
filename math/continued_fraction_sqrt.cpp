@@ -1,5 +1,6 @@
 // for more stuff: https://cp-algorithms.com/algebra/continued-fractions.html
 // for sqrt of rationals: http://web.math.princeton.edu/mathlab/jr02fall/Periodicity/mariusjp.pdf
+// for reference: timus 1814
 
 template <class T>
 auto continued_fraction_sqrt(T n) {
