@@ -18,45 +18,51 @@ class Mint {
     static constexpr Base One = Base{1};
 
    public:
-    Base mod() { return T::value; }
-    Mint() : v_(Zero) {}
-    M raw(Base v) { return *reinterpret_cast<M*>(&v); }
+    constexpr Base mod() { return T::value; }
+    constexpr Mint() : v_(Zero) {}
+    constexpr M raw(Base v) { return *reinterpret_cast<M*>(&v); }
     template <class V>
-    Mint(V v) : v_((v %= mod()) < Zero ? v + mod() : v) {}
-    M& operator++() { return v_ = ++v_ == mod() ? Zero : v_, *this; }
-    M& operator--() { return --(v_ ? v_ : v_ = mod()), *this; }
-    M operator+() const { return *this; }
-    M operator-() const { return raw(v_ ? mod() - v_ : Zero); }
-    M& operator*=(M o) { return v_ = Bigger(v_) * o.v_ % mod(), *this; }
-    M& operator/=(M o) {
+    constexpr Mint(V v) : v_{Base((v %= mod()) < Zero ? v + mod() : v)} {}
+    constexpr M& operator++() { return v_ = ++v_ == mod() ? Zero : v_, *this; }
+    constexpr M& operator--() { return --(v_ ? v_ : v_ = mod()), *this; }
+    constexpr M operator+() const { return *this; }
+    constexpr M operator-() const { return raw(v_ ? mod() - v_ : Zero); }
+    constexpr M& operator*=(M o) {
+        return v_ = Bigger(v_) * o.v_ % mod(), *this;
+    }
+    constexpr M& operator/=(M o) {
         auto [inv, gcd] = extgcd(o.v_, mod());
         assert(gcd == One);
         return *this *= inv;
     }
-    M& operator+=(M o) {
+    constexpr M& operator+=(M o) {
         return v_ = Base(v_ += o.v_ - mod()) < Zero ? v_ + mod() : v_, *this;
     }
-    M& operator-=(M o) {
+    constexpr M& operator-=(M o) {
         return v_ = Base(v_ -= o.v_) < Zero ? v_ + mod() : v_, *this;
     }
-    friend M operator++(M& a, int) { return std::exchange(a, ++M(a)); }
-    friend M operator--(M& a, int) { return std::exchange(a, --M(a)); }
-    friend M operator*(M a, M b) { return a *= b; }
-    friend M operator/(M a, M b) { return a /= b; }
-    friend M operator+(M a, M b) { return a += b; }
-    friend M operator-(M a, M b) { return a -= b; }
-    friend std::istream& operator>>(std::istream& is, M& x) {
+    constexpr friend M operator++(M& a, int) {
+        return std::exchange(a, ++M(a));
+    }
+    constexpr friend M operator--(M& a, int) {
+        return std::exchange(a, --M(a));
+    }
+    constexpr friend M operator*(M a, M b) { return a *= b; }
+    constexpr friend M operator/(M a, M b) { return a /= b; }
+    constexpr friend M operator+(M a, M b) { return a += b; }
+    constexpr friend M operator-(M a, M b) { return a -= b; }
+    constexpr friend std::istream& operator>>(std::istream& is, M& x) {
         int64_t v;
         return is >> v, x = v, is;
     }
-    friend std::ostream& operator<<(std::ostream& os, M x) {
+    constexpr friend std::ostream& operator<<(std::ostream& os, M x) {
         return os << x.v_;
     }
-    friend bool operator==(M a, M b) { return a.v_ == b.v_; }
-    friend bool operator!=(M a, M b) { return a.v_ != b.v_; }
+    constexpr friend bool operator==(M a, M b) { return a.v_ == b.v_; }
+    constexpr friend bool operator!=(M a, M b) { return a.v_ != b.v_; }
 
    private:
-    static std::array<Base, 2> extgcd(Base a, Base b) {
+    static constexpr std::array<Base, 2> extgcd(Base a, Base b) {
         std::array x{One, Zero};
         while (b) std::swap(x[0] -= a / b * x[1], x[1]), std::swap(a %= b, b);
         return {x[0], a};
