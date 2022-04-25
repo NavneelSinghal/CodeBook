@@ -1,3 +1,26 @@
+// find the longest subsequence s of [0, ..., n - 1] such that
+// comparator(s[i], s[i + 1]) is true for all valid i
+// no need to use template parameters for strict/non-strict
+template <class Compare, bool return_indices = false, bool do_reserve = false>
+auto get_lis_indices(int n, Compare&& comparator) {
+    std::vector<int> indices;
+    if constexpr (do_reserve) indices.reserve(n);
+    for (int i = 0; i < n; ++i) {
+        int location;
+        location = int(
+            std::lower_bound(indices.begin(), indices.end(), i, comparator) -
+            indices.begin());
+        if (location == (int)indices.size())
+            indices.push_back(i);
+        else
+            indices[location] = i;
+    }
+    if constexpr (return_indices)
+        return indices;
+    else
+        return indices.size();
+}
+
 template <class T, bool is_strict = true, bool return_indices = false,
           bool do_reserve = false>
 auto get_lis_indices(const std::vector<T>& a) {
