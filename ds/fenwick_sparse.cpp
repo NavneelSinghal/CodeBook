@@ -13,7 +13,7 @@ struct Fenwick {
     }
     // prefix sum [0, i)
     T query(ll i) {
-        T s = 0;
+        T s{};
         while (i) {
             auto it = t.find(i);
             if (it != t.end()) s += it->second;
@@ -37,7 +37,7 @@ struct Fenwick {
     // returns 0 if no such positive r exists
     template <class F>
     ll max_right(F&& f) {
-        T sum = 0;
+        T sum{};
         ll pos = 0;
         for (ll i = __lg(n); i >= 0; --i) {
             ll x = pos | (1LL << i);

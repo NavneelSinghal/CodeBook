@@ -5,7 +5,7 @@ struct Fenwick2D {
     vector<vector<T>> t;
     Fenwick2D(int n, int m) : n(n), m(m), t(n + 1, vector<T>(m + 1)) {}
     T query(int i, int j) {
-        T s = 0;
+        T s{};
         for (int x = i; x > 0; x -= x & (-x))
             for (int y = j; y > 0; y -= y & (-y)) s += t[x][y];
         return s;
@@ -94,7 +94,7 @@ struct SparseFenwick2D {
         t;
     SparseFenwick2D(int n, int m) : n(n), m(m) {}
     T query(int i, int j) {
-        T s = 0;
+        T s{};
         for (int x = i; x > 0; x -= x & (-x)) {
             auto& tx = t[x];
             for (int y = j; y > 0; y -= y & (-y)) s += tx[y];

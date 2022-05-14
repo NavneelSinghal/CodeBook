@@ -7,7 +7,7 @@ struct Fenwick {
     Fenwick(int n) : n(n), t(n + 1) {}
     // prefix sum [0, i)
     T query(int i) {
-        T s = 0;
+        T s{};
         while (i) {
             s += t[i];
             i -= i & (-i);
@@ -31,7 +31,7 @@ struct Fenwick {
     template <class F>
     int max_right(F&& f) {
         // assert(f(0));
-        T sum = 0;
+        T sum{};
         int pos = 0;
         for (int i = __lg(n); i >= 0; --i) {
             if (pos + (1 << i) <= n) {
