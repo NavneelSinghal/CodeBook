@@ -1,65 +1,57 @@
-template <class T>
+// Typical LogWidth = 3
+template <typename T, int LogWidth>
 struct PersistentArray {
-    using Array = std::vector<T>;
+    static constexpr int Mask = (1 << LogWidth) - 1;
+    struct WideNode {
+        T data;
+        std::array<WideNode*, 1 << LogWidth> child;
+        WideNode() : data{}, child{} {}
+        WideNode(const T& data) : data{data}, child{} {}
+    };
 
-    PersistentArray(const Array& data_)
-        : data{data_}, d{{true, -1, T{}, -1, 0}} {}
+    WideNode* root;
+    inline static std::deque<WideNode> buffer;
 
-    // returns value of latest version
-    T get(int version, int index) { return d[version].get(index, d, data); }
+    PersistentArray() : root{nullptr} {}
 
-    // returns value of latest version
-    T get(int index) { return d.back().get(index, d, data); }
+    // value at index k
+    T get(int k) { return get(root, k); }
 
-    // returns new version number
-    int set(int version, int index, T value) {
-        int new_pos = (int)d.size();
-        d.push_back(d[version].set(index, value, new_pos));
-        return new_pos;
+    // mutable value at index k
+    T* mutable_get(int k) {
+        auto [new_root, value_ptr] = mutable_get(root, k);
+        root = new_root;
+        return value_ptr;
     }
 
-    // returns new version number
-    int set(int index, T value) {
-        int new_pos = (int)d.size();
-        d.push_back(d.back().set(index, value, new_pos));
-        return new_pos;
+    // build from std::vector
+    void build(const std::vector<T>& v) {
+        root = nullptr;
+        for (int i = 0; i < (int)v.size(); i++) root = build(root, v[i], i);
     }
-
-    int total_versions() { return (int)d.size(); }
 
    private:
-    struct Node;
-    using Container = std::vector<Node>;
-    struct Node {
-        bool is_root;
-        int index;
-        T value;
-        int parent_pos;
-        int self_pos;
-        // for a single persistent array, the container c should be the same
-        T get(int i, Container& c, Array& a) {
-            reroot(c, a);
-            return a[i];
+    T get(WideNode* t, int k) {
+        if (k == 0) return t->data;
+        return get(t->child[k & Mask], k >> LogWidth);
+    }
+    std::pair<WideNode*, T*> mutable_get(WideNode* t, int k) {
+        t = t ? &buffer.emplace_back(*t) : &buffer.emplace_back();
+        if (k == 0) return {t, &t->data};
+        auto [ret_root, ret_value_ptr] =
+            mutable_get(t->child[k & Mask], k >> LogWidth);
+        t->child[k & Mask] = ret_root;
+        return {t, ret_value_ptr};
+    }
+    WideNode* build(WideNode* t, const T& data, int k) {
+        if (!t) t = &buffer.emplace_back();
+        if (k == 0) {
+            t->data = data;
+            return t;
         }
-        Node set(int i, T v, int new_self_pos) {
-            return Node{false, i, v, self_pos, new_self_pos};
-        }
-        void reroot(Container& c, Array& a) {
-            if (!is_root) {
-                auto i = index;
-                auto v = value;
-                auto& p = c[parent_pos];
-                p.reroot(c, a);
-                is_root = true;
-                std::swap(v, a[i]);
-                p.is_root = false;
-                p.index = i;
-                p.value = v;
-                p.parent_pos = self_pos;
-            }
-        }
-    };
-    Array data;
-    Container d;
+        auto p = build(t->child[k & Mask], data, k >> LogWidth);
+        t->child[k & Mask] = p;
+        return t;
+    }
 };
 
