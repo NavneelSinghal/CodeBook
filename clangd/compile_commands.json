@@ -3,7 +3,8 @@
     "arguments": [
       "/usr/bin/g++",
       "-O2",
-      "-std=c++17",
+      "-std=c++20",
+      "-fmodules-ts",
       "-DTIMING",
       "-DLOCAL",
       "-Wall",
@@ -25,7 +26,35 @@
       "a.cpp"
     ],
     "directory": "/home/navneel/Desktop/cp/workspace",
-    "file": "/home/navneel/Desktop/cp/workspace/a.cpp",
-    "output": "/home/navneel/Desktop/cp/workspace/a"
+    "file": "a.cpp",
+    "output": "a"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-O2",
+      "-std=c17",
+      "-Wall",
+      "-Wextra",
+      "-pedantic",
+      "-Wshadow",
+      "-Wformat=2",
+      "-Wfloat-equal",
+      "-Wconversion",
+      "-Wlogical-op",
+      "-Wshift-overflow=2",
+      "-Wduplicated-cond",
+      "-Wcast-qual",
+      "-Wcast-align",
+      "-Wno-sign-conversion",
+      "-Wno-unknown-pragmas",
+      "-o",
+      "a",
+      "a.c"
+    ],
+    "directory": "/home/navneel/Desktop/cp/workspace",
+    "file": "a.c",
+    "output": "a"
   }
+
 ]
