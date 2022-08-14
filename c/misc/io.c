@@ -1,123 +1,85 @@
-#define IBUFSIZE /* */
-#define OBUFSIZE /* */
+#include <inttypes.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+
+#define IBUFSIZE /* TODO */
+#define OBUFSIZE /* TODO */
 
 char ibuf[IBUFSIZE], obuf[OBUFSIZE];
 char *ibufptr = &*ibuf, *obufptr = &*obuf;
-
-// assumes "x y z"
-int read_non_negative() {
-    ++ibufptr;
-    int ans = 0;
-    while (*ibufptr >= '0') ans = ans * 10 + *(ibufptr++) - '0';
-    return ans;
-}
-
-int read_int() {
-    ++ibufptr;
-    int ans = 0;
-    int sign = 1;
-    if (*ibufptr == '-') sign = -1, ibufptr++;
-    while (*ibufptr >= '0') ans = ans * 10 + *(ibufptr++) - '0';
-    return ans * sign;
-}
 
 void print_char(char x) {
     *(obufptr++) = x;
 }
 
-// 1 2 3 4 5 6 7 8 9 10
-void print_non_negative(int x) {
-#define PRINT_MID(X, P) print_char((x / P) % 10 + 48)
-#define PRINT_TOP(X, P) print_char(x / P + 48)
-#define PRINT_BOTTOM(X) print_char(x % 10 + 48)
-    if (x < 1000000) {
-        if (x < 1000) {
-            if (x < 10) {
-                print_char(x + 48);
-            } else if (x < 100) {
-                PRINT_TOP(X, 10);
-                PRINT_BOTTOM(X);
-            } else {
-                PRINT_TOP(X, 100);
-                PRINT_MID(X, 10);
-                PRINT_BOTTOM(X);
-            }
-        } else {
-            if (x < 10000) {
-                PRINT_TOP(X, 1000);
-                PRINT_MID(X, 100);
-                PRINT_MID(X, 10);
-                PRINT_BOTTOM(X);
-            } else if (x < 100000) {
-                PRINT_TOP(X, 10000);
-                PRINT_MID(X, 1000);
-                PRINT_MID(X, 100);
-                PRINT_MID(X, 10);
-                PRINT_BOTTOM(X);
-            } else {
-                PRINT_TOP(X, 100000);
-                PRINT_MID(X, 10000);
-                PRINT_MID(X, 1000);
-                PRINT_MID(X, 100);
-                PRINT_MID(X, 10);
-                PRINT_BOTTOM(X);
-            }
-        }
-    } else {
-        if (x < 100000000) {
-            if (x < 10000000) {
-                PRINT_TOP(X, 1000000);
-                PRINT_MID(X, 100000);
-                PRINT_MID(X, 10000);
-                PRINT_MID(X, 1000);
-                PRINT_MID(X, 100);
-                PRINT_MID(X, 10);
-                PRINT_BOTTOM(X);
-            } else {
-                PRINT_TOP(X, 10000000);
-                PRINT_MID(X, 1000000);
-                PRINT_MID(X, 100000);
-                PRINT_MID(X, 10000);
-                PRINT_MID(X, 1000);
-                PRINT_MID(X, 100);
-                PRINT_MID(X, 10);
-                PRINT_BOTTOM(X);
-            }
-        } else {
-            if (x < 1000000000) {
-                PRINT_TOP(X, 100000000);
-                PRINT_MID(X, 10000000);
-                PRINT_MID(X, 1000000);
-                PRINT_MID(X, 100000);
-                PRINT_MID(X, 10000);
-                PRINT_MID(X, 1000);
-                PRINT_MID(X, 100);
-                PRINT_MID(X, 10);
-                PRINT_BOTTOM(X);
-            } else {
-                PRINT_TOP(X, 1000000000);
-                PRINT_MID(X, 100000000);
-                PRINT_MID(X, 10000000);
-                PRINT_MID(X, 1000000);
-                PRINT_MID(X, 100000);
-                PRINT_MID(X, 10000);
-                PRINT_MID(X, 1000);
-                PRINT_MID(X, 100);
-                PRINT_MID(X, 10);
-                PRINT_BOTTOM(X);
-            }
-        }
-    }
-#undef PRINT_MID
-#undef PRINT_TOP
-#undef PRINT_BOTTOM
+void print_str(const char* const c, size_t len) {
+    memcpy(obufptr, c, len);
+    obufptr += len;
 }
 
-void print(int x) {
-    if (x < 0)
-        print_char('-'), print_non_negative(-x);
-    else
-        print_non_negative(x);
+#define PRINT_UNSIGNED(X)            \
+    void print_u##X(uint##X##_t x) { \
+        if (x < 10)                  \
+            print_char(x + 48);      \
+        else {                       \
+            print_u##X(x / 10);      \
+            print_char(x % 10 + 48); \
+        }                            \
+    }
+
+#define unlikely(x) __builtin_expect(!!(x), 0)
+#define PRINT_SIGNED(X)                                        \
+    void print_i##X(int##X##_t x) {                            \
+        static char buf[100];                                  \
+        if (unlikely(x == INT##X##_MIN)) {                     \
+            int len = sprintf(buf, "%" PRIi##X, INT##X##_MIN); \
+            print_str(buf, len);                               \
+        } else if (x < 0) {                                    \
+            print_char('-');                                   \
+            print_u##X(-x);                                    \
+        } else {                                               \
+            print_u##X(x);                                     \
+        }                                                      \
+    }
+
+PRINT_UNSIGNED(32);
+PRINT_UNSIGNED(64);
+PRINT_SIGNED(32);
+PRINT_SIGNED(64);
+
+void skip_char() {
+    ++ibufptr;
+}
+
+// can do skip_spaces instead of skip_char for this purpose, but it will be
+// slower
+
+// assumes "x y z"
+#define READ_UNSIGNED(X)                                             \
+    uint##X##_t read_u##X() {                                        \
+        skip_char();                                                 \
+        uint##X##_t ans = 0;                                         \
+        while (*ibufptr >= '0') ans = ans * 10 + *(ibufptr++) - '0'; \
+        return ans;                                                  \
+    }
+#define READ_SIGNED(X)                                               \
+    uint##X##_t read_i##X() {                                        \
+        skip_char();                                                 \
+        int##X##_t ans = 0, sign = 1;                                \
+        if (*ibufptr == '-') sign = -1, ++ibufptr;                   \
+        while (*ibufptr >= '0') ans = ans * 10 + *(ibufptr++) - '0'; \
+        return sign * ans;                                           \
+    }
+
+READ_UNSIGNED(32);
+READ_UNSIGNED(64);
+READ_SIGNED(32);
+READ_SIGNED(64);
+
+void load_str(char* s) {
+    skip_char();
+    while (*ibufptr != ' ' && *ibufptr != '\n') *(s++) = *(ibufptr++);
 }
 
 // at the beginning of main():
