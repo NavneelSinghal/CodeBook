@@ -1,0 +1,9 @@
+1. https://dgc9715.github.io/ICPC-Reference
+2. https://github.com/NyaanNyaan/library
+3. https://ei1333.github.io/library/
+
+ICPC references:
+1. https://github.com/kth-competitive-programming/kactl/
+2. https://github.com/ecnerwala/cp-book
+
+segtree: https://dgc9715.github.io/ICPC-Reference/src/data_structures/seg_tree.cpp

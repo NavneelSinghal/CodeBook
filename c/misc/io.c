@@ -64,7 +64,7 @@ void skip_char() {
         return ans;                                                  \
     }
 #define READ_SIGNED(X)                                               \
-    uint##X##_t read_i##X() {                                        \
+    int##X##_t read_i##X() {                                         \
         skip_char();                                                 \
         int##X##_t ans = 0, sign = 1;                                \
         if (*ibufptr == '-') sign = -1, ++ibufptr;                   \
