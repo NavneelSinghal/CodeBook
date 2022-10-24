@@ -6,7 +6,7 @@ struct identity {
 };
 
 // sort strings of different lengths in time O(total length + max value)
-// return permutation as well as the sorted string
+// return permutation as well as the sorted strings
 template <class T, class U, class F = identity>
 auto sort_strings(const std::vector<T>& a, U max_value, F&& mapping = {}) {
     static_assert(

@@ -6,5 +6,6 @@ AlignTrailingComments: true
 DerivePointerAlignment: false
 PointerAlignment: Left
 AllowShortFunctionsOnASingleLine: Inline
-#AllowShortIfStatementsOnASingleLine: Always
+AllowShortIfStatementsOnASingleLine: Always
 AllowShortLambdasOnASingleLine: Inline
+ColumnLimit: 200
