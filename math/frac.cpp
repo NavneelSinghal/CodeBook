@@ -1,4 +1,5 @@
 struct frac {
+    using ll = __int128;
     ll n, d;
     frac(ll _n, ll _d) {
         n = _n, d = _d;

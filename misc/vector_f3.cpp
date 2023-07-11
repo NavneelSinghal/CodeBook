@@ -66,7 +66,7 @@ struct VectorF3 {
     template <typename T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
     constexpr VectorF3& operator*=(T x) {
         if (x == 0)
-            data[0].reset(), data[1].reset(), data[2].reset();
+            data[0].set(), data[1].reset(), data[2].reset();
         else if (x == 2)
             swap(data[1], data[2]);
         return *this;

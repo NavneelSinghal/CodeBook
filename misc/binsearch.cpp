@@ -1,7 +1,7 @@
 template <typename I, typename P, bool b>
 I bin_search_split(I l, I r, const P &predicate) {
     --l, ++r;
-    while (r - l > 1) {
+    while (l + 1 < r) {
         auto mid = l + (r - l) / 2;
         if (predicate(mid))
             l = mid;

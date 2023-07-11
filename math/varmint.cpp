@@ -18,9 +18,9 @@ class Mint {
     static constexpr Base One = Base{1};
 
    public:
-    constexpr Base mod() { return T::value; }
+    static constexpr Base mod() { return T::value; }
     constexpr Mint() : v_(Zero) {}
-    constexpr M raw(Base v) { return *reinterpret_cast<M*>(&v); }
+    static constexpr M raw(Base v) { return *reinterpret_cast<M*>(&v); }
     template <class V>
     constexpr Mint(V v) : v_{Base((v %= mod()) < Zero ? v + mod() : v)} {}
     constexpr M& operator++() { return v_ = ++v_ == mod() ? Zero : v_, *this; }
