@@ -1,147 +1,67 @@
-#pragma GCC optimize("Ofast")
-#pragma GCC target("avx")
-#pragma GCC optimize("unroll-loops")
-
-#include <bits/stdc++.h>
-
-using namespace std;
-
-#if 0
-
-Problem statement: given Q queries of the form k x1 x2 ... xk, find \sum_{(i, j) \in {1..k}^2, i < j} dist(xi, xj)
-
-Solution using virtual trees (compressed tree which contains only vertices and some LCAs (LCA is computed for adjacent vertices in preorder)
-
-#endif
-
-int n, l, timer;
-vector<int> tin, tout, mark, dep, subtree_cnt;
-vector<vector<int>> g, g_vt, up;
-
-void dfs(int v, int p) {
-    tin[v] = ++timer;
-    up[v][0] = p;
-    for (int i = 1; i <= l; ++i) up[v][i] = up[up[v][i - 1]][i - 1];
-    for (int u : g[v]) {
-        if (u != p) {
-            dep[u] = dep[v] + 1;
-            dfs(u, v);
+template <template <typename> class Container = std::vector>
+struct VirtualTree {
+    using graph = std::vector<Container<int>>;
+    VirtualTree(const graph& G, int root = 0) : N((int)G.size()), g(G), g_vt(N), par(N), start(N), depth(N), sz(N), in_time(N) {
+        par[root] = -1;
+        dfs_sz(root);
+        start[root] = root;
+        dfs_hld(root);
+    }
+ 
+    bool is_anc(int u, int v) { return in_time[u] <= in_time[v] && in_time[u] + sz[u] > in_time[v]; }
+ 
+    void dfs_sz(int u) {
+        sz[u] = 1;
+        for (auto& v : g[u]) {
+            par[v] = u;
+            depth[v] = depth[u] + 1;
+            g[v].erase(std::find(std::begin(g[v]), std::end(g[v]), u));
+            dfs_sz(v);
+            sz[u] += sz[v];
+            if (sz[v] > sz[g[u][0]]) std::swap(v, g[u][0]);
         }
     }
-    tout[v] = ++timer;
-}
-
-bool is_ancestor(int u, int v) {
-    return tin[u] <= tin[v] && tout[u] >= tout[v];
-}
-
-int lca(int u, int v) {
-    if (is_ancestor(u, v)) return u;
-    if (is_ancestor(v, u)) return v;
-    for (int i = l; i >= 0; --i)
-        if (!is_ancestor(up[u][i], v)) u = up[u][i];
-    return up[u][0];
-}
-
-void precompute_lca(int root = 0) {
-    tin.resize(n);
-    tout.resize(n);
-    dep.resize(n);
-    subtree_cnt.resize(n);
-    timer = 0;
-    l = ceil(log2(n));
-    up.assign(n, vector<int>(l + 1));
-    dfs(root, root);
-}
-
-bool cmp(int u, int v) { return tin[u] < tin[v]; }
-
-int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr);
-    cout.tie(nullptr);
-
-    cin >> n;
-    g.resize(n);
-    g_vt.resize(n);
-    mark.resize(n);
-
-    for (int i = 1; i < n; ++i) {
-        int u, v;
-        cin >> u >> v;
-        --u, --v;
-        g[u].push_back(v);
-        g[v].push_back(u);
+    void dfs_hld(int u) {
+        in_time[u] = timer++;
+        for (auto& v : g[u]) {
+            start[v] = (v == g[u][0] ? start[u] : v);
+            dfs_hld(v);
+        }
     }
-
-    precompute_lca();
-
-    int q;
-    cin >> q;
-    while (q--) {
-        int k;
-        cin >> k;
-        vector<int> vertices(k);
-
-        for (auto &x : vertices) {
-            cin >> x;
-            --x;
-            mark[x] = true;
-        }
-
-        // sort by dfs time (time when we enter vertex, also called tin-order),
-        // add lca of each pair of adjacent nodes, then sort again
-        vector<int> v = vertices;
-        sort(v.begin(), v.end(), cmp);
-        for (int i = 1; i < k; ++i) v.push_back(lca(v[i - 1], v[i]));
-        sort(v.begin(), v.end(), cmp);
-        v.erase(unique(v.begin(), v.end()), v.end());
-
-        for (auto x : v) {
-            g_vt[x].clear();
-        }
-
-        // create virtual tree from the found order
-        vector<int> st;  // stack of vertices
+    int lca(int u, int v) {
+        for (; start[u] != start[v]; v = par[start[v]])
+            if (depth[start[u]] > depth[start[v]]) std::swap(u, v);
+        return depth[u] < depth[v] ? u : v;
+    }
+    int dist(int u, int v) { return depth[u] + depth[v] - 2 * depth[lca(u, v)]; }
+    void build(std::span<int> vertices) {
+        auto k = vertices.size();
+        std::vector<int> v(vertices.begin(), vertices.end());
+        std::sort(std::begin(v), std::end(v), [&](int x, int y) { return in_time[x] < in_time[y]; });
+        for (std::size_t i = 1; i < k; ++i) v.push_back(lca(v[i - 1], v[i]));
+        std::sort(std::begin(v), std::end(v), [&](int x, int y) { return in_time[x] < in_time[y]; });
+        v.erase(std::unique(std::begin(v), std::end(v)), std::end(v));
+        k = v.size();
+        for (auto x : v) g_vt[x].clear();
+        std::vector<int> st;
         st.push_back(v[0]);
-        for (int i = 1; i < (int)v.size(); ++i) {
+        for (std::size_t i = 1; i < k; ++i) {
             int u = v[i];
-            while (st.size() >= 2 && !is_ancestor(st.back(), u)) {
-                g_vt[st[st.size() - 2]].push_back(st.back());
+            while (st.size() >= 2 && !is_anc(st.back(), u)) {
+                g_vt[st.end()[-2]].push_back(st.back());
                 st.pop_back();
             }
             st.push_back(u);
         }
-
         while (st.size() >= 2) {
-            g_vt[st[st.size() - 2]].push_back(st.back());
+            g_vt[st.end()[-2]].push_back(st.back());
             st.pop_back();
         }
-
-        int root_vt = st[0];
-
-        function<long long(int, int)> solve = [&](int u, int p) {
-            long long ans = 0;
-            subtree_cnt[u] = mark[u];
-            for (auto v : g_vt[u]) {
-                ans += solve(
-                    v, u);  // g_vt is directed tree so no parent check needed
-                subtree_cnt[u] += subtree_cnt[v];
-            }
-            if (p != -1) {
-                int weight = dep[u] - dep[p];
-                ans +=
-                    weight * 1ll * subtree_cnt[u] * 1ll * (k - subtree_cnt[u]);
-            }
-            return ans;
-        };
-
-        cout << solve(root_vt, -1) << '\n';
-
-        for (auto &x : vertices) {
-            mark[x] = false;
-        }
+        root_vt = st[0];
     }
-
-    return 0;
-}
+    int N;
+    graph g, g_vt;
+    std::vector<int> par, start, depth, sz, in_time;
+    int timer{};
+    int root_vt{};
+};

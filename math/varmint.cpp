@@ -70,6 +70,8 @@ class Mint {
     Base v_;
 };
 
+// usage
+
 constexpr int md = static_cast<int>(1e9 + 7);
 using mint_constant =
     Mint<std::integral_constant<decay<decltype(md)>::type, md>>;
